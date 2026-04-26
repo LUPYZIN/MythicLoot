@@ -31,6 +31,7 @@ header{
     text-align:center;
     backdrop-filter:blur(15px);
     border-bottom:1px solid rgba(255,255,255,0.05);
+    z-index:100;
 }
 .logo{
     font-weight:900;
@@ -42,7 +43,7 @@ header{
 
 /* WALLET */
 .wallet{
-    margin-top:80px;
+    margin-top:90px;
     display:flex;
     justify-content:center;
 }
@@ -57,10 +58,30 @@ header{
 /* GRID */
 .grid{
     padding:20px;
+    padding-bottom:90px;
     display:flex;
     justify-content:center;
     gap:25px;
     flex-wrap:wrap;
+}
+
+/* ===== CARROSSEL MOBILE ===== */
+@media(max-width:768px){
+.grid{
+    overflow:hidden;
+    justify-content:flex-start;
+}
+.carousel{
+    display:flex;
+    gap:20px;
+    overflow-x:auto;
+    scroll-snap-type:x mandatory;
+    padding:20px;
+}
+.box-card{
+    flex:0 0 70%;
+    scroll-snap-align:center;
+}
 }
 
 /* CARTA */
@@ -105,7 +126,7 @@ h3{font-size:16px;font-weight:800;}
 .rarity{font-size:11px;color:var(--muted);margin:5px 0;}
 .price{color:var(--primary);font-weight:800;}
 
-/* ===== OPENING AAA ===== */
+/* OPENING */
 #opening{
     display:none;
     position:fixed;
@@ -119,10 +140,8 @@ h3{font-size:16px;font-weight:800;}
     gap:20px;
 }
 
-/* BAU */
 .chest{
     font-size:90px;
-    transition:0.3s;
 }
 .shake{
     animation:shake 0.08s infinite;
@@ -135,64 +154,38 @@ h3{font-size:16px;font-weight:800;}
 100%{transform:rotate(-6deg)}
 }
 
-/* EXPLOSÃO */
+.explode{
+    animation:explode .5s forwards;
+}
 @keyframes explode{
 0%{transform:scale(1)}
 100%{transform:scale(2.5);opacity:0}
 }
-.explode{
-    animation:explode .5s forwards;
-}
 
-/* RESULT CARD AAA */
+/* RESULT */
 .result{
     display:none;
     perspective:1000px;
 }
-
 .result-card{
     width:230px;
     border-radius:16px;
     overflow:hidden;
     transform:rotateY(90deg) scale(.6);
     opacity:0;
-    transition:.6s cubic-bezier(.34,1.5,.64,1);
-    box-shadow:0 20px 60px rgba(0,0,0,.8);
+    transition:.6s;
 }
 .result-card.show{
     transform:rotateY(0) scale(1);
     opacity:1;
 }
-
-/* brilho animado */
-.result-card::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:linear-gradient(120deg,transparent,rgba(0,224,255,.5),transparent);
-    opacity:0;
-}
-.result-card.show::before{
-    animation:shine 1.2s ease;
-}
-@keyframes shine{
-0%{opacity:0;transform:translateX(-100%)}
-50%{opacity:1}
-100%{opacity:0;transform:translateX(100%)}
-}
-
 .result img{
     width:100%;
     height:300px;
     object-fit:cover;
 }
 
-.result h3{
-    text-align:center;
-    padding:10px;
-}
-
-/* BOTAO */
+/* BUTTON */
 button{
     padding:14px 30px;
     border:none;
@@ -200,10 +193,7 @@ button{
     background:var(--primary);
     font-weight:700;
     cursor:pointer;
-    transition:.2s;
-}
-button:hover{
-    transform:scale(1.05);
+    color:#fff;
 }
 
 /* MENU */
@@ -217,21 +207,29 @@ nav{
     justify-content:space-around;
     align-items:center;
     border-top:1px solid rgba(255,255,255,0.05);
+    z-index:100;
 }
+
 .nav-item{
     display:flex;
     flex-direction:column;
     align-items:center;
     color:var(--muted);
     font-size:12px;
+    transition:.3s;
 }
+.nav-item:hover{
+    color:var(--primary);
+    transform:translateY(-3px);
+}
+.nav-item.active{
+    color:var(--primary);
+}
+
 .nav-item svg{
     width:26px;
     height:26px;
     fill:currentColor;
-}
-.nav-item.active{
-    color:var(--primary);
 }
 </style>
 </head>
@@ -248,7 +246,7 @@ nav{
 </div>
 </div>
 
-<div class="grid">
+<div class="grid carousel">
 
 <div class="box-card" onclick="openBox(5)">
 <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co49ba.png')"></div>
@@ -281,7 +279,6 @@ nav{
 
 </div>
 
-<!-- OPEN -->
 <div id="opening">
 <div class="chest" id="chest">📦</div>
 <button id="spinBtn">GIRAR</button>
@@ -299,10 +296,12 @@ nav{
 <svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/></svg>
 <span>Caixas</span>
 </div>
+
 <div class="nav-item">
 <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>
 <span>Conta</span>
 </div>
+
 <div class="nav-item">
 <svg viewBox="0 0 24 24"><path d="M20 6h-3V4H7v2H4v14h16V6z"/></svg>
 <span>Resgatar</span>
@@ -351,9 +350,7 @@ document.getElementById("img").src=item.img;
 document.getElementById("name").innerText=item.name;
 
 document.getElementById("result").style.display="block";
-setTimeout(()=>{
-document.getElementById("card").classList.add("show");
-},50);
+setTimeout(()=>document.getElementById("card").classList.add("show"),50);
 
 setTimeout(()=>{
 document.getElementById("opening").style.display="none";
