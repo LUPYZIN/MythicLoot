@@ -2,8 +2,9 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>MYTHIC BOX - Som + Carrossel 2它</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>MYTHIC BOX - Carrossel Centralizado</title>
+
 <style>
 :root{
     --bg:#05070d;
@@ -193,7 +194,7 @@ button:hover{
     transform:scale(1.05);
 }
 
-/* MENU COM ANIMAÇÃO HOVER + SOM */
+/* MENU COM ANIMAÇÃO HOVER */
 nav{
     position:fixed;
     bottom:0;
@@ -237,45 +238,87 @@ nav{
     color:var(--primary);
 }
 
-/* ========== MOBILE: CARROSSEL COM 2 CAIXAS LADO A LADO ========== */
-@media (max-width: 768px){
-    .grid{
+/* ========== CARROSSEL ESTILO NETFLIX (APENAS MOBILE) ========== */
+@media (max-width: 768px) {
+    .grid {
         display: flex;
         flex-wrap: nowrap;
         overflow-x: auto;
         scroll-snap-type: x mandatory;
         -webkit-overflow-scrolling: touch;
-        gap: 16px;
-        padding: 20px 16px;
+        gap: 20px;
+        padding: 30px 15px;
         scroll-behavior: smooth;
+        /* remove barras de scroll mas mantém funcional */
+        scrollbar-width: thin;
     }
-    .grid .box-card{
-        width: calc(50% - 12px);
-        min-width: calc(50% - 12px);
-        scroll-snap-align: start;
-        transform: none !important;
-        filter: none !important;
-        opacity: 1 !important;
+    .grid::-webkit-scrollbar {
+        height: 4px;
     }
-    /* esconde scroll mas mantém funcional */
-    .grid::-webkit-scrollbar{
-        height: 3px;
-    }
-    .grid::-webkit-scrollbar-track{
+    .grid::-webkit-scrollbar-track {
         background: #1a1c24;
         border-radius: 10px;
     }
-    .grid::-webkit-scrollbar-thumb{
+    .grid::-webkit-scrollbar-thumb {
         background: var(--primary);
         border-radius: 10px;
     }
+
+    .grid .box-card {
+        scroll-snap-align: center;
+        width: 240px;
+        min-width: 240px;
+        transition: all 0.3s ease;
+    }
+
+    /* Efeito de profundidade: o card central fica maior, laterais menores e com opacidade */
+    .grid .box-card:not(.active-slide) {
+        transform: scale(0.85);
+        opacity: 0.6;
+        filter: blur(1px);
+    }
+    .grid .box-card.active-slide {
+        transform: scale(1.05);
+        opacity: 1;
+        filter: blur(0);
+        box-shadow: 0 0 25px rgba(0,224,255,0.5);
+        z-index: 2;
+    }
+
+    /* Botões de navegação customizados (setas) */
+    .carousel-controls {
+        display: flex;
+        justify-content: center;
+        gap: 25px;
+        margin: 10px 0 20px;
+    }
+    .carousel-btn {
+        background: rgba(0,224,255,0.2);
+        backdrop-filter: blur(8px);
+        border: 1px solid var(--primary);
+        border-radius: 60px;
+        width: 50px;
+        height: 50px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: 0.2s;
+        color: white;
+        font-size: 32px;
+        font-weight: bold;
+    }
+    .carousel-btn:hover {
+        background: var(--primary);
+        transform: scale(1.1);
+        box-shadow: 0 0 15px var(--primary);
+    }
 }
 
-@media (max-width: 480px){
-    .grid .box-card{
-        width: calc(50% - 12px);
-        min-width: calc(50% - 12px);
-        height: 270px;
+/* No desktop, esconde os controles do carrossel */
+@media (min-width: 769px) {
+    .carousel-controls {
+        display: none;
     }
 }
 </style>
@@ -293,66 +336,70 @@ nav{
 </div>
 
 <div class="grid" id="carouselGrid">
-<div class="box-card" data-price="5" data-name="Caixa Básica">
-<div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co49ba.png')"></div>
-<div class="card-overlay"></div>
-<div class="card-content">
-<div class="box-icon">🎁</div>
-<h3>Caixa Básica</h3>
-<p class="rarity">Games até R$100</p>
-<div class="price">R$ 5</div>
-</div>
+    <div class="box-card" data-price="5" data-name="Caixa Básica">
+        <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co49ba.png')"></div>
+        <div class="card-overlay"></div>
+        <div class="card-content">
+            <div class="box-icon">🎁</div>
+            <h3>Caixa Básica</h3>
+            <p class="rarity">Games até R$100</p>
+            <div class="price">R$ 5</div>
+        </div>
+    </div>
+    <div class="box-card disabled" data-price="15" data-disabled="true">
+        <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co2qhe.png')"></div>
+        <div class="card-overlay"></div>
+        <div class="card-content">
+            <h3>Intermediária</h3>
+            <p class="rarity">EM BREVE</p>
+            <div class="price">R$ 15</div>
+        </div>
+    </div>
+    <div class="box-card disabled" data-price="30" data-disabled="true">
+        <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.png')"></div>
+        <div class="card-overlay"></div>
+        <div class="card-content">
+            <h3>Premium</h3>
+            <p class="rarity">EM BREVE</p>
+            <div class="price">R$ 30</div>
+        </div>
+    </div>
 </div>
 
-<div class="box-card disabled" data-price="15" data-disabled="true">
-<div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co2qhe.png')"></div>
-<div class="card-overlay"></div>
-<div class="card-content">
-<h3>Intermediária</h3>
-<p class="rarity">EM BREVE</p>
-<div class="price">R$ 15</div>
-</div>
-</div>
-
-<div class="box-card disabled" data-price="30" data-disabled="true">
-<div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.png')"></div>
-<div class="card-overlay"></div>
-<div class="card-content">
-<h3>Premium</h3>
-<p class="rarity">EM BREVE</p>
-<div class="price">R$ 30</div>
-</div>
-</div>
+<!-- Controles do carrossel (setas) aparecem só no mobile -->
+<div class="carousel-controls">
+    <div class="carousel-btn" id="prevCarousel">‹</div>
+    <div class="carousel-btn" id="nextCarousel">›</div>
 </div>
 
 <div id="opening">
-<div class="chest" id="chest">📦</div>
-<button id="spinBtn">GIRAR</button>
-<div class="result" id="result">
-<div class="result-card" id="card">
-<img id="img">
-<h3 id="name"></h3>
-</div>
-</div>
+    <div class="chest" id="chest">📦</div>
+    <button id="spinBtn">GIRAR</button>
+    <div class="result" id="result">
+        <div class="result-card" id="card">
+            <img id="img">
+            <h3 id="name"></h3>
+        </div>
+    </div>
 </div>
 
 <nav>
-<div class="nav-item active">
-<svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/></svg>
-<span>Caixas</span>
-</div>
-<div class="nav-item">
-<svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>
-<span>Conta</span>
-</div>
-<div class="nav-item">
-<svg viewBox="0 0 24 24"><path d="M20 6h-3V4H7v2H4v14h16V6z"/></svg>
-<span>Resgatar</span>
-</div>
+    <div class="nav-item active">
+        <svg viewBox="0 0 24 24"><path d="M3 7l9-4 9 4v10l-9 4-9-4z"/></svg>
+        <span>Caixas</span>
+    </div>
+    <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M12 12c2.7 0 5-2.3 5-5s-2.3-5-5-5-5 2.3-5 5 2.3 5 5 5zm0 2c-3.3 0-10 1.7-10 5v3h20v-3c0-3.3-6.7-5-10-5z"/></svg>
+        <span>Conta</span>
+    </div>
+    <div class="nav-item">
+        <svg viewBox="0 0 24 24"><path d="M20 6h-3V4H7v2H4v14h16V6z"/></svg>
+        <span>Resgatar</span>
+    </div>
 </nav>
 
 <script>
-// ==================== SONS (Web Audio - sem arquivos externos) ====================
+// ==================== SONS ====================
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
 
@@ -372,29 +419,13 @@ function playTone(freq, duration, type='sine', volume=0.2){
         osc.stop(now + duration);
     }catch(e){ console.warn("audio error", e); }
 }
+function playHover(){ playTone(880, 0.08, 'sine', 0.08); }
+function playClick(){ playTone(660, 0.1, 'sine', 0.15); }
+function playOpenBox(){ playTone(440, 0.2, 'triangle', 0.2); setTimeout(()=> playTone(550, 0.15, 'sine', 0.2), 100); }
+function playSpin(){ playTone(300, 0.1, 'sawtooth', 0.1); setTimeout(()=> playTone(350, 0.1, 'sawtooth', 0.1), 100); setTimeout(()=> playTone(400, 0.1, 'sawtooth', 0.1), 200); }
+function playWin(){ playTone(523.25, 0.2, 'sine', 0.3); setTimeout(()=> playTone(659.25, 0.2, 'sine', 0.3), 150); setTimeout(()=> playTone(783.99, 0.4, 'sine', 0.3), 300); }
 
-function playHover(){
-    playTone(880, 0.08, 'sine', 0.08);
-}
-function playClick(){
-    playTone(660, 0.1, 'sine', 0.15);
-}
-function playOpenBox(){
-    playTone(440, 0.2, 'triangle', 0.2);
-    setTimeout(()=> playTone(550, 0.15, 'sine', 0.2), 100);
-}
-function playSpin(){
-    playTone(300, 0.1, 'sawtooth', 0.1);
-    setTimeout(()=> playTone(350, 0.1, 'sawtooth', 0.1), 100);
-    setTimeout(()=> playTone(400, 0.1, 'sawtooth', 0.1), 200);
-}
-function playWin(){
-    playTone(523.25, 0.2, 'sine', 0.3);
-    setTimeout(()=> playTone(659.25, 0.2, 'sine', 0.3), 150);
-    setTimeout(()=> playTone(783.99, 0.4, 'sine', 0.3), 300);
-}
-
-// ==================== LÓGICA DO SISTEMA ====================
+// ==================== LÓGICA PRINCIPAL ====================
 let saldo = 100;
 const items = [
     {name:"Cyberpunk 2077", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co1r7h.png"},
@@ -413,7 +444,7 @@ function openBox(price){
         alert("Saldo insuficiente");
         return;
     }
-    playOpenBox();  // som ao abrir modal
+    playOpenBox();
     document.getElementById("opening").style.display="flex";
     document.getElementById("spinBtn").onclick=()=>spin(price);
 }
@@ -425,12 +456,12 @@ function spin(price){
     updateMoney();
     btn.style.display="none";
     chest.classList.add("shake");
-    playSpin(); // som de girar
+    playSpin();
     
     setTimeout(()=>{
         chest.classList.remove("shake");
         chest.classList.add("explode");
-        playWin(); // som de explosão/ganho
+        playWin();
         setTimeout(()=>{
             chest.style.display="none";
             const item=items[Math.floor(Math.random()*items.length)];
@@ -452,7 +483,7 @@ function spin(price){
     },2000);
 }
 
-// Associar clique nas caixas com som
+// Clique nas caixas
 document.querySelectorAll('.box-card').forEach(card => {
     card.addEventListener('click', function(e) {
         e.stopPropagation();
@@ -460,17 +491,105 @@ document.querySelectorAll('.box-card').forEach(card => {
             alert("🔒 Caixa em breve!");
             return;
         }
-        playClick();  // som de clique na caixa
+        playClick();
         const price = parseFloat(this.dataset.price);
         if(!isNaN(price)) openBox(price);
     });
 });
 
-// ==================== HOVER MENU COM SOM ====================
-document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('mouseenter', () => {
-        playHover();
+// ==================== CARROSSEL MOBILE ESTILO NETFLIX ====================
+function initMobileCarousel() {
+    const isMobile = window.innerWidth <= 768;
+    if(!isMobile) return;
+
+    const container = document.getElementById('carouselGrid');
+    const cards = Array.from(document.querySelectorAll('.box-card'));
+    if(cards.length === 0) return;
+
+    // Função para atualizar a classe "active-slide" baseada no centro da tela
+    function updateActiveSlide() {
+        const containerRect = container.getBoundingClientRect();
+        const centerX = containerRect.left + containerRect.width / 2;
+        let closestCard = null;
+        let closestDistance = Infinity;
+        
+        cards.forEach(card => {
+            const rect = card.getBoundingClientRect();
+            const cardCenterX = rect.left + rect.width / 2;
+            const distance = Math.abs(cardCenterX - centerX);
+            if(distance < closestDistance) {
+                closestDistance = distance;
+                closestCard = card;
+            }
+        });
+        
+        cards.forEach(card => card.classList.remove('active-slide'));
+        if(closestCard) closestCard.classList.add('active-slide');
+    }
+    
+    // Scroll suave para o card ao clicar nas setas
+    function scrollToCard(index) {
+        if(index < 0) index = 0;
+        if(index >= cards.length) index = cards.length-1;
+        const card = cards[index];
+        if(card) {
+            card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+            setTimeout(updateActiveSlide, 300);
+        }
+    }
+    
+    // Navegação por setas
+    let currentIdx = 0;
+    const updateCurrentIndex = () => {
+        const containerRect = container.getBoundingClientRect();
+        const centerX = containerRect.left + containerRect.width / 2;
+        let bestIdx = 0;
+        let bestDist = Infinity;
+        cards.forEach((card, idx) => {
+            const rect = card.getBoundingClientRect();
+            const dist = Math.abs(rect.left + rect.width/2 - centerX);
+            if(dist < bestDist) {
+                bestDist = dist;
+                bestIdx = idx;
+            }
+        });
+        currentIdx = bestIdx;
+    };
+    
+    document.getElementById('prevCarousel').addEventListener('click', () => {
+        playClick();
+        updateCurrentIndex();
+        scrollToCard(currentIdx - 1);
     });
+    document.getElementById('nextCarousel').addEventListener('click', () => {
+        playClick();
+        updateCurrentIndex();
+        scrollToCard(currentIdx + 1);
+    });
+    
+    // Atualiza ao rolar ou redimensionar
+    container.addEventListener('scroll', () => {
+        requestAnimationFrame(updateActiveSlide);
+    });
+    window.addEventListener('resize', () => {
+        updateActiveSlide();
+    });
+    updateActiveSlide();
+}
+
+// Ativar carrossel e áudio
+document.body.addEventListener('click', () => {
+    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+}, { once: true });
+
+window.addEventListener('load', () => {
+    initMobileCarousel();
+    updateMoney();
+});
+
+// Menu hover com som
+document.querySelectorAll('.nav-item').forEach(item => {
+    item.addEventListener('mouseenter', playHover);
     item.addEventListener('click', (e) => {
         document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
         item.classList.add('active');
@@ -479,13 +598,6 @@ document.querySelectorAll('.nav-item').forEach(item => {
         else if(tab === 'resgatar') alert("🎮 Resgate em breve!");
     });
 });
-
-// Iniciar áudio sob demanda (para não travar em navegadores)
-document.body.addEventListener('click', () => {
-    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
-}, { once: true });
-
-updateMoney();
 </script>
 </body>
 </html>
