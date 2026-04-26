@@ -3,346 +3,444 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>MYTHIC BOX - Carrossel Netflix</title>
+<title>MYTHIC BOX — Design Limpo</title>
 <style>
-:root{
-    --bg:#05070d;
-    --card:#111318;
-    --primary:#00e0ff;
-    --text:#fff;
-    --muted:#8e939c;
-}
-
-*{margin:0;padding:0;box-sizing:border-box;}
-
-body{
-    font-family:system-ui;
-    background: radial-gradient(circle at top,#0a0d18,#05070d);
-    color:var(--text);
-    padding-bottom: 80px;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-}
-
-/* HEADER */
-header{
-    position:fixed;
-    top:0;
-    width:100%;
-    padding:18px;
-    text-align:center;
-    backdrop-filter:blur(15px);
-    border-bottom:1px solid rgba(255,255,255,0.05);
-    z-index:100;
-    background: rgba(5,7,13,0.8);
-}
-.logo{
-    font-weight:900;
-    letter-spacing:3px;
-    background:linear-gradient(90deg,#fff,var(--primary));
-    -webkit-background-clip:text;
-    -webkit-text-fill-color:transparent;
-}
-
-/* WALLET */
-.wallet{
-    margin-top:85px;
-    display:flex;
-    justify-content:center;
-    width: 100%;
-}
-.wallet-box{
-    display:flex;
-    gap:10px;
-    padding:10px 18px;
-    border:1px solid var(--primary);
-    border-radius:12px;
-    background: rgba(17,19,24,0.5);
-    backdrop-filter: blur(4px);
-}
-
-/* CARROSSEL PRINCIPAL - estilo Netflix */
-.carousel-wrapper {
-    width: 100%;
-    max-width: 1200px;
-    margin: 20px auto;
-    position: relative;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 0 50px; /* espaço para as setas */
-}
-
-.carousel-container {
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none; /* Firefox */
-    -ms-overflow-style: none; /* IE */
-    flex: 1;
-    padding: 30px 0;
-}
-.carousel-container::-webkit-scrollbar {
-    display: none; /* Chrome/Safari - ESCONDE A BARRA */
-}
-
-.carousel {
-    display: flex;
-    gap: 25px;
-    justify-content: center;
-    align-items: center;
-    transition: all 0.3s;
-}
-
-/* Caixas do carrossel */
-.carousel .box-card {
-    flex: 0 0 auto;
-    width: 220px;
-    height: 320px;
-    scroll-snap-align: center;
-    transition: all 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.2);
-    filter: brightness(0.6) blur(1.5px);
-    transform: scale(0.85);
-    opacity: 0.7;
-    margin: 0 -10px; /* sobreposição suave */
-}
-.carousel .box-card.active {
-    filter: brightness(1) blur(0);
-    transform: scale(1.05);
-    opacity: 1;
-    z-index: 10;
-    box-shadow: 0 0 30px rgba(0,224,255,0.5);
+* {
     margin: 0;
-}
-.carousel .box-card.prev,
-.carousel .box-card.next {
-    filter: brightness(0.5) blur(1px);
-    transform: scale(0.85);
-    opacity: 0.7;
+    padding: 0;
+    box-sizing: border-box;
 }
 
-/* Botões de navegação */
-.carousel-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    background: rgba(0,224,255,0.2);
-    backdrop-filter: blur(8px);
-    border: 1px solid rgba(0,224,255,0.6);
+:root {
+    --bg: #0a0c12;
+    --surface: #14161f;
+    --surface-light: #1e202b;
+    --primary: #3b82f6;
+    --primary-soft: #60a5fa;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --border: #2d2f3e;
+    --card-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.4);
+}
+
+body {
+    font-family: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    line-height: 1.4;
+}
+
+/* Header — limpo, apenas essencial */
+header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    background: rgba(10, 12, 18, 0.85);
+    backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    z-index: 100;
+    padding: 14px 24px;
+}
+
+.header-content {
+    max-width: 1200px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.logo {
+    font-size: 1.5rem;
+    font-weight: 700;
+    letter-spacing: -0.3px;
+    background: linear-gradient(110deg, #fff, var(--primary-soft));
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+}
+
+.header-icons {
+    display: flex;
+    gap: 12px;
+}
+
+.icon-btn {
+    width: 36px;
+    height: 36px;
     border-radius: 50%;
-    width: 48px;
-    height: 48px;
+    background: var(--surface);
     display: flex;
     align-items: center;
     justify-content: center;
     cursor: pointer;
-    z-index: 20;
-    transition: all 0.2s;
+    transition: 0.2s;
+    border: 1px solid var(--border);
+}
+
+.icon-btn svg {
+    width: 18px;
+    height: 18px;
+    fill: var(--text-muted);
+}
+
+.icon-btn:hover {
+    background: var(--surface-light);
+    border-color: var(--primary-soft);
+}
+
+/* Wallet — simples, clean */
+.wallet {
+    display: flex;
+    justify-content: center;
+    margin-top: 100px;
+    margin-bottom: 32px;
+}
+
+.wallet-box {
+    background: var(--surface);
+    border-radius: 40px;
+    border: 1px solid var(--border);
+    padding: 10px 28px;
+    font-weight: 500;
+    font-size: 1.1rem;
+    color: var(--text);
+    backdrop-filter: blur(4px);
+}
+
+.wallet-box span {
+    color: var(--primary);
+    font-weight: 600;
+    margin-left: 6px;
+}
+
+/* Carrossel — mesma lógica estável, visual limpo */
+.carousel-wrapper {
+    width: 100%;
+    max-width: 1200px;
+    margin: 0 auto 40px;
+    position: relative;
+    padding: 20px 60px;
+}
+
+.carousel-container {
+    width: 100%;
+    overflow-x: auto;
+    scroll-behavior: smooth;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+    padding: 16px 0;
+}
+
+.carousel-container::-webkit-scrollbar {
+    display: none;
+}
+
+.carousel {
+    display: flex;
+    gap: 28px;
+    align-items: center;
+    justify-content: center;
+}
+
+/* Cards — elegantes, sem excesso de brilho */
+.box-card {
+    flex: 0 0 auto;
+    width: 260px;
+    height: 350px;
+    border-radius: 28px;
+    background: var(--surface);
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 1px solid var(--border);
+    box-shadow: var(--card-shadow);
+}
+
+.box-card:not(.active) {
+    transform: scale(0.85);
+    opacity: 0.7;
+    filter: brightness(0.9);
+}
+
+.box-card.active {
+    transform: scale(1.02);
+    border-color: var(--primary);
+    box-shadow: 0 12px 28px -8px rgba(59,130,246,0.3);
+    opacity: 1;
+    filter: brightness(1);
+}
+
+.card-bg {
+    position: absolute;
+    inset: 0;
+    background-size: cover;
+    background-position: center;
+    filter: brightness(0.6);
+    transition: 0.3s;
+}
+
+.box-card.active .card-bg {
+    filter: brightness(0.75);
+}
+
+.card-overlay {
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.85) 10%, rgba(0,0,0,0.2) 60%);
+}
+
+.card-content {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 20px;
+    text-align: center;
+    z-index: 2;
+}
+
+.box-icon {
     font-size: 32px;
-    font-weight: bold;
+    margin-bottom: 6px;
+}
+
+.card-content h3 {
+    font-size: 1.25rem;
+    font-weight: 600;
+    margin-bottom: 4px;
+}
+
+.rarity {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    margin: 6px 0;
+}
+
+.price {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: var(--primary-soft);
+}
+
+/* Botões do carrossel — minimalistas */
+.carousel-btn {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 44px;
+    height: 44px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 32px;
+    font-weight: 300;
+    color: var(--text-muted);
+    transition: 0.2s;
+    z-index: 20;
+}
+
+.carousel-btn:hover {
+    background: var(--surface-light);
+    border-color: var(--primary);
+    color: var(--primary);
+}
+
+.btn-left { left: 8px; }
+.btn-right { right: 8px; }
+
+/* Menu inferior — clean, flutuante suave */
+nav {
+    position: fixed;
+    bottom: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(10, 12, 18, 0.9);
+    backdrop-filter: blur(16px);
+    border-radius: 60px;
+    border: 1px solid var(--border);
+    padding: 6px 16px;
+    display: flex;
+    gap: 4px;
+    z-index: 100;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    padding: 8px 24px;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: 0.2s;
+    color: var(--text-muted);
+}
+
+.nav-item svg {
+    width: 24px;
+    height: 24px;
+    fill: currentColor;
+}
+
+.nav-item span {
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.nav-item:hover {
+    background: var(--surface);
+    color: var(--primary);
+}
+
+.nav-item.active {
+    background: var(--surface);
+    color: var(--primary);
+}
+
+/* Modal de abertura — limpo, sem brilho exagerado */
+#opening {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(10px);
+    z-index: 200;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 24px;
+}
+
+.chest {
+    font-size: 100px;
+    transition: 0.2s;
+}
+
+.shake {
+    animation: shakeIt 0.08s infinite;
+}
+
+@keyframes shakeIt {
+    0% { transform: rotate(0deg); }
+    50% { transform: rotate(5deg); }
+    100% { transform: rotate(-5deg); }
+}
+
+.explode {
+    animation: explodeAnim 0.45s forwards;
+}
+
+@keyframes explodeAnim {
+    0% { transform: scale(1); opacity: 1; }
+    100% { transform: scale(2); opacity: 0; }
+}
+
+.result {
+    display: none;
+    perspective: 800px;
+}
+
+.result-card {
+    width: 260px;
+    border-radius: 28px;
+    overflow: hidden;
+    background: var(--surface);
+    transform: rotateY(90deg) scale(0.8);
+    opacity: 0;
+    transition: 0.45s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+    border: 1px solid var(--border);
+}
+
+.result-card.show {
+    transform: rotateY(0) scale(1);
+    opacity: 1;
+}
+
+.result img {
+    width: 100%;
+    height: 320px;
+    object-fit: cover;
+}
+
+.result h3 {
+    padding: 18px;
+    text-align: center;
+    font-weight: 600;
+    background: var(--surface-light);
+    font-size: 1.1rem;
+}
+
+button {
+    background: var(--primary);
+    border: none;
+    padding: 12px 32px;
+    border-radius: 60px;
+    font-weight: 600;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: 0.2s;
     color: white;
 }
-.carousel-btn:hover {
-    background: var(--primary);
-    transform: translateY(-50%) scale(1.1);
-    box-shadow: 0 0 15px var(--primary);
-}
-.btn-left { left: 10px; }
-.btn-right { right: 10px; }
 
-/* Estilo base das caixas (igual original) */
-.box-card{
-    border-radius:18px;
-    overflow:hidden;
-    position:relative;
-    cursor:pointer;
-    transition:.35s;
-    box-shadow:0 15px 40px rgba(0,0,0,.6);
-}
-.box-card:hover{
-    transform:translateY(-10px) scale(1.02);
-}
-.card-bg{
-    position:absolute;
-    inset:0;
-    background-size:cover;
-    filter:brightness(.55);
-}
-.card-overlay{
-    position:absolute;
-    inset:0;
-    background:linear-gradient(to top,#000 15%,transparent 60%);
-}
-.card-content{
-    position:absolute;
-    bottom:0;
-    width:100%;
-    padding:15px;
-    text-align:center;
-}
-.box-icon{font-size:22px;}
-h3{font-size:16px;font-weight:800;}
-.rarity{font-size:11px;color:var(--muted);margin:5px 0;}
-.price{color:var(--primary);font-weight:800;}
-
-/* Modal de abertura (igual) */
-#opening{
-    display:none;
-    position:fixed;
-    inset:0;
-    background:#05070df2;
-    backdrop-filter:blur(20px);
-    z-index:200;
-    flex-direction:column;
-    align-items:center;
-    justify-content:center;
-    gap:20px;
-}
-.chest{
-    font-size:90px;
-    transition:0.3s;
-}
-.shake{
-    animation:shake 0.08s infinite;
-    filter:drop-shadow(0 0 20px var(--primary));
-}
-@keyframes shake{
-0%{transform:rotate(0)}
-50%{transform:rotate(6deg)}
-100%{transform:rotate(-6deg)}
-}
-@keyframes explode{
-0%{transform:scale(1)}
-100%{transform:scale(2.5);opacity:0}
-}
-.explode{
-    animation:explode .5s forwards;
-}
-.result{
-    display:none;
-    perspective:1000px;
-}
-.result-card{
-    width:230px;
-    border-radius:16px;
-    overflow:hidden;
-    transform:rotateY(90deg) scale(.6);
-    opacity:0;
-    transition:.6s cubic-bezier(.34,1.5,.64,1);
-    box-shadow:0 20px 60px rgba(0,0,0,.8);
-}
-.result-card.show{
-    transform:rotateY(0) scale(1);
-    opacity:1;
-}
-.result-card::before{
-    content:"";
-    position:absolute;
-    inset:0;
-    background:linear-gradient(120deg,transparent,rgba(0,224,255,.5),transparent);
-    opacity:0;
-}
-.result-card.show::before{
-    animation:shine 1.2s ease;
-}
-@keyframes shine{
-0%{opacity:0;transform:translateX(-100%)}
-50%{opacity:1}
-100%{opacity:0;transform:translateX(100%)}
-}
-.result img{
-    width:100%;
-    height:300px;
-    object-fit:cover;
-}
-.result h3{
-    text-align:center;
-    padding:10px;
-}
-button{
-    padding:14px 30px;
-    border:none;
-    border-radius:12px;
-    background:var(--primary);
-    font-weight:700;
-    cursor:pointer;
-    transition:.2s;
-}
-button:hover{
-    transform:scale(1.05);
+button:hover {
+    background: var(--primary-soft);
+    transform: scale(1.02);
 }
 
-/* Menu inferior */
-nav{
-    position:fixed;
-    bottom:0;
-    width:100%;
-    height:70px;
-    background:#0a0c12;
-    display:flex;
-    justify-content:space-around;
-    align-items:center;
-    border-top:1px solid rgba(255,255,255,0.05);
-    z-index:99;
-}
-.nav-item{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    color:var(--muted);
-    font-size:12px;
-    cursor:pointer;
-    transition: all 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
-    padding: 6px 12px;
-    border-radius: 30px;
-}
-.nav-item:hover{
-    transform: translateY(-4px);
-    color: var(--primary);
-    text-shadow: 0 0 6px var(--primary);
-}
-.nav-item:hover svg{
-    fill: var(--primary);
-    filter: drop-shadow(0 0 4px var(--primary));
-    transform: scale(1.1);
-}
-.nav-item svg{
-    width:26px;
-    height:26px;
-    fill:currentColor;
-    transition: all 0.2s;
-}
-.nav-item.active{
-    color:var(--primary);
+.disabled {
+    cursor: not-allowed;
+    opacity: 0.65;
+    filter: grayscale(0.2);
 }
 
-/* Responsivo: ajusta tamanho das caixas */
-@media (max-width: 768px){
-    .carousel .box-card {
-        width: 180px;
-        height: 270px;
+.disabled .price {
+    color: #6c757d;
+}
+
+/* Responsivo */
+@media (max-width: 780px) {
+    .box-card {
+        width: 200px;
+        height: 280px;
     }
-    .carousel .box-card.active {
-        transform: scale(1);
+    .carousel-wrapper {
+        padding: 10px 45px;
     }
     .carousel-btn {
-        width: 40px;
-        height: 40px;
+        width: 38px;
+        height: 38px;
         font-size: 28px;
     }
-    .btn-left { left: 5px; }
-    .btn-right { right: 5px; }
-    .carousel-wrapper {
-        padding: 0 40px;
+    .nav-item {
+        padding: 6px 16px;
+    }
+    .wallet-box {
+        padding: 8px 20px;
+        font-size: 1rem;
     }
 }
-@media (max-width: 480px){
-    .carousel .box-card {
-        width: 160px;
+
+@media (max-width: 520px) {
+    .box-card {
+        width: 170px;
         height: 240px;
+    }
+    .box-card.active {
+        transform: scale(1);
+    }
+    .box-card:not(.active) {
+        transform: scale(0.8);
+    }
+    .nav-item span {
+        font-size: 10px;
     }
 }
 </style>
@@ -350,43 +448,51 @@ nav{
 <body>
 
 <header>
-<div class="logo">MYTHIC BOX</div>
+    <div class="header-content">
+        <div class="logo">MYTHIC BOX</div>
+        <div class="header-icons">
+            <div class="icon-btn">
+                <svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-2h2v2zm0-4h-2V7h2v6z"/></svg>
+            </div>
+        </div>
+    </div>
 </header>
 
 <div class="wallet">
-<div class="wallet-box">
-💰 <span id="money">R$ 100,00</span>
-</div>
+    <div class="wallet-box">
+        💰 Saldo <span id="money">R$ 100,00</span>
+    </div>
 </div>
 
-<!-- CARROSSEL NETFLIX -->
 <div class="carousel-wrapper">
     <div class="carousel-btn btn-left" id="prevBtn">‹</div>
     <div class="carousel-container" id="carouselContainer">
         <div class="carousel" id="carousel">
-            <div class="box-card" data-price="5" data-name="Caixa Básica">
+            <div class="box-card" data-price="5">
                 <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co49ba.png')"></div>
                 <div class="card-overlay"></div>
                 <div class="card-content">
                     <div class="box-icon">🎁</div>
                     <h3>Caixa Básica</h3>
-                    <p class="rarity">Games até R$100</p>
+                    <p class="rarity">Até R$100</p>
                     <div class="price">R$ 5</div>
                 </div>
             </div>
-            <div class="box-card disabled" data-price="15" data-disabled="true">
+            <div class="box-card disabled" data-price="15">
                 <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co2qhe.png')"></div>
                 <div class="card-overlay"></div>
                 <div class="card-content">
+                    <div class="box-icon">✨</div>
                     <h3>Intermediária</h3>
                     <p class="rarity">EM BREVE</p>
                     <div class="price">R$ 15</div>
                 </div>
             </div>
-            <div class="box-card disabled" data-price="30" data-disabled="true">
+            <div class="box-card disabled" data-price="30">
                 <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.png')"></div>
                 <div class="card-overlay"></div>
                 <div class="card-content">
+                    <div class="box-icon">💎</div>
                     <h3>Premium</h3>
                     <p class="rarity">EM BREVE</p>
                     <div class="price">R$ 30</div>
@@ -395,17 +501,6 @@ nav{
         </div>
     </div>
     <div class="carousel-btn btn-right" id="nextBtn">›</div>
-</div>
-
-<div id="opening">
-    <div class="chest" id="chest">📦</div>
-    <button id="spinBtn">GIRAR</button>
-    <div class="result" id="result">
-        <div class="result-card" id="card">
-            <img id="img">
-            <h3 id="name"></h3>
-        </div>
-    </div>
 </div>
 
 <nav>
@@ -423,13 +518,25 @@ nav{
     </div>
 </nav>
 
+<div id="opening">
+    <div class="chest" id="chest">📦</div>
+    <button id="spinBtn">ABRIR</button>
+    <div class="result" id="result">
+        <div class="result-card" id="card">
+            <img id="img" alt="cover">
+            <h3 id="name"></h3>
+        </div>
+    </div>
+</div>
+
 <script>
-// ========== SONS ==========
+// Áudio simples opcional (sem exageros)
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
-function playTone(freq, duration, type='sine', volume=0.2){
-    try{
-        if(!audioCtx) audioCtx = new AudioCtx();
+function playTone(freq, duration, type='sine', vol=0.15) {
+    if (!audioCtx) audioCtx = new AudioCtx();
+    if (audioCtx.state === 'suspended') return;
+    try {
         const now = audioCtx.currentTime;
         const osc = audioCtx.createOscillator();
         const gain = audioCtx.createGain();
@@ -437,169 +544,137 @@ function playTone(freq, duration, type='sine', volume=0.2){
         gain.connect(audioCtx.destination);
         osc.frequency.value = freq;
         osc.type = type;
-        gain.gain.setValueAtTime(volume, now);
+        gain.gain.setValueAtTime(vol, now);
         gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
         osc.start();
         osc.stop(now + duration);
-    }catch(e){}
+    } catch(e) {}
 }
-function playHover(){ playTone(880, 0.08, 'sine', 0.08); }
-function playClick(){ playTone(660, 0.1, 'sine', 0.15); }
-function playOpenBox(){ playTone(440, 0.2, 'triangle', 0.2); setTimeout(()=> playTone(550, 0.15, 'sine', 0.2), 100); }
-function playSpin(){ playTone(300, 0.1, 'sawtooth', 0.1); setTimeout(()=> playTone(350, 0.1, 'sawtooth', 0.1), 100); setTimeout(()=> playTone(400, 0.1, 'sawtooth', 0.1), 200); }
-function playWin(){ playTone(523.25, 0.2, 'sine', 0.3); setTimeout(()=> playTone(659.25, 0.2, 'sine', 0.3), 150); setTimeout(()=> playTone(783.99, 0.4, 'sine', 0.3), 300); }
+function playClick() { playTone(660, 0.08, 'sine', 0.1); }
+function playOpen() { playTone(440, 0.18, 'triangle', 0.12); setTimeout(()=> playTone(560, 0.12, 'sine', 0.1), 100); }
+function playSpin() { playTone(320, 0.08, 'sawtooth', 0.08); setTimeout(()=> playTone(380, 0.08, 'sawtooth', 0.08), 100); }
+function playWin() { playTone(523, 0.2, 'sine', 0.2); setTimeout(()=> playTone(659, 0.2, 'sine', 0.2), 140); }
 
-// ========== LÓGICA DO CARROSSEL ==========
+// ========== CARROSSEL (lógica testada e estável) ==========
 const container = document.getElementById('carouselContainer');
-const carousel = document.getElementById('carousel');
-const cards = Array.from(document.querySelectorAll('.carousel .box-card'));
-let currentIndex = 1; // começa no meio (índice 1)
+const cards = document.querySelectorAll('.box-card');
+let currentIndex = 0;
+let autoDetect = true;
 
-function updateCarousel() {
-    const containerRect = container.getBoundingClientRect();
-    const centerX = containerRect.left + containerRect.width / 2;
-    let closestIndex = 0;
-    let minDistance = Infinity;
-    
+function scrollToCard(index) {
+    if (index < 0) index = cards.length - 1;
+    if (index >= cards.length) index = 0;
+    currentIndex = index;
+    const card = cards[currentIndex];
+    const scrollPos = card.offsetLeft - (container.clientWidth / 2) + (card.clientWidth / 2);
+    autoDetect = false;
+    container.scrollTo({ left: Math.max(0, scrollPos), behavior: 'smooth' });
+    setTimeout(() => { updateActive(); autoDetect = true; }, 280);
+}
+
+function updateActive() {
+    cards.forEach(c => c.classList.remove('active'));
+    cards[currentIndex].classList.add('active');
+}
+
+function detectCenter() {
+    if (!autoDetect) return;
+    const centerX = container.getBoundingClientRect().left + container.clientWidth / 2;
+    let closest = 0, minDist = Infinity;
     cards.forEach((card, idx) => {
-        const rect = card.getBoundingClientRect();
-        const cardCenter = rect.left + rect.width / 2;
-        const distance = Math.abs(cardCenter - centerX);
-        if (distance < minDistance) {
-            minDistance = distance;
-            closestIndex = idx;
-        }
+        const cardCenter = card.getBoundingClientRect().left + card.clientWidth / 2;
+        const dist = Math.abs(cardCenter - centerX);
+        if (dist < minDist) { minDist = dist; closest = idx; }
     });
-    
-    currentIndex = closestIndex;
-    cards.forEach((card, idx) => {
-        card.classList.remove('active', 'prev', 'next');
-        if (idx === currentIndex) {
-            card.classList.add('active');
-        } else if (idx === currentIndex - 1) {
-            card.classList.add('prev');
-        } else if (idx === currentIndex + 1) {
-            card.classList.add('next');
-        }
-    });
+    if (currentIndex !== closest) { currentIndex = closest; updateActive(); }
 }
 
-function scrollToIndex(index) {
-    const card = cards[index];
-    if (card) {
-        card.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-        setTimeout(updateCarousel, 200);
-    }
-}
-
-function next() {
-    if (currentIndex < cards.length - 1) {
-        scrollToIndex(currentIndex + 1);
-    } else {
-        scrollToIndex(0);
-    }
-}
-function prev() {
-    if (currentIndex > 0) {
-        scrollToIndex(currentIndex - 1);
-    } else {
-        scrollToIndex(cards.length - 1);
-    }
-}
-
-container.addEventListener('scroll', updateCarousel);
-window.addEventListener('resize', updateCarousel);
-document.getElementById('nextBtn').addEventListener('click', () => { playClick(); next(); });
-document.getElementById('prevBtn').addEventListener('click', () => { playClick(); prev(); });
-
-// Inicializar posição no centro
-setTimeout(() => {
-    scrollToIndex(1);
-    updateCarousel();
-}, 100);
+document.getElementById('nextBtn').onclick = () => { scrollToCard(currentIndex + 1); playClick(); };
+document.getElementById('prevBtn').onclick = () => { scrollToCard(currentIndex - 1); playClick(); };
+container.addEventListener('scroll', () => { clearTimeout(window.scrollTO); window.scrollTO = setTimeout(detectCenter, 40); });
+window.addEventListener('resize', () => setTimeout(() => scrollToCard(currentIndex), 100));
+setTimeout(() => scrollToCard(0), 100);
 
 // ========== SISTEMA DE CAIXAS ==========
-let saldo = 100;
-const items = [
-    {name:"Cyberpunk 2077", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co1r7h.png"},
-    {name:"Elden Ring", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.png"},
-    {name:"GTA V", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co1w2s.png"},
-    {name:"Hades", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co1z5c.png"},
-    {name:"The Witcher 3", img:"https://images.igdb.com/igdb/image/upload/t_cover_big/co1q8d.png"}
+let balance = 100;
+const prizeList = [
+    { name: 'Cyberpunk 2077', img: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1r7h.png' },
+    { name: 'Elden Ring', img: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.png' },
+    { name: 'GTA V', img: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1w2s.png' },
+    { name: 'Hades', img: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1z5c.png' },
+    { name: 'The Witcher 3', img: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1q8d.png' }
 ];
 
-function updateMoney(){
-    document.getElementById("money").innerText="R$ "+saldo.toFixed(2).replace(".",",");
+function updateBalanceUI() {
+    document.getElementById('money').innerText = 'R$ ' + balance.toFixed(2).replace('.', ',');
 }
 
-function openBox(price){
-    if(saldo<price){ alert("Saldo insuficiente"); return; }
-    playOpenBox();
-    document.getElementById("opening").style.display="flex";
-    document.getElementById("spinBtn").onclick=()=>spin(price);
+function openBox(price) {
+    if (balance < price) { alert('Saldo insuficiente'); return; }
+    playOpen();
+    document.getElementById('opening').style.display = 'flex';
+    document.getElementById('spinBtn').onclick = () => spin(price);
 }
 
-function spin(price){
-    const chest=document.getElementById("chest");
-    const btn=document.getElementById("spinBtn");
-    saldo-=price;
-    updateMoney();
-    btn.style.display="none";
-    chest.classList.add("shake");
+function spin(price) {
+    const chest = document.getElementById('chest');
+    const btn = document.getElementById('spinBtn');
+    balance -= price;
+    updateBalanceUI();
+    btn.style.display = 'none';
+    chest.classList.add('shake');
     playSpin();
-    setTimeout(()=>{
-        chest.classList.remove("shake");
-        chest.classList.add("explode");
+
+    setTimeout(() => {
+        chest.classList.remove('shake');
+        chest.classList.add('explode');
         playWin();
-        setTimeout(()=>{
-            chest.style.display="none";
-            const item=items[Math.floor(Math.random()*items.length)];
-            document.getElementById("img").src=item.img;
-            document.getElementById("name").innerText=item.name;
-            document.getElementById("result").style.display="block";
-            setTimeout(()=> document.getElementById("card").classList.add("show"), 50);
-            setTimeout(()=>{
-                document.getElementById("opening").style.display="none";
-                document.getElementById("result").style.display="none";
-                document.getElementById("card").classList.remove("show");
-                chest.style.display="block";
-                chest.classList.remove("explode");
-                btn.style.display="block";
-            }, 3500);
-        }, 400);
-    }, 2000);
+        setTimeout(() => {
+            chest.style.display = 'none';
+            const prize = prizeList[Math.floor(Math.random() * prizeList.length)];
+            document.getElementById('img').src = prize.img;
+            document.getElementById('name').innerHTML = prize.name + '<span style="display:block;font-size:0.8rem;margin-top:6px;color:#94a3b8;">Você ganhou!</span>';
+            document.getElementById('result').style.display = 'block';
+            setTimeout(() => document.getElementById('card').classList.add('show'), 40);
+            setTimeout(() => {
+                document.getElementById('opening').style.display = 'none';
+                document.getElementById('result').style.display = 'none';
+                document.getElementById('card').classList.remove('show');
+                chest.style.display = 'block';
+                chest.classList.remove('explode');
+                btn.style.display = 'block';
+            }, 3200);
+        }, 380);
+    }, 1600);
 }
 
+// Evento de clique nos cards
 cards.forEach(card => {
-    card.addEventListener('click', (e) => {
-        e.stopPropagation();
-        if(card.classList.contains('disabled')) {
-            alert("🔒 Caixa em breve!");
-            return;
-        }
+    card.addEventListener('click', () => {
+        if (card.classList.contains('disabled')) { alert('🔒 Em breve'); return; }
         playClick();
         const price = parseFloat(card.dataset.price);
-        if(!isNaN(price)) openBox(price);
+        if (!isNaN(price)) openBox(price);
     });
 });
 
-// Menu hover com som
+// Menu inferior
 document.querySelectorAll('.nav-item').forEach(item => {
-    item.addEventListener('mouseenter', playHover);
     item.addEventListener('click', () => {
-        document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+        document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
         item.classList.add('active');
-        const tab = item.querySelector('span').innerText.toLowerCase();
-        if(tab === 'conta') alert("👤 Área da conta em desenvolvimento! Saldo: R$"+saldo.toFixed(2));
-        else if(tab === 'resgatar') alert("🎮 Resgate em breve!");
+        const label = item.querySelector('span').innerText.toLowerCase();
+        if (label === 'conta') alert(`👤 Saldo atual: R$ ${balance.toFixed(2)}`);
+        else if (label === 'resgatar') alert('🎮 Em breve você poderá resgatar.');
     });
 });
 
+// Ativar áudio no primeiro toque
 document.body.addEventListener('click', () => {
-    if(audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
+    if (audioCtx && audioCtx.state === 'suspended') audioCtx.resume();
 }, { once: true });
 
-updateMoney();
+updateBalanceUI();
 </script>
 </body>
 </html>
