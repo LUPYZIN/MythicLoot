@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>MYTHIC BOX — Carrossel Centralizado</title>
+<title>MYTHIC BOX — Grid Responsivo</title>
 <style>
 * {
     margin: 0;
@@ -20,7 +20,7 @@
     --text: #f1f5f9;
     --text-muted: #94a3b8;
     --border: #2d2f3e;
-    --card-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.4);
+    --card-shadow: 0 12px 24px -12px rgba(0, 0, 0, 0.5);
 }
 
 body {
@@ -28,7 +28,7 @@ body {
     background: var(--bg);
     color: var(--text);
     min-height: 100vh;
-    line-height: 1.4;
+    padding-bottom: 100px;
 }
 
 /* Header */
@@ -96,7 +96,7 @@ header {
     display: flex;
     justify-content: center;
     margin-top: 100px;
-    margin-bottom: 32px;
+    margin-bottom: 40px;
 }
 
 .wallet-box {
@@ -116,50 +116,23 @@ header {
     margin-left: 6px;
 }
 
-/* Carrossel - estrutura corrigida para mobile */
-.carousel-wrapper {
-    width: 100%;
+/* Grid de caixas — responsivo, sem alterar o card */
+.container {
     max-width: 1200px;
-    margin: 0 auto 40px;
-    position: relative;
-    padding: 0 45px; /* espaço para os botões */
+    margin: 0 auto;
+    padding: 0 24px;
 }
 
-@media (max-width: 640px) {
-    .carousel-wrapper {
-        padding: 0 35px; /* menos espaço em mobile, mas suficiente para botões */
-    }
-}
-
-@media (max-width: 480px) {
-    .carousel-wrapper {
-        padding: 0 30px;
-    }
-}
-
-.carousel-container {
-    width: 100%;
-    overflow-x: auto;
-    scroll-behavior: smooth;
-    scrollbar-width: none;
-    -ms-overflow-style: none;
-    padding: 16px 0;
-}
-
-.carousel-container::-webkit-scrollbar {
-    display: none;
-}
-
-.carousel {
-    display: flex;
-    gap: 28px;
+.cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 32px;
+    justify-items: center;
     align-items: center;
-    justify-content: flex-start; /* importante: muda para flex-start para o cálculo funcionar */
 }
 
-/* Cards */
+/* Cards — mantendo o DESIGN ORIGINAL (retrato, imagem, overlay, etc) */
 .box-card {
-    flex: 0 0 auto;
     width: 260px;
     height: 350px;
     border-radius: 28px;
@@ -167,23 +140,15 @@ header {
     overflow: hidden;
     position: relative;
     cursor: pointer;
-    transition: all 0.3s ease;
+    transition: all 0.25s ease;
     border: 1px solid var(--border);
     box-shadow: var(--card-shadow);
 }
 
-.box-card:not(.active) {
-    transform: scale(0.85);
-    opacity: 0.7;
-    filter: brightness(0.9);
-}
-
-.box-card.active {
-    transform: scale(1.02);
+.box-card:hover {
+    transform: translateY(-6px);
     border-color: var(--primary);
-    box-shadow: 0 12px 28px -8px rgba(59,130,246,0.3);
-    opacity: 1;
-    filter: brightness(1);
+    box-shadow: 0 20px 30px -12px rgba(0, 0, 0, 0.5);
 }
 
 .card-bg {
@@ -195,7 +160,7 @@ header {
     transition: 0.3s;
 }
 
-.box-card.active .card-bg {
+.box-card:hover .card-bg {
     filter: brightness(0.75);
 }
 
@@ -237,37 +202,6 @@ header {
     font-weight: 700;
     color: var(--primary-soft);
 }
-
-/* Botões do carrossel - sempre visíveis e clicáveis */
-.carousel-btn {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    width: 44px;
-    height: 44px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 60px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    font-size: 32px;
-    font-weight: 300;
-    color: var(--text-muted);
-    transition: 0.2s;
-    z-index: 20;
-    backdrop-filter: blur(4px);
-}
-
-.carousel-btn:hover {
-    background: var(--surface-light);
-    border-color: var(--primary);
-    color: var(--primary);
-}
-
-.btn-left { left: 8px; }
-.btn-right { right: 8px; }
 
 /* Menu inferior */
 nav {
@@ -418,36 +352,51 @@ button:hover {
     color: #6c757d;
 }
 
-/* Ajustes responsivos para os cards não ficarem cortados */
-@media (max-width: 780px) {
-    .box-card {
-        width: 200px;
-        height: 280px;
+/* Responsivo: mobile com 2 colunas */
+@media (max-width: 860px) {
+    .cards-grid {
+        gap: 24px;
     }
-    .carousel-btn {
-        width: 38px;
-        height: 38px;
+    .box-card {
+        width: 220px;
+        height: 300px;
+    }
+}
+
+@media (max-width: 720px) {
+    .cards-grid {
+        grid-template-columns: repeat(2, 1fr);
+        gap: 20px;
+    }
+    .box-card {
+        width: 100%;
+        max-width: 260px;
+        height: auto;
+        aspect-ratio: 260 / 350;
+    }
+    .container {
+        padding: 0 16px;
+    }
+    .wallet {
+        margin-top: 90px;
+    }
+}
+
+@media (max-width: 480px) {
+    .box-card {
+        max-width: 100%;
+    }
+    .card-content h3 {
+        font-size: 1rem;
+    }
+    .price {
+        font-size: 1.1rem;
+    }
+    .box-icon {
         font-size: 28px;
     }
     .nav-item {
         padding: 6px 16px;
-    }
-    .wallet-box {
-        padding: 8px 20px;
-        font-size: 1rem;
-    }
-}
-
-@media (max-width: 520px) {
-    .box-card {
-        width: 170px;
-        height: 240px;
-    }
-    .box-card.active {
-        transform: scale(1);
-    }
-    .box-card:not(.active) {
-        transform: scale(0.8);
     }
     .nav-item span {
         font-size: 10px;
@@ -474,43 +423,42 @@ button:hover {
     </div>
 </div>
 
-<div class="carousel-wrapper">
-    <div class="carousel-btn btn-left" id="prevBtn">‹</div>
-    <div class="carousel-container" id="carouselContainer">
-        <div class="carousel" id="carousel">
-            <div class="box-card" data-price="5">
-                <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co49ba.png')"></div>
-                <div class="card-overlay"></div>
-                <div class="card-content">
-                    <div class="box-icon">🎁</div>
-                    <h3>Caixa Básica</h3>
-                    <p class="rarity">Até R$100</p>
-                    <div class="price">R$ 5</div>
-                </div>
+<div class="container">
+    <div class="cards-grid" id="cardsGrid">
+        <!-- Caixa 1 -->
+        <div class="box-card" data-price="5">
+            <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co49ba.png')"></div>
+            <div class="card-overlay"></div>
+            <div class="card-content">
+                <div class="box-icon">🎁</div>
+                <h3>Caixa Básica</h3>
+                <p class="rarity">Até R$100</p>
+                <div class="price">R$ 5</div>
             </div>
-            <div class="box-card disabled" data-price="15">
-                <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co2qhe.png')"></div>
-                <div class="card-overlay"></div>
-                <div class="card-content">
-                    <div class="box-icon">✨</div>
-                    <h3>Intermediária</h3>
-                    <p class="rarity">EM BREVE</p>
-                    <div class="price">R$ 15</div>
-                </div>
+        </div>
+        <!-- Caixa 2 -->
+        <div class="box-card disabled" data-price="15">
+            <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co2qhe.png')"></div>
+            <div class="card-overlay"></div>
+            <div class="card-content">
+                <div class="box-icon">✨</div>
+                <h3>Intermediária</h3>
+                <p class="rarity">EM BREVE</p>
+                <div class="price">R$ 15</div>
             </div>
-            <div class="box-card disabled" data-price="30">
-                <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.png')"></div>
-                <div class="card-overlay"></div>
-                <div class="card-content">
-                    <div class="box-icon">💎</div>
-                    <h3>Premium</h3>
-                    <p class="rarity">EM BREVE</p>
-                    <div class="price">R$ 30</div>
-                </div>
+        </div>
+        <!-- Caixa 3 -->
+        <div class="box-card disabled" data-price="30">
+            <div class="card-bg" style="background-image:url('https://images.igdb.com/igdb/image/upload/t_cover_big/co4jni.png')"></div>
+            <div class="card-overlay"></div>
+            <div class="card-content">
+                <div class="box-icon">💎</div>
+                <h3>Premium</h3>
+                <p class="rarity">EM BREVE</p>
+                <div class="price">R$ 30</div>
             </div>
         </div>
     </div>
-    <div class="carousel-btn btn-right" id="nextBtn">›</div>
 </div>
 
 <nav>
@@ -565,87 +513,7 @@ function playOpen() { playTone(440, 0.18, 'triangle', 0.12); setTimeout(()=> pla
 function playSpin() { playTone(320, 0.08, 'sawtooth', 0.08); setTimeout(()=> playTone(380, 0.08, 'sawtooth', 0.08), 100); }
 function playWin() { playTone(523, 0.2, 'sine', 0.2); setTimeout(()=> playTone(659, 0.2, 'sine', 0.2), 140); }
 
-// ========== CARROSSEL CORRIGIDO PARA MOBILE (centralização perfeita) ==========
-const container = document.getElementById('carouselContainer');
-const carousel = document.getElementById('carousel');
-const cards = document.querySelectorAll('.box-card');
-let currentIndex = 0;
-let autoDetect = true;
-
-// Função robusta para centralizar qualquer card no viewport do container
-function scrollToCard(index) {
-    if (index < 0) index = cards.length - 1;
-    if (index >= cards.length) index = 0;
-    currentIndex = index;
-    const card = cards[currentIndex];
-    // Obtém a largura exata do container (viewport do carrossel)
-    const containerWidth = container.clientWidth;
-    const cardWidth = card.offsetWidth;
-    // Calcula a posição de scroll para deixar o card perfeitamente no meio
-    // offsetLeft é a distância do início do .carousel até o início do card
-    const scrollTarget = card.offsetLeft - (containerWidth / 2) + (cardWidth / 2);
-    autoDetect = false;
-    container.scrollTo({
-        left: Math.max(0, scrollTarget),
-        behavior: 'smooth'
-    });
-    // Após o scroll, atualiza a classe active e reativa a detecção
-    setTimeout(() => {
-        updateActive();
-        autoDetect = true;
-    }, 300);
-}
-
-function updateActive() {
-    cards.forEach(c => c.classList.remove('active'));
-    cards[currentIndex].classList.add('active');
-}
-
-function detectCenterCard() {
-    if (!autoDetect) return;
-    const containerRect = container.getBoundingClientRect();
-    const centerX = containerRect.left + containerRect.width / 2;
-    let closest = 0;
-    let minDist = Infinity;
-    cards.forEach((card, idx) => {
-        const rect = card.getBoundingClientRect();
-        const cardCenter = rect.left + rect.width / 2;
-        const dist = Math.abs(cardCenter - centerX);
-        if (dist < minDist) {
-            minDist = dist;
-            closest = idx;
-        }
-    });
-    if (currentIndex !== closest) {
-        currentIndex = closest;
-        updateActive();
-    }
-}
-
-// Eventos das setas
-document.getElementById('nextBtn').onclick = () => {
-    scrollToCard(currentIndex + 1);
-    playClick();
-};
-document.getElementById('prevBtn').onclick = () => {
-    scrollToCard(currentIndex - 1);
-    playClick();
-};
-// Detecção de scroll manual (arrasto do usuário)
-container.addEventListener('scroll', () => {
-    clearTimeout(window.scrollTO);
-    window.scrollTO = setTimeout(detectCenterCard, 40);
-});
-// Ao redimensionar a janela, reposiciona o card atual para não ficar cortado
-window.addEventListener('resize', () => {
-    setTimeout(() => scrollToCard(currentIndex), 100);
-});
-// Inicialização: centralizar o primeiro card (índice 0)
-setTimeout(() => {
-    scrollToCard(0);
-}, 100);
-
-// ========== SISTEMA DE CAIXAS ==========
+// Sistema de caixas
 let balance = 100;
 const prizeList = [
     { name: 'Cyberpunk 2077', img: 'https://images.igdb.com/igdb/image/upload/t_cover_big/co1r7h.png' },
@@ -698,7 +566,8 @@ function spin(price) {
     }, 1600);
 }
 
-// Clique nos cards
+// Clique nas caixas
+const cards = document.querySelectorAll('.box-card');
 cards.forEach(card => {
     card.addEventListener('click', () => {
         if (card.classList.contains('disabled')) { alert('🔒 Em breve'); return; }
