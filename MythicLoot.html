@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-<title>MYTHIC BOX — Design Limpo</title>
+<title>MYTHIC BOX — Carrossel Centralizado</title>
 <style>
 * {
     margin: 0;
@@ -31,7 +31,7 @@ body {
     line-height: 1.4;
 }
 
-/* Header — limpo, apenas essencial */
+/* Header */
 header {
     position: fixed;
     top: 0;
@@ -91,7 +91,7 @@ header {
     border-color: var(--primary-soft);
 }
 
-/* Wallet — simples, clean */
+/* Wallet */
 .wallet {
     display: flex;
     justify-content: center;
@@ -116,13 +116,25 @@ header {
     margin-left: 6px;
 }
 
-/* Carrossel — mesma lógica estável, visual limpo */
+/* Carrossel - estrutura corrigida para mobile */
 .carousel-wrapper {
     width: 100%;
     max-width: 1200px;
     margin: 0 auto 40px;
     position: relative;
-    padding: 20px 60px;
+    padding: 0 45px; /* espaço para os botões */
+}
+
+@media (max-width: 640px) {
+    .carousel-wrapper {
+        padding: 0 35px; /* menos espaço em mobile, mas suficiente para botões */
+    }
+}
+
+@media (max-width: 480px) {
+    .carousel-wrapper {
+        padding: 0 30px;
+    }
 }
 
 .carousel-container {
@@ -142,10 +154,10 @@ header {
     display: flex;
     gap: 28px;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start; /* importante: muda para flex-start para o cálculo funcionar */
 }
 
-/* Cards — elegantes, sem excesso de brilho */
+/* Cards */
 .box-card {
     flex: 0 0 auto;
     width: 260px;
@@ -226,7 +238,7 @@ header {
     color: var(--primary-soft);
 }
 
-/* Botões do carrossel — minimalistas */
+/* Botões do carrossel - sempre visíveis e clicáveis */
 .carousel-btn {
     position: absolute;
     top: 50%;
@@ -245,6 +257,7 @@ header {
     color: var(--text-muted);
     transition: 0.2s;
     z-index: 20;
+    backdrop-filter: blur(4px);
 }
 
 .carousel-btn:hover {
@@ -256,7 +269,7 @@ header {
 .btn-left { left: 8px; }
 .btn-right { right: 8px; }
 
-/* Menu inferior — clean, flutuante suave */
+/* Menu inferior */
 nav {
     position: fixed;
     bottom: 20px;
@@ -305,7 +318,7 @@ nav {
     color: var(--primary);
 }
 
-/* Modal de abertura — limpo, sem brilho exagerado */
+/* Modal */
 #opening {
     display: none;
     position: fixed;
@@ -405,14 +418,11 @@ button:hover {
     color: #6c757d;
 }
 
-/* Responsivo */
+/* Ajustes responsivos para os cards não ficarem cortados */
 @media (max-width: 780px) {
     .box-card {
         width: 200px;
         height: 280px;
-    }
-    .carousel-wrapper {
-        padding: 10px 45px;
     }
     .carousel-btn {
         width: 38px;
@@ -530,7 +540,7 @@ button:hover {
 </div>
 
 <script>
-// Áudio simples opcional (sem exageros)
+// Áudio simples
 const AudioCtx = window.AudioContext || window.webkitAudioContext;
 let audioCtx = null;
 function playTone(freq, duration, type='sine', vol=0.15) {
@@ -555,21 +565,35 @@ function playOpen() { playTone(440, 0.18, 'triangle', 0.12); setTimeout(()=> pla
 function playSpin() { playTone(320, 0.08, 'sawtooth', 0.08); setTimeout(()=> playTone(380, 0.08, 'sawtooth', 0.08), 100); }
 function playWin() { playTone(523, 0.2, 'sine', 0.2); setTimeout(()=> playTone(659, 0.2, 'sine', 0.2), 140); }
 
-// ========== CARROSSEL (lógica testada e estável) ==========
+// ========== CARROSSEL CORRIGIDO PARA MOBILE (centralização perfeita) ==========
 const container = document.getElementById('carouselContainer');
+const carousel = document.getElementById('carousel');
 const cards = document.querySelectorAll('.box-card');
 let currentIndex = 0;
 let autoDetect = true;
 
+// Função robusta para centralizar qualquer card no viewport do container
 function scrollToCard(index) {
     if (index < 0) index = cards.length - 1;
     if (index >= cards.length) index = 0;
     currentIndex = index;
     const card = cards[currentIndex];
-    const scrollPos = card.offsetLeft - (container.clientWidth / 2) + (card.clientWidth / 2);
+    // Obtém a largura exata do container (viewport do carrossel)
+    const containerWidth = container.clientWidth;
+    const cardWidth = card.offsetWidth;
+    // Calcula a posição de scroll para deixar o card perfeitamente no meio
+    // offsetLeft é a distância do início do .carousel até o início do card
+    const scrollTarget = card.offsetLeft - (containerWidth / 2) + (cardWidth / 2);
     autoDetect = false;
-    container.scrollTo({ left: Math.max(0, scrollPos), behavior: 'smooth' });
-    setTimeout(() => { updateActive(); autoDetect = true; }, 280);
+    container.scrollTo({
+        left: Math.max(0, scrollTarget),
+        behavior: 'smooth'
+    });
+    // Após o scroll, atualiza a classe active e reativa a detecção
+    setTimeout(() => {
+        updateActive();
+        autoDetect = true;
+    }, 300);
 }
 
 function updateActive() {
@@ -577,23 +601,49 @@ function updateActive() {
     cards[currentIndex].classList.add('active');
 }
 
-function detectCenter() {
+function detectCenterCard() {
     if (!autoDetect) return;
-    const centerX = container.getBoundingClientRect().left + container.clientWidth / 2;
-    let closest = 0, minDist = Infinity;
+    const containerRect = container.getBoundingClientRect();
+    const centerX = containerRect.left + containerRect.width / 2;
+    let closest = 0;
+    let minDist = Infinity;
     cards.forEach((card, idx) => {
-        const cardCenter = card.getBoundingClientRect().left + card.clientWidth / 2;
+        const rect = card.getBoundingClientRect();
+        const cardCenter = rect.left + rect.width / 2;
         const dist = Math.abs(cardCenter - centerX);
-        if (dist < minDist) { minDist = dist; closest = idx; }
+        if (dist < minDist) {
+            minDist = dist;
+            closest = idx;
+        }
     });
-    if (currentIndex !== closest) { currentIndex = closest; updateActive(); }
+    if (currentIndex !== closest) {
+        currentIndex = closest;
+        updateActive();
+    }
 }
 
-document.getElementById('nextBtn').onclick = () => { scrollToCard(currentIndex + 1); playClick(); };
-document.getElementById('prevBtn').onclick = () => { scrollToCard(currentIndex - 1); playClick(); };
-container.addEventListener('scroll', () => { clearTimeout(window.scrollTO); window.scrollTO = setTimeout(detectCenter, 40); });
-window.addEventListener('resize', () => setTimeout(() => scrollToCard(currentIndex), 100));
-setTimeout(() => scrollToCard(0), 100);
+// Eventos das setas
+document.getElementById('nextBtn').onclick = () => {
+    scrollToCard(currentIndex + 1);
+    playClick();
+};
+document.getElementById('prevBtn').onclick = () => {
+    scrollToCard(currentIndex - 1);
+    playClick();
+};
+// Detecção de scroll manual (arrasto do usuário)
+container.addEventListener('scroll', () => {
+    clearTimeout(window.scrollTO);
+    window.scrollTO = setTimeout(detectCenterCard, 40);
+});
+// Ao redimensionar a janela, reposiciona o card atual para não ficar cortado
+window.addEventListener('resize', () => {
+    setTimeout(() => scrollToCard(currentIndex), 100);
+});
+// Inicialização: centralizar o primeiro card (índice 0)
+setTimeout(() => {
+    scrollToCard(0);
+}, 100);
 
 // ========== SISTEMA DE CAIXAS ==========
 let balance = 100;
@@ -648,7 +698,7 @@ function spin(price) {
     }, 1600);
 }
 
-// Evento de clique nos cards
+// Clique nos cards
 cards.forEach(card => {
     card.addEventListener('click', () => {
         if (card.classList.contains('disabled')) { alert('🔒 Em breve'); return; }
