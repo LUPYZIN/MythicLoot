@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Dashboard Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --bg-card: #151a26;
+            --text: #f3f4f6;
+            --text-2: #9ca3af;
+            --primary: #6366f1;
+            --green: #10b981;
+            --red: #ef4444;
+            --gold: #fbbf24;
+            --orange: #f59e0b;
+            --pink: #ec4899;
+            --border: rgba(255, 255, 255, 0.06);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+        
+        header {
+            background: rgba(11, 14, 20, 0.95);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(16px);
+            padding: .9rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .5rem;
+        }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text); text-decoration: none; }
+        .logo em { color: var(--red); font-style: normal; }
+        .btn-header { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: .4rem .8rem; border-radius: 6px; font-size: .8rem; cursor: pointer; transition: .3s; text-decoration: none; }
+        .btn-header:hover { border-color: var(--red); color: var(--red); }
+        
+        .main-layout { max-width: 1600px; margin: 0 auto; padding: 1.5rem 2rem; display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; }
+        
+        .sidebar { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1rem; position: sticky; top: 80px; height: fit-content; }
+        .sidebar-btn { background: transparent; border: none; color: var(--text-2); padding: .7rem 1rem; border-radius: 8px; font-size: .85rem; cursor: pointer; transition: .3s; text-align: left; display: flex; align-items: center; gap: .5rem; width: 100%; text-decoration: none; }
+        .sidebar-btn:hover { background: rgba(255, 255, 255, .03); color: var(--text); }
+        .sidebar-btn.active { background: rgba(99, 102, 241, .12); color: var(--primary); font-weight: 600; }
+        
+        .panel { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1.5rem; }
+        .panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+        
+        .stats-row { display: grid; grid-template-columns: repeat(6, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-mini { background: rgba(255, 255, 255, .02); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; }
+        .stat-mini .val { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; }
+        .stat-mini .lbl { font-size: .75rem; color: var(--text-2); margin-top: .2rem; }
+        
+        .btn-sm { padding: .3rem .6rem; border-radius: 4px; font-size: .7rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .1rem; }
+        .btn-sm.primary { background: var(--primary); color: #fff; }
+        .btn-sm.red { background: var(--red); color: #fff; }
+        .btn-sm.gold { background: var(--gold); color: #000; }
+        .btn-sm.orange { background: var(--orange); color: #000; }
+        .btn-sm.pink { background: var(--pink); color: #fff; }
+        
+        .toast { position: fixed; top: 1.5rem; right: 1.5rem; background: var(--bg-card); border: 1px solid var(--red); padding: .8rem 1.2rem; border-radius: 12px; font-size: .85rem; z-index: 999; transform: translateX(140%); transition: .3s; max-width: 320px; }
+        .toast.show { transform: translateX(0); }
+        .toast.ok { border-color: var(--green); }
+        
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; padding: 1rem; }
+            .sidebar { display: flex; flex-wrap: wrap; gap: .3rem; position: static; }
+            .sidebar-btn { width: auto; font-size: .7rem; padding: .4rem .6rem; }
+            .stats-row { grid-template-columns: 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    
+    <header>
+        <a href="looto.html" class="logo"><em>🛡️</em> Looto Admin</a>
+        <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+        <div>
+            <a href="looto.html" class="btn-header">🏠 Site</a>
+            <button class="btn-header" onclick="logout()" style="margin-left:.5rem;">🚪 Sair</button>
+        </div>
+    </header>
+    
+    <div class="main-layout" id="main-layout">
+        <aside class="sidebar">
+            <a href="admin.html" class="sidebar-btn active">📊 Dashboard</a>
+            <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+            <a href="abots.html" class="sidebar-btn">🤖 Bots</a>
+            <a href="asorteios.html" class="sidebar-btn">🎁 Sorteios</a>
+            <a href="alogsorteios.html" class="sidebar-btn">📋 Log Sorteios</a>
+            <a href="achat.html" class="sidebar-btn">💬 Chat</a>
+            <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+            <a href="aloja.html" class="sidebar-btn">🛒 Loja</a>
+            <a href="admins.html" class="sidebar-btn">🔑 Admins</a>
+            <a href="aassinantes.html" class="sidebar-btn">⭐ Assinantes</a>
+            <a href="ainfluencer.html" class="sidebar-btn">🌟 Influencers</a>
+            <a href="arecompensas.html" class="sidebar-btn">🎯 Recompensas</a>
+            <a href="aglobalmsg.html" class="sidebar-btn">📢 Mensagens Globais</a>
+            <a href="aferramentas.html" class="sidebar-btn">🔧 Ferramentas</a>
+        </aside>
+        
+        <div class="panel">
+            <div class="panel-title">📊 Dashboard <span style="font-size:.7rem;color:var(--text-2);" id="dash-time"></span></div>
+            <div class="stats-row" id="dash-stats"></div>
+            <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:1rem;">
+                <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:1rem;">
+                    <h4 style="font-family:'Space Grotesk',sans-serif;margin-bottom:.5rem;">🧹 Limpeza</h4>
+                    <button class="btn-sm primary" onclick="forcarLimpeza()">⚡ Feed (10min)</button>
+                    <button class="btn-sm red" onclick="forcarLimpezaTotal()">💣 Limpeza Total</button>
+                </div>
+                <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:1rem;">
+                    <h4 style="font-family:'Space Grotesk',sans-serif;margin-bottom:.5rem;">⚡ Ações</h4>
+                    <button class="btn-sm gold" onclick="distribuirPontos()">🪙 +100 XP</button>
+                    <button class="btn-sm orange" onclick="distribuirMoney()">💰 +50 Money</button>
+                    <button class="btn-sm red" onclick="resetarTudo()">🔄 Reset</button>
+                </div>
+                <div style="background:rgba(255,255,255,.02);border:1px solid var(--border);border-radius:12px;padding:1rem;">
+                    <h4 style="font-family:'Space Grotesk',sans-serif;margin-bottom:.5rem;">🌟 Links</h4>
+                    <a href="ainfluencer.html" class="btn-sm pink" style="text-decoration:none;display:inline-block;">🌟 Influencers</a>
+                    <a href="arecompensas.html" class="btn-sm gold" style="text-decoration:none;display:inline-block;">🎯 Recompensas</a>
+                    <a href="aglobalmsg.html" class="btn-sm primary" style="text-decoration:none;display:inline-block;margin-top:.2rem;">📢 Msg Global</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, get, update, remove, push, set } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+        authDomain: "looto-f46e5.firebaseapp.com",
+        databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+        projectId: "looto-f46e5",
+        storageBucket: "looto-f46e5.firebasestorage.app",
+        messagingSenderId: "295066400995",
+        appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    
+    function toast(msg, ok = false) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (ok ? ' ok' : '');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+    
+    window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+    
+    async function checkAdmin(user) {
+        if (!user) return false;
+        if (user.email === 'startubez.com@gmail.com') return true;
+        const snap = await get(ref(db, 'admins'));
+        if (!snap.exists()) return false;
+        const admins = snap.val();
+        for (let key of Object.keys(admins)) { const a = admins[key]; if (a.uid === user.uid || a.email === user.email) return true; }
+        return false;
+    }
+    
+    async function criarAdminMaster() {
+        try {
+            const snap = await get(ref(db, 'admins'));
+            let existe = false;
+            if (snap.exists()) {
+                const admins = snap.val();
+                for (let key of Object.keys(admins)) {
+                    if (admins[key].email === 'startubez.com@gmail.com') {
+                        existe = true;
+                        await update(ref(db, 'admins/' + key), { uid: 'u1BGSDSXdJSXnpUESiSbgYLXNkv1', nome: 'Maycon', master: true });
+                        break;
+                    }
+                }
+            }
+            if (!existe) {
+                const r = push(ref(db, 'admins'));
+                await set(r, { email: "startubez.com@gmail.com", uid: "u1BGSDSXdJSXnpUESiSbgYLXNkv1", nome: "Maycon", master: true, addedAt: Date.now(), addedBy: "system" });
+            }
+        } catch (e) {}
+    }
+    
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const isAdmin = await checkAdmin(user);
+        if (!isAdmin) {
+            document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;flex-direction:column;gap:1rem;padding:2rem;"><h1 style="font-family:'Space Grotesk',sans-serif;font-size:3rem;color:#ef4444;">🚫 Acesso Negado</h1><p style="color:#9ca3af;">Você não tem permissão.</p><a href="looto.html" style="background:#6366f1;color:#fff;padding:.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;">Ir para o Site</a></div>`;
+            setTimeout(() => window.location.href = 'looto.html', 3000);
+            return;
+        }
+        await criarAdminMaster();
+        document.getElementById('admin-info').textContent = `👑 ${user.email}`;
+        carregarDashboard();
+    });
+    
+    async function carregarDashboard() {
+        document.getElementById('dash-time').textContent = new Date().toLocaleString('pt-BR');
+        const [u, s, f, b, c, l] = await Promise.all([
+            get(ref(db, 'usuarios')), get(ref(db, 'sorteios')), get(ref(db, 'feed')),
+            get(ref(db, 'bots')), get(ref(db, 'chat')), get(ref(db, 'logSorteios'))
+        ]);
+        
+        const totalU = u.exists() ? Object.keys(u.val()).length : 0;
+        const totalS = s.exists() ? Object.keys(s.val()).length : 0;
+        const totalF = f.exists() ? Object.keys(f.val()).length : 0;
+        const totalB = b.exists() ? Object.keys(b.val()).length : 0;
+        const totalC = c.exists() ? Object.keys(c.val()).length : 0;
+        const totalL = l.exists() ? Object.keys(l.val()).length : 0;
+        
+        document.getElementById('dash-stats').innerHTML = `
+            <div class="stat-mini"><div class="val" style="color:#6366f1;">${totalU}</div><div class="lbl">Usuários</div></div>
+            <div class="stat-mini"><div class="val" style="color:#10b981;">${totalS}</div><div class="lbl">Sorteios</div></div>
+            <div class="stat-mini"><div class="val" style="color:#fbbf24;">${totalF}</div><div class="lbl">Feed</div></div>
+            <div class="stat-mini"><div class="val" style="color:#f59e0b;">${totalB}</div><div class="lbl">Bots</div></div>
+            <div class="stat-mini"><div class="val" style="color:#ec4899;">${totalC}</div><div class="lbl">Chat</div></div>
+            <div class="stat-mini"><div class="val" style="color:#38bdf8;">${totalL}</div><div class="lbl">Logs</div></div>`;
+    }
+    
+    window.forcarLimpeza = async () => {
+        const snap = await get(ref(db, 'feed'));
+        let c = 0;
+        if (snap.exists()) {
+            const now = Date.now();
+            const ps = [];
+            snap.forEach(x => { if (now - x.val().ts > 600000) ps.push(remove(ref(db, 'feed/' + x.key)).then(() => c++)); });
+            await Promise.all(ps);
+        }
+        toast(`${c} feeds removidos`, true);
+    };
+    
+    window.forcarLimpezaTotal = async () => {
+        if (!confirm('⚠️ Limpar feed + sorteios expirados?')) return;
+        await remove(ref(db, 'feed'));
+        const snap = await get(ref(db, 'sorteios'));
+        let c = 0;
+        if (snap.exists()) {
+            const now = Date.now();
+            const ps = [];
+            snap.forEach(x => { if (x.val().expiraEm && now - x.val().expiraEm > 86400000) ps.push(remove(ref(db, 'sorteios/' + x.key)).then(() => c++)); });
+            await Promise.all(ps);
+        }
+        toast(`Feed limpo + ${c} sorteios`, true);
+    };
+    
+    window.distribuirPontos = async () => {
+        const snap = await get(ref(db, 'usuarios'));
+        if (!snap.exists()) return;
+        const ps = [];
+        snap.forEach(c => ps.push(update(ref(db, 'usuarios/' + c.key), { pontos: (c.val().pontos || 0) + 100 })));
+        await Promise.all(ps);
+        toast('+100 XP para todos! 🎁', true);
+    };
+    
+    window.distribuirMoney = async () => {
+        const snap = await get(ref(db, 'usuarios'));
+        if (!snap.exists()) return;
+        const ps = [];
+        snap.forEach(c => ps.push(update(ref(db, 'usuarios/' + c.key), { dinheiro: (c.val().dinheiro || 0) + 50 })));
+        await Promise.all(ps);
+        toast('+50 Money para todos! 💰', true);
+    };
+    
+    window.resetarTudo = async () => {
+        if (!confirm('⚠️ ZERAR XP, Money E NÍVEL?')) return;
+        const snap = await get(ref(db, 'usuarios'));
+        if (!snap.exists()) return;
+        const ps = [];
+        snap.forEach(c => ps.push(update(ref(db, 'usuarios/' + c.key), { pontos: 0, dinheiro: 0, nivelConta: 0 })));
+        await Promise.all(ps);
+        toast('Reset total! 🔄', true);
+    };
+    </script>
+</body>
+</html>

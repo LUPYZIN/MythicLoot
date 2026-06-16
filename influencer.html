@@ -1,0 +1,477 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Looto | Programa Influencer</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14; --text: #f3f4f6; --text-2: #9ca3af;
+            --green: #10b981; --gold: #fbbf24; --red: #ef4444; --pink: #ec4899;
+            --orange: #f59e0b; --purple: #a855f7;
+            --border: rgba(255,255,255,0.06); --input-bg: #1a1f2e; --input-border: #2a2f3e;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+        body { background:var(--bg); color:var(--text); min-height:100vh; overflow-x:hidden; }
+        
+        .bg { position:fixed; inset:0; z-index:0; background-size:cover; background-position:center; }
+        .bg::before { content:''; position:absolute; inset:0; background:linear-gradient(180deg,rgba(11,14,20,0.2),rgba(11,14,20,0.8)); }
+        .stars { position:fixed; inset:0; z-index:0; pointer-events:none; }
+        .star { position:absolute; width:2px; height:2px; background:white; border-radius:50%; animation:twinkle 3s infinite; }
+        @keyframes twinkle { 0%,100%{opacity:.3} 50%{opacity:1} }
+        
+        .back-btn { position:fixed; top:1.5rem; left:1.5rem; z-index:200; background:rgba(21,26,38,0.85); border:1px solid rgba(255,255,255,0.1); color:var(--text); padding:.6rem 1.2rem; border-radius:12px; font-size:.85rem; text-decoration:none; backdrop-filter:blur(10px); }
+        .back-btn:hover { border-color:var(--pink); color:var(--pink); }
+        
+        .toast { position:fixed; top:1.5rem; right:1.5rem; z-index:999; background:#151a26; border:1px solid var(--red); padding:.8rem 1.2rem; border-radius:12px; font-size:.85rem; transform:translateX(150%); transition:.3s; max-width:350px; }
+        .toast.show { transform:translateX(0); }
+        .toast.ok { border-color:var(--green); }
+        
+        .main { position:relative; z-index:10; display:flex; flex-direction:column; align-items:center; padding:5rem 2rem 4rem; min-height:100vh; }
+        .container { max-width:900px; width:100%; }
+        
+        .badge { display:inline-flex; align-items:center; gap:.4rem; padding:.4rem 1.2rem; border-radius:99px; font-size:.78rem; font-weight:700; text-transform:uppercase; letter-spacing:.1em; margin-bottom:1rem; }
+        .badge.on { background:rgba(16,185,129,.2); border:1px solid var(--green); color:var(--green); animation:glow 2s infinite; }
+        .badge.off { background:rgba(239,68,68,.2); border:1px solid var(--red); color:var(--red); }
+        .badge.end { background:rgba(156,163,175,.2); border-color:#6b7280; color:#9ca3af; }
+        @keyframes glow { 0%,100%{box-shadow:0 0 8px rgba(16,185,129,.2)} 50%{box-shadow:0 0 20px rgba(16,185,129,.5)} }
+        
+        .title { font-family:'Space Grotesk',sans-serif; font-size:clamp(1.8rem,4vw,3rem); font-weight:700; text-align:center; text-shadow:0 0 30px rgba(236,72,153,0.3); animation:float 4s infinite; }
+        @keyframes float { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-6px)} }
+        .desc { text-align:center; color:var(--text-2); font-size:.95rem; max-width:600px; margin:0 auto 1.5rem; line-height:1.5; }
+        
+        .countdown { display:flex; gap:.8rem; margin:1.5rem 0; flex-wrap:wrap; justify-content:center; }
+        .countdown>div { background:rgba(21,26,38,0.8); border:1px solid rgba(255,255,255,0.08); border-radius:16px; padding:1rem 1.3rem; text-align:center; backdrop-filter:blur(10px); min-width:75px; }
+        .countdown .num { font-family:'Space Grotesk',sans-serif; font-size:2rem; font-weight:700; color:var(--gold); }
+        .countdown .lbl { font-size:.65rem; color:var(--text-2); }
+        
+        .section { background:rgba(21,26,38,0.8); border:1px solid var(--border); border-radius:16px; padding:1.5rem; margin-bottom:1rem; backdrop-filter:blur(10px); }
+        .section h3 { font-family:'Space Grotesk',sans-serif; font-size:1.05rem; margin-bottom:1rem; display:flex; align-items:center; gap:.5rem; }
+        
+        .plataforma { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:12px; padding:1rem; margin-bottom:.6rem; }
+        .plataforma .nome { font-weight:600; }
+        .plataforma .regra { font-size:.78rem; color:var(--text-2); margin:.2rem 0 0 1.5rem; }
+        
+        /* Grid de recompensas - TODOS cards iguais */
+        .recompensas-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(200px,1fr)); gap:.8rem; }
+        
+        .rec-card {
+            background:rgba(255,255,255,0.02); border:1px solid var(--border);
+            border-radius:14px; overflow:hidden; transition:.3s;
+        }
+        .rec-card:hover { border-color:rgba(255,255,255,0.15); transform:translateY(-2px); }
+        .rec-card .rec-thumb {
+            height:100px; background-size:cover; background-position:center;
+            background-color:#1a1f2e; position:relative;
+            display:flex; align-items:center; justify-content:center;
+        }
+        .rec-card .rec-thumb .rec-badge {
+            position:absolute; top:.4rem; left:.4rem;
+            background:rgba(0,0,0,.75); padding:.15rem .55rem;
+            border-radius:5px; font-size:.62rem; font-weight:600;
+            text-transform:uppercase; letter-spacing:.05em;
+        }
+        .rec-card .rec-thumb .rec-badge.key-badge { background:rgba(245,158,11,.7); }
+        .rec-card .rec-thumb .rec-badge.sorteio-badge { background:rgba(99,102,241,.7); }
+        .rec-card .rec-thumb .rec-icon { font-size:2.5rem; }
+        .rec-card .rec-info { padding:.8rem; }
+        .rec-card .rec-game { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:.85rem; }
+        .rec-card .rec-sub { font-size:.7rem; color:var(--text-2); margin-top:.15rem; }
+        .rec-card .rec-parts { 
+            font-size:.7rem; color:var(--primary); margin-top:.25rem;
+            display:flex; align-items:center; gap:.3rem;
+            background:rgba(99,102,241,0.08); padding:.25rem .5rem;
+            border-radius:6px; width:fit-content;
+        }
+        
+        .btn { padding:.75rem 2rem; border-radius:10px; font-weight:600; border:none; cursor:pointer; font-size:.85rem; display:inline-flex; align-items:center; justify-content:center; gap:.4rem; transition:.2s; text-decoration:none; }
+        .btn:hover { transform:translateY(-2px); box-shadow:0 8px 20px rgba(0,0,0,0.4); }
+        .btn.pink { background:linear-gradient(135deg,var(--pink),#be185d); color:#fff; }
+        .btn.gold { background:linear-gradient(135deg,var(--gold),#d97706); color:#000; }
+        .btn.block { width:100%; }
+        
+        .status-card { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:14px; padding:1.2rem; text-align:center; }
+        .status-card.pendente { border-color:var(--orange); }
+        .status-card.aprovado { border-color:var(--green); }
+        .status-card.recusado { border-color:var(--red); }
+        .status-card.sorteio { border-color:var(--purple); }
+        .status-icon { font-size:3rem; }
+        .status-text { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; }
+        .status-sub { font-size:.8rem; color:var(--text-2); }
+        
+        .sorteio-box { background:rgba(99,102,241,0.05); border:1px solid rgba(99,102,241,0.2); border-radius:14px; padding:1.2rem; text-align:center; margin-top:1rem; }
+        
+        .contatos { display:flex; gap:.8rem; flex-wrap:wrap; justify-content:center; }
+        .contato { background:rgba(255,255,255,0.03); border:1px solid var(--border); padding:.5rem 1rem; border-radius:8px; color:var(--text-2); text-decoration:none; font-size:.8rem; }
+        .contato:hover { border-color:var(--pink); color:var(--pink); }
+        
+        .modal { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,0.7); display:none; align-items:center; justify-content:center; padding:1rem; }
+        .modal.show { display:flex; }
+        .modal-box { background:#151a26; border:1px solid var(--border); border-radius:16px; padding:2rem; max-width:500px; width:100%; }
+        
+        .form-group { margin-bottom:1rem; }
+        .form-group label { display:block; font-size:.75rem; color:var(--text-2); margin-bottom:.4rem; text-transform:uppercase; }
+        .form-group input, .form-group select, .form-group textarea { width:100%; background:var(--input-bg); border:1px solid var(--input-border); color:var(--text); padding:.65rem .9rem; border-radius:8px; font-size:.85rem; outline:none; }
+        .form-group select { appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:2rem; }
+        
+        @media (max-width:768px) {
+            .main { padding:4rem 1rem 3rem; }
+            .countdown>div { padding:.7rem; min-width:55px; }
+            .countdown .num { font-size:1.4rem; }
+            .recompensas-grid { grid-template-columns:1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div class="bg" id="bg"></div>
+<div class="stars" id="stars"></div>
+<a href="looto.html" class="back-btn">← Voltar</a>
+<div id="toast" class="toast"></div>
+<div class="main"><div class="container" id="app"></div></div>
+
+<div class="modal" id="modalInscricao">
+    <div class="modal-box">
+        <h3 style="font-family:'Space Grotesk',sans-serif;margin-bottom:1rem;">📝 Inscrever-se</h3>
+        <div class="form-group"><label>📱 Plataforma</label><select id="formPlataforma"><option value="youtube">▶️ YouTube</option><option value="tiktok">🎵 TikTok</option><option value="instagram">📷 Instagram</option><option value="twitch">🎮 Twitch</option><option value="kick">🥊 Kick</option></select></div>
+        <div class="form-group"><label>🔗 Link</label><input type="url" id="formLink"></div>
+        <div class="form-group"><label>👁️ Views</label><input type="number" id="formViews" value="0"></div>
+        <div class="form-group"><label>👥 Seguidores</label><input type="number" id="formSeguidores" value="0"></div>
+        <div class="form-group"><label>❤️ Likes</label><input type="number" id="formLikes" value="0"></div>
+        <div class="form-group"><label>💬 Comentário</label><textarea id="formComentario"></textarea></div>
+        <div class="form-group"><label>🖼️ Print URL</label><input type="url" id="formPrint"></div>
+        <div style="display:flex;gap:.5rem;"><button class="btn pink block" onclick="enviarInscricao()">📨 Enviar</button><button class="btn outline" onclick="fecharModal()">Cancelar</button></div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { getDatabase, ref, get, set, push, update, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+    authDomain: "looto-f46e5.firebaseapp.com",
+    databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+    projectId: "looto-f46e5",
+    storageBucket: "looto-f46e5.firebasestorage.app",
+    messagingSenderId: "295066400995",
+    appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let currentUser = null;
+let dadosPrograma = null;
+let minhaInscricao = null;
+let timerInterval = null;
+
+const PLAT_NOMES = { youtube:'▶️ YouTube', tiktok:'🎵 TikTok', instagram:'📷 Instagram', twitch:'🎮 Twitch', kick:'🥊 Kick' };
+const NIVEIS = ['Bronze','Platina','Ouro','Diamante'];
+const NIVEL_REQ = { publico:0, bronze:0, platina:1, ouro:2, diamante:3 };
+
+function toast(msg, ok=false) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (ok?' ok':'');
+    clearTimeout(el._t);
+    el._t = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+function createStars() {
+    for(let i=0;i<50;i++) {
+        const d = document.createElement('div');
+        d.className = 'star';
+        d.style.left = Math.random()*100+'%';
+        d.style.top = Math.random()*100+'%';
+        d.style.animationDelay = Math.random()*3+'s';
+        document.getElementById('stars').appendChild(d);
+    }
+}
+
+function startTimer(expiraEm) {
+    if(timerInterval) clearInterval(timerInterval);
+    function tick() {
+        const diff = expiraEm - Date.now();
+        if(diff <= 0) { clearInterval(timerInterval); ['d','h','m','s'].forEach(id => { const el = document.getElementById(id); if(el) el.textContent='00'; }); render(); return; }
+        document.getElementById('d').textContent = String(Math.floor(diff/86400000)).padStart(2,'0');
+        document.getElementById('h').textContent = String(Math.floor((diff%86400000)/3600000)).padStart(2,'0');
+        document.getElementById('m').textContent = String(Math.floor((diff%3600000)/60000)).padStart(2,'0');
+        document.getElementById('s').textContent = String(Math.floor((diff%60000)/1000)).padStart(2,'0');
+    }
+    tick();
+    timerInterval = setInterval(tick,1000);
+}
+
+window.fecharModal = () => document.getElementById('modalInscricao').classList.remove('show');
+async function fetchPrograma() { const snap = await get(ref(db, 'programaInfluencer')); dadosPrograma = snap.exists() ? snap.val() : null; }
+async function fetchMinhaInscricao() {
+    if(!currentUser) { minhaInscricao = null; return; }
+    const snap = await get(ref(db, 'inscricoesInfluencer'));
+    minhaInscricao = null;
+    if(snap.exists()) for(const [k,v] of Object.entries(snap.val())) if(v.uid===currentUser.uid) { minhaInscricao={id:k,...v}; break; }
+}
+
+function render() {
+    const app = document.getElementById('app');
+    if(!dadosPrograma) { app.innerHTML='<div style="text-align:center;padding:3rem;"><h2>🚧 Indisponível</h2><a href="looto.html" class="btn pink">Voltar</a></div>'; return; }
+    if(dadosPrograma.wallpaper) document.getElementById('bg').style.backgroundImage='url('+dadosPrograma.wallpaper+')';
+    
+    const ativo = dadosPrograma.ativo === true;
+    const expirou = dadosPrograma.expiraEm && dadosPrograma.expiraEm < Date.now();
+    const aberto = ativo && !expirou;
+    const rec = dadosPrograma.recompensa || {};
+    const sort = dadosPrograma.sorteio || {};
+    
+    let html = '';
+    html += ativo ? (expirou ? '<div class="badge end">⏰ Encerrado</div>' : '<div class="badge on">🌟 Ativo</div>') : '<div class="badge off">⏸️ Pausado</div>';
+    html += '<h1 class="title">'+(dadosPrograma.titulo||'Programa Influencer')+'</h1>';
+    html += '<p class="desc">'+(dadosPrograma.descricao||'')+'</p>';
+    if(dadosPrograma.expiraEm && !expirou) html += '<div class="countdown"><div><div class="num" id="d">00</div><div class="lbl">Dias</div></div><div><div class="num" id="h">00</div><div class="lbl">Horas</div></div><div><div class="num" id="m">00</div><div class="lbl">Min</div></div><div><div class="num" id="s">00</div><div class="lbl">Seg</div></div></div>';
+    
+    // Regras
+    const regras = dadosPrograma.regras || {};
+    if(Object.keys(regras).length) {
+        html += '<div class="section"><h3>📋 Regras</h3>';
+        for(const [plat, r] of Object.entries(regras)) {
+            if(!r||(!r.viewsMin&&!r.seguidoresMin&&!r.likesMin&&!r.instrucoes)) continue;
+            html += '<div class="plataforma"><div class="nome">'+(PLAT_NOMES[plat]||plat)+'</div>';
+            if(r.viewsMin) html += '<div class="regra">👁️ '+r.viewsMin.toLocaleString()+' views</div>';
+            if(r.seguidoresMin) html += '<div class="regra">👥 '+r.seguidoresMin.toLocaleString()+' seguidores</div>';
+            if(r.likesMin) html += '<div class="regra">❤️ '+r.likesMin.toLocaleString()+' likes</div>';
+            if(r.instrucoes) html += '<div class="regra">📝 '+r.instrucoes+'</div>';
+            html += '</div>';
+        }
+        html += '</div>';
+    }
+    
+    // Recompensas
+    html += '<div class="section"><h3>🎁 Recompensas</h3><div class="recompensas-grid" id="recompensas-grid">';
+    
+    // LootMoney
+    if(rec.lootmoney) {
+        html += `
+            <div class="rec-card">
+                <div class="rec-thumb" style="background:linear-gradient(135deg,rgba(245,158,11,0.15),rgba(245,158,11,0.05));">
+                    <span class="rec-icon">💰</span>
+                </div>
+                <div class="rec-info">
+                    <div class="rec-game">+${rec.lootmoney} LootMoney</div>
+                    <div class="rec-sub">Dinheiro virtual</div>
+                </div>
+            </div>`;
+    }
+    
+    // XP
+    if(rec.xp) {
+        html += `
+            <div class="rec-card">
+                <div class="rec-thumb" style="background:linear-gradient(135deg,rgba(99,102,241,0.15),rgba(99,102,241,0.05));">
+                    <span class="rec-icon">⭐</span>
+                </div>
+                <div class="rec-info">
+                    <div class="rec-game">+${rec.xp} XP</div>
+                    <div class="rec-sub">Pontos de experiência</div>
+                </div>
+            </div>`;
+    }
+    
+    // Nível
+    if(rec.nivel!==undefined&&rec.nivel>=0) {
+        html += `
+            <div class="rec-card">
+                <div class="rec-thumb" style="background:linear-gradient(135deg,rgba(16,185,129,0.15),rgba(16,185,129,0.05));">
+                    <span class="rec-icon">📈</span>
+                </div>
+                <div class="rec-info">
+                    <div class="rec-game">${NIVEIS[rec.nivel]}</div>
+                    <div class="rec-sub">Nível da conta</div>
+                </div>
+            </div>`;
+    }
+    
+    // Keys do banco (inseridas via JS)
+    if(rec.usarKeys) {
+        fetchKeysBanco().then(keys => {
+            const grid = document.getElementById('recompensas-grid');
+            if(grid && keys.length > 0) {
+                keys.forEach(k => {
+                    const card = document.createElement('div');
+                    card.className = 'rec-card';
+                    card.innerHTML = `
+                        <div class="rec-thumb" style="background-image:url('${k.wallpaperUrl||''}');">
+                            <span class="rec-badge key-badge">${k.plataforma||'Steam'}</span>
+                        </div>
+                        <div class="rec-info">
+                            <div class="rec-game">🎮 ${k.nome||'Jogo'}</div>
+                            <div class="rec-sub">🔑 Key de jogo</div>
+                        </div>`;
+                    grid.appendChild(card);
+                });
+            }
+        });
+    }
+    
+    // Sorteio - MOSTRA WALLPAPER DE UMA KEY DO SORTEIO
+    if(sort.ativo) {
+        const totalParts = Object.keys(sort.participantes||{}).length;
+        const maxParts = sort.max || '∞';
+        
+        // Busca o wallpaper de uma key do sorteio para mostrar
+        fetchWallpaperSorteio(sort).then(wallpaperUrl => {
+            const grid = document.getElementById('recompensas-grid');
+            if(grid) {
+                const card = document.createElement('div');
+                card.className = 'rec-card';
+                card.innerHTML = `
+                    <div class="rec-thumb" style="background-image:url('${wallpaperUrl||''}');${!wallpaperUrl?'background:linear-gradient(135deg,rgba(99,102,241,0.3),rgba(168,85,247,0.4));':''}">
+                        <span class="rec-badge sorteio-badge">SORTEIO</span>
+                        ${!wallpaperUrl?'<span class="rec-icon">🎰</span>':''}
+                    </div>
+                    <div class="rec-info">
+                        <div class="rec-game">${sort.nome||'Sorteio Exclusivo'}</div>
+                        <div class="rec-sub">🎰 Sorteio entre aprovados</div>
+                        <div class="rec-parts">👥 ${totalParts} / ${maxParts} participantes</div>
+                    </div>`;
+                grid.appendChild(card);
+            }
+        });
+    }
+    
+    html += '</div></div>';
+    
+    // Status
+    if(!currentUser) {
+        html += '<div style="text-align:center;padding:2rem;"><h3>🔐 Faça login</h3><a href="login.html" class="btn pink">Entrar</a></div>';
+    } else if(minhaInscricao) {
+        const st = minhaInscricao.status||'pendente';
+        const cfg = {
+            pendente:{icon:'⏳',text:'Pendente',sub:'Aguardando análise.',cls:'pendente'},
+            aprovado:{icon:'✅',text:'Aprovado!',sub:minhaInscricao.recompensaDada||'',cls:'aprovado'},
+            recusado:{icon:'❌',text:'Recusado',sub:minhaInscricao.motivoRecusa||'',cls:'recusado'},
+            sorteio:{icon:'🎰',text:'No Sorteio',sub:'Participando!',cls:'sorteio'}
+        }[st]||{icon:'⏳',text:'Pendente',sub:'',cls:'pendente'};
+        html += '<div class="status-card '+cfg.cls+'"><div class="status-icon">'+cfg.icon+'</div><div class="status-text">'+cfg.text+'</div><div class="status-sub">'+cfg.sub+'</div>';
+        if(st==='recusado'&&aberto) html += '<button class="btn pink" onclick="abrirInscricao()">🔄 Tentar</button>';
+        html += '</div>';
+        
+        if(sort.ativo&&(st==='aprovado'||st==='sorteio')) {
+            const parts = sort.participantes||{};
+            if(st==='sorteio'&&parts[currentUser.uid]) html += '<div class="sorteio-box"><h3>🎰 '+sort.nome+'</h3><p style="color:var(--green);">✅ Participando!</p></div>';
+            else if(st==='aprovado'&&!parts[currentUser.uid]) html += '<button class="btn gold block" onclick="participarSorteio()">🎰 Participar do Sorteio</button>';
+        }
+    } else if(aberto) {
+        html += '<button class="btn pink block" onclick="abrirInscricao()">📝 Inscrever-se</button>';
+    }
+    
+    // Contatos
+    const contatos = [];
+    if(dadosPrograma.emailSuporte) contatos.push({icon:'📧',href:'mailto:'+dadosPrograma.emailSuporte,text:dadosPrograma.emailSuporte});
+    if(dadosPrograma.discord) contatos.push({icon:'💬',href:dadosPrograma.discord,text:'Discord'});
+    if(dadosPrograma.contato) contatos.push({icon:'📱',href:dadosPrograma.contato,text:'Contato'});
+    if(contatos.length) {
+        html += '<div class="section"><h3>📞 Suporte</h3><div class="contatos">';
+        contatos.forEach(c=>html+='<a href="'+c.href+'" target="_blank" class="contato">'+c.icon+' '+c.text+'</a>');
+        html += '</div></div>';
+    }
+    
+    app.innerHTML = html;
+    if(dadosPrograma.expiraEm&&!expirou) startTimer(dadosPrograma.expiraEm);
+}
+
+async function fetchKeysBanco() {
+    try {
+        const snap = await get(ref(db, 'programaInfluencer/bancoKeys'));
+        if(!snap.exists()) return [];
+        const keys = [];
+        snap.forEach(c => { const k = c.val(); if(!k.usada) keys.push({ id: c.key, ...k }); });
+        return keys.slice(0, 6);
+    } catch(e) { return []; }
+}
+
+// Busca wallpaper de uma key do sorteio para mostrar no card
+async function fetchWallpaperSorteio(sort) {
+    try {
+        // Tenta pegar das keys do ganhador
+        const keysIds = (sort.ganhador?.keysIds || []).concat(sort.perdedor?.keysIds || []);
+        if(keysIds.length > 0) {
+            const snap = await get(ref(db, 'programaInfluencer/bancoKeys'));
+            if(snap.exists()) {
+                const keys = snap.val();
+                for(const id of keysIds) {
+                    if(keys[id] && keys[id].wallpaperUrl) return keys[id].wallpaperUrl;
+                }
+            }
+        }
+        // Fallback: pega qualquer key disponível
+        const snap = await get(ref(db, 'programaInfluencer/bancoKeys'));
+        if(snap.exists()) {
+            const keys = snap.val();
+            for(const [id, k] of Object.entries(keys)) {
+                if(!k.usada && k.wallpaperUrl) return k.wallpaperUrl;
+            }
+        }
+    } catch(e) {}
+    return ''; // sem wallpaper, mostra ícone 🎰
+}
+
+window.abrirInscricao = async function() {
+    if(!currentUser) return toast('🔐 Faça login!');
+    await fetchPrograma();
+    if(!dadosPrograma||dadosPrograma.ativo!==true) return toast('⏸️ Pausado.');
+    if(dadosPrograma.expiraEm&&dadosPrograma.expiraEm<Date.now()) return toast('⏰ Encerrado.');
+    const snap = await get(ref(db,'usuarios/'+currentUser.uid));
+    if(((snap.val()||{}).nivelConta||0) < (NIVEL_REQ[dadosPrograma.nivelMin||'publico']||0)) return toast('🔒 Nível insuficiente.');
+    document.getElementById('modalInscricao').classList.add('show');
+};
+
+window.enviarInscricao = async function() {
+    const link = document.getElementById('formLink').value.trim();
+    if(!link) return toast('❌ Informe o link.');
+    const p = document.getElementById('formPlataforma').value;
+    const regras = (dadosPrograma.regras||{})[p]||{};
+    const v = parseInt(document.getElementById('formViews').value)||0;
+    const s = parseInt(document.getElementById('formSeguidores').value)||0;
+    const l = parseInt(document.getElementById('formLikes').value)||0;
+    if(regras.viewsMin&&v<regras.viewsMin) return toast('❌ Views.');
+    if(regras.seguidoresMin&&s<regras.seguidoresMin) return toast('❌ Seguidores.');
+    if(regras.likesMin&&l<regras.likesMin) return toast('❌ Likes.');
+    try {
+        const snap = await get(ref(db,'usuarios/'+currentUser.uid));
+        const u = snap.val()||{};
+        await push(ref(db,'inscricoesInfluencer'),{
+            uid:currentUser.uid, nome:u.username||currentUser.displayName||'Usuário',
+            email:currentUser.email||'', plataforma:p, link, views:v, seguidores:s, likes:l,
+            comentario:document.getElementById('formComentario').value.trim(),
+            printUrl:document.getElementById('formPrint').value.trim(),
+            status:'pendente', dataInscricao:Date.now()
+        });
+        document.getElementById('modalInscricao').classList.remove('show');
+        toast('✅ Enviada!',true);
+        setTimeout(async()=>{await fetchMinhaInscricao();render();},1500);
+    } catch(e) { toast('❌ '+e.message); }
+};
+
+window.participarSorteio = async function() {
+    const sort = dadosPrograma.sorteio;
+    if(!sort||!sort.ativo) return toast('⚠️ Indisponível.');
+    const parts = sort.participantes||{};
+    if(sort.max>0&&Object.keys(parts).length>=sort.max) return toast('🔴 Lotado.');
+    if(parts[currentUser.uid]) return toast('✅ Já está.');
+    parts[currentUser.uid] = { uid:currentUser.uid, nome:(minhaInscricao||{}).nome||'Usuário', email:currentUser.email, entradoEm:Date.now() };
+    await set(ref(db,'programaInfluencer/sorteio/participantes'),parts);
+    if(minhaInscricao) await update(ref(db,'inscricoesInfluencer/'+minhaInscricao.id),{status:'sorteio'});
+    toast('🎰 Entrou!',true);
+    setTimeout(async()=>{await fetchMinhaInscricao();render();},1000);
+};
+
+onValue(ref(db,'programaInfluencer'),async(snap)=>{dadosPrograma=snap.exists()?snap.val():null;await fetchMinhaInscricao();render();});
+onValue(ref(db,'inscricoesInfluencer'),async()=>{await fetchMinhaInscricao();render();});
+onAuthStateChanged(auth,async(user)=>{currentUser=user;await fetchPrograma();await fetchMinhaInscricao();render();});
+createStars();
+</script>
+<script type="module" src="presence.js"></script>
+</body>
+</html>

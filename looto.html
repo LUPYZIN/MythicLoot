@@ -1,0 +1,831 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Sorteios de Games</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14; --bg-card: #151a26; --bg-header: rgba(11,14,20,0.9);
+            --text: #f3f4f6; --text-2: #9ca3af; --primary: #6366f1; --primary-h: #4f46e5;
+            --green: #10b981; --gold: #fbbf24; --bronze: #cd7f32; --diamond: #38bdf8;
+            --money: #f59e0b; --border: rgba(255,255,255,0.06);
+            --t: all 0.3s cubic-bezier(0.4,0,0.2,1);
+            --nav-bg: rgba(11,14,20,0.95); --nav-border: rgba(255,255,255,0.06);
+            --nav-text: #9ca3af; --nav-text-hover: #f3f4f6; --nav-active: #6366f1;
+            --nav-active-bg: rgba(99,102,241,0.1); --nav-mobile-bg: #151a26;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+        body { background:var(--bg); color:var(--text); overflow-x:hidden; padding-bottom:80px; }
+        #page-loader { position:fixed; inset:0; z-index:1000; background:var(--bg); display:flex; align-items:center; justify-content:center; flex-direction:column; gap:1rem; }
+        #page-loader.gone { display:none; }
+        .spin { width:36px; height:36px; border:3px solid var(--border); border-top-color:var(--primary); border-radius:50%; animation:spin .7s linear infinite; }
+        @keyframes spin { to { transform:rotate(360deg); } }
+        .guest-overlay { position:fixed; inset:0; z-index:999; background:rgba(0,0,0,.85); backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center; padding:1rem; }
+        .guest-overlay.open { display:flex; }
+        .guest-modal { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; padding:2.5rem; max-width:480px; width:100%; text-align:center; animation:modalIn .3s ease; }
+        .guest-modal h2 { font-family:'Space Grotesk',sans-serif; font-size:1.5rem; margin-bottom:.75rem; }
+        .guest-modal p { color:var(--text-2); font-size:.9rem; margin-bottom:1.5rem; line-height:1.6; }
+        .guest-features { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin-bottom:1.5rem; text-align:left; }
+        .guest-feat { background:rgba(255,255,255,.03); padding:.75rem; border-radius:10px; font-size:.82rem; display:flex; align-items:center; gap:.5rem; }
+        .guest-buttons { display:flex; gap:.75rem; justify-content:center; flex-wrap:wrap; }
+        .gbtn { padding:.8rem 1.75rem; border-radius:10px; font-weight:700; font-size:.9rem; cursor:pointer; transition:var(--t); font-family:'Space Grotesk',sans-serif; text-decoration:none; border:none; }
+        .gbtn-primary { background:var(--primary); color:#fff; } .gbtn-primary:hover { background:var(--primary-h); transform:translateY(-2px); }
+        .gbtn-outline { background:transparent; border:1px solid rgba(255,255,255,.2); color:var(--text); } .gbtn-outline:hover { background:rgba(255,255,255,.04); }
+        #toast { position:fixed; top:1.5rem; right:1.5rem; z-index:600; background:var(--bg-card); border:1px solid #ef4444; padding:.8rem 1.2rem; border-radius:12px; font-size:.85rem; transform:translateX(140%); transition:var(--t); box-shadow:0 8px 24px rgba(0,0,0,.4); backdrop-filter:blur(8px); max-width:290px; pointer-events:none; }
+        #toast.show { transform:translateX(0); } #toast.ok { border-color:var(--green); }
+        .navbar { background: var(--nav-bg); border-bottom: 1px solid var(--nav-border); position: sticky; top: 0; z-index: 200; backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); }
+        .navbar-inner { max-width: 1400px; margin: 0 auto; padding: 0.75rem 2rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+        .navbar-brand { font-family: 'Space Grotesk', sans-serif; font-size: 1.35rem; font-weight: 700; color: #f3f4f6; text-decoration: none; display: flex; align-items: center; gap: 0.4rem; letter-spacing: -0.02em; }
+        .navbar-brand .brand-icon { color: #6366f1; display: flex; align-items: center; } .navbar-brand .brand-icon svg { stroke: #6366f1; }
+        .navbar-links { display: flex; gap: 0.25rem; align-items: center; }
+        .navbar-link { color: var(--nav-text); text-decoration: none; font-size: 0.85rem; font-weight: 500; padding: 0.45rem 0.85rem; border-radius: 8px; transition: all 0.25s ease; display: flex; align-items: center; gap: 0.4rem; white-space: nowrap; position: relative; }
+        .navbar-link:hover { color: var(--nav-text-hover); background: rgba(255,255,255,0.04); }
+        .navbar-link.active { color: var(--nav-active); background: var(--nav-active-bg); font-weight: 600; }
+        .navbar-link.active::after { content: ''; position: absolute; bottom: -2px; left: 50%; transform: translateX(-50%); width: 20px; height: 2px; background: var(--nav-active); border-radius: 2px; }
+        .navbar-link .nav-icon { width: 18px; height: 18px; flex-shrink: 0; display: flex; align-items: center; } .navbar-link .nav-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .user-pill { display:flex; align-items:center; gap:.5rem; background:rgba(255,255,255,.03); border:1px solid var(--border); padding:.4rem .9rem .4rem .55rem; border-radius:50px; cursor:pointer; transition:var(--t); text-decoration:none; position:relative; }
+        .user-pill:hover { border-color:var(--primary); }
+        .upill-avatar { width:30px; height:30px; border-radius:50%; background:#2e3748; display:flex; align-items:center; justify-content:center; font-size:.82rem; font-weight:700; border:2px solid var(--primary); overflow:hidden; flex-shrink:0; } .upill-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; }
+        .upill-info { display:flex; flex-direction:column; gap:1px; } .upill-name { font-size:.85rem; font-weight:600; }
+        .upill-row { display:flex; gap:.5rem; font-size:.7rem; } .upill-money { color:var(--money); font-weight:600; } .upill-xp { color:var(--primary); font-weight:600; }
+        .user-level-badge { position:absolute; top:-4px; right:-4px; width:18px; height:18px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.65rem; font-weight:700; color:#fff; border:2px solid var(--bg-header); }
+        .login-btn-header { background:var(--primary); color:#fff; border:none; padding:.55rem 1.2rem; border-radius:8px; font-weight:600; font-size:.85rem; cursor:pointer; transition:var(--t); font-family:'Space Grotesk',sans-serif; } .login-btn-header:hover { background:var(--primary-h); }
+        .mobile-nav { display: none; position: fixed; bottom: 0; left: 0; right: 0; background: var(--nav-mobile-bg); border-top: 1px solid var(--nav-border); z-index: 199; padding: 0.5rem 0.25rem; padding-bottom: env(safe-area-inset-bottom, 0.5rem); box-shadow: 0 -4px 20px rgba(0,0,0,0.3); }
+        .mobile-nav-inner { display: flex; justify-content: space-around; align-items: center; max-width: 500px; margin: 0 auto; }
+        .mobile-nav-link { color: var(--nav-text); text-decoration: none; font-size: 0.65rem; font-weight: 500; display: flex; flex-direction: column; align-items: center; gap: 0.25rem; padding: 0.35rem 0.5rem; border-radius: 10px; transition: all 0.25s ease; min-width: 50px; position: relative; }
+        .mobile-nav-link:hover { color: var(--nav-text-hover); } .mobile-nav-link.active { color: var(--nav-active); }
+        .mobile-nav-link.active::before { content: ''; position: absolute; top: -6px; left: 50%; transform: translateX(-50%); width: 4px; height: 4px; background: var(--nav-active); border-radius: 50%; }
+        .mobile-nav-link .nav-icon { width: 22px; height: 22px; flex-shrink: 0; display: flex; align-items: center; justify-content: center; } .mobile-nav-link .nav-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .mobile-nav-link .nav-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em; }
+        .main-layout { max-width:1200px; margin:1.75rem auto; padding:0 2rem; display:flex; flex-direction:column; gap:1.5rem; }
+        .hero-banner { border-radius:18px; overflow:hidden; min-height:260px; position:relative; border:1px solid var(--border); background:#0f1420; }
+        .hero-bg { position:absolute; inset:0; background-size:cover; background-position:center; transition:background-image .6s ease; }
+        .hero-overlay { position:absolute; inset:0; background:linear-gradient(to top, rgba(11,14,20,.96) 40%, rgba(11,14,20,.25)); }
+        .hero-inner { position:relative; z-index:1; padding:1.75rem; height:100%; display:flex; flex-direction:column; justify-content:flex-end; min-height:260px; }
+        .hero-badges { position:absolute; top:1.25rem; left:1.25rem; display:flex; gap:.5rem; flex-wrap:wrap; }
+        .hbadge { padding:.28rem .7rem; border-radius:6px; font-size:.72rem; font-weight:700; text-transform:uppercase; letter-spacing:.5px; font-family:'Space Grotesk',sans-serif; }
+        .hbadge-purple { background:var(--primary); color:#fff; } .hbadge-gold { background:rgba(251,191,36,.12); color:var(--gold); border:1px solid rgba(251,191,36,.3); } .hbadge-live { background:rgba(16,185,129,.12); color:var(--green); border:1px solid rgba(16,185,129,.3); }
+        .hero-title { font-family:'Space Grotesk',sans-serif; font-size:1.85rem; font-weight:700; margin-bottom:.4rem; line-height:1.2; max-width:600px; }
+        .hero-sub { font-size:.88rem; color:var(--text-2); margin-bottom:.75rem; }
+        .hero-countdown { display:flex; align-items:center; gap:.5rem; color:var(--gold); font-weight:600; font-size:1rem; margin-bottom:.75rem; }
+        .hero-cta { display:inline-flex; align-items:center; gap:.5rem; background:var(--primary); color:#fff; border:none; padding:.7rem 1.4rem; border-radius:10px; font-size:.9rem; font-weight:600; cursor:pointer; transition:var(--t); font-family:'Space Grotesk',sans-serif; }
+        .hero-cta:hover { background:var(--primary-h); transform:translateY(-2px); } .hero-cta:disabled { opacity:.45; cursor:not-allowed; transform:none; } .hero-cta.exclusive { background:transparent; border:2px solid; cursor:not-allowed; }
+
+        /* ═══ PAINEL DUPLO (substitui ícone flutuante e feed de vencedores) ═══ */
+        .quick-panel { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+        .quick-panel-card { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:1rem 1.2rem; display:flex; align-items:center; gap:1rem; cursor:pointer; transition:var(--t); text-decoration:none; color:inherit; }
+        .quick-panel-card:hover { border-color:var(--primary); transform:translateY(-2px); }
+        .quick-panel-icon { font-size:2.2rem; width:50px; height:50px; display:flex; align-items:center; justify-content:center; border-radius:12px; background:rgba(255,255,255,0.03); flex-shrink:0; position:relative; }
+        .quick-panel-badge { position:absolute; top:-6px; right:-6px; background:#ef4444; color:#fff; border-radius:50%; min-width:20px; height:20px; font-size:0.65rem; font-weight:700; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg-card); }
+        .quick-panel-info { flex:1; min-width:0; }
+        .quick-panel-label { font-size:0.7rem; color:var(--text-2); text-transform:uppercase; letter-spacing:0.05em; }
+        .quick-panel-value { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; margin-top:0.15rem; }
+        .quick-panel-desc { font-size:0.7rem; color:var(--text-2); margin-top:0.1rem; }
+        .quick-panel-progress { height:4px; background:rgba(255,255,255,0.06); border-radius:99px; overflow:hidden; margin-top:0.4rem; }
+        .quick-panel-progress-fill { height:100%; border-radius:99px; transition:width 0.5s ease; }
+
+        .search-bar { display:flex; gap:.75rem; flex-wrap:wrap; align-items:center; background:var(--bg-card); border:1px solid var(--border); border-radius:12px; padding:.9rem; }
+        .search-wrap { position:relative; flex:1; min-width:220px; } .s-icon { position:absolute; left:.85rem; top:50%; transform:translateY(-50%); color:var(--text-2); pointer-events:none; }
+        .search-input { width:100%; background:var(--bg); border:1px solid var(--border); padding:.7rem 1rem .7rem 2.4rem; border-radius:8px; color:var(--text); font-size:.88rem; outline:none; transition:var(--t); } .search-input:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(99,102,241,.1); }
+        .filter-select { background:var(--bg); border:1px solid var(--border); padding:.7rem 1rem; border-radius:8px; color:var(--text); font-size:.88rem; outline:none; cursor:pointer; min-width:180px; font-family:'Space Grotesk',sans-serif; transition:var(--t); } .filter-select:focus { border-color:var(--primary); }
+        .section-title { font-family:'Space Grotesk',sans-serif; font-size:1.2rem; font-weight:700; margin-bottom:1.25rem; display:flex; align-items:center; gap:.65rem; }
+        .s-count { font-size:.72rem; background:rgba(99,102,241,.15); color:var(--primary); padding:.2rem .6rem; border-radius:99px; font-weight:600; }
+        .grid-sorteios { display:grid; grid-template-columns:repeat(auto-fill,minmax(265px,1fr)); gap:1.25rem; }
+        .card { background:var(--bg-card); border-radius:14px; overflow:hidden; border:1px solid var(--border); transition:var(--t); display:flex; flex-direction:column; } .card:hover { transform:translateY(-4px); border-color:rgba(99,102,241,.3); box-shadow:0 12px 28px rgba(0,0,0,.35); }
+        .card-thumb { height:148px; background-size:cover; background-position:center; position:relative; background-color:#1a1f2e; flex-shrink:0; cursor:pointer; }
+        .thumb-top { position:absolute; inset:0; padding:.6rem; display:flex; align-items:flex-start; justify-content:space-between; }
+        .cbadge { background:rgba(11,14,20,.85); backdrop-filter:blur(4px); padding:.25rem .55rem; border-radius:6px; font-size:.72rem; font-weight:600; } .cbadge-pub { color:var(--green); } .cbadge-vip { color:var(--gold); border:1px solid rgba(251,191,36,.25); } .cbadge-dia { color:var(--diamond); border:1px solid rgba(56,189,248,.25); } .cbadge-time { color:var(--text); } .cbadge-cost { color:var(--money); background:rgba(245,158,11,.15); border:1px solid rgba(245,158,11,.3); }
+        .card-body { padding:1.1rem; display:flex; flex-direction:column; flex:1; }
+        .card-title { font-family:'Space Grotesk',sans-serif; font-size:1rem; font-weight:700; margin-bottom:.25rem; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .card-host { display:flex; align-items:center; gap:.35rem; font-size:.78rem; color:var(--text-2); margin-bottom:.85rem; }
+        .host-dot { width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:.65rem; font-weight:700; flex-shrink:0; color:#fff; cursor:pointer; transition:var(--t); overflow:hidden; position:relative; } .host-dot img { width:100%; height:100%; object-fit:cover; border-radius:50%; position:absolute; inset:0; } .host-dot:hover { transform:scale(1.15); box-shadow:0 0 8px currentColor; }
+        .host-level-mini { font-size:.55rem; background:rgba(0,0,0,.7); border-radius:50%; width:14px; height:14px; display:flex; align-items:center; justify-content:center; position:absolute; bottom:-2px; right:-2px; z-index:1; }
+        .card-prog { margin-bottom:.9rem; } .prog-row { display:flex; justify-content:space-between; font-size:.75rem; color:var(--text-2); margin-bottom:.3rem; } .prog-track { background:rgba(255,255,255,.06); height:5px; border-radius:99px; overflow:hidden; } .prog-fill { height:100%; border-radius:99px; background:var(--primary); transition:width .5s ease; }
+        .btn-card { width:100%; background:var(--primary); color:#fff; border:none; padding:.7rem; border-radius:9px; font-size:.88rem; font-weight:600; cursor:pointer; transition:var(--t); font-family:'Space Grotesk',sans-serif; } .btn-card:hover { background:var(--primary-h); } .btn-card.outline { background:transparent; border:1px solid var(--primary); color:var(--primary); } .btn-card.outline:hover { background:rgba(99,102,241,.08); } .btn-card:disabled { opacity:.45; cursor:not-allowed; }
+        .empty-state { grid-column:1/-1; text-align:center; padding:3rem; color:var(--text-2); font-size:.9rem; } .empty-icon { font-size:2.5rem; display:block; margin-bottom:.75rem; }
+        .load-more-wrap { display:flex; flex-direction:column; align-items:center; gap:.6rem; margin-top:2rem; padding:1.25rem; border:1px dashed var(--border); border-radius:12px; } .load-more-btn { background:transparent; border:1px solid rgba(255,255,255,.12); color:var(--text); padding:.7rem 1.75rem; border-radius:8px; font-weight:600; font-size:.88rem; cursor:pointer; transition:var(--t); font-family:'Space Grotesk',sans-serif; display:flex; align-items:center; gap:.5rem; } .load-more-btn:hover { background:var(--bg-card); border-color:var(--primary); } .load-more-btn:disabled { opacity:.45; cursor:not-allowed; } .page-info { font-size:.78rem; color:var(--text-2); letter-spacing:.05em; }
+        .fab { position: fixed; bottom: 2rem; right: 2rem; background: linear-gradient(135deg, #6366f1, #10b981); color: #fff; border: none; padding: 0.9rem 1.5rem; border-radius: 50px; font-weight: 700; font-size: 0.95rem; box-shadow: 0 4px 24px rgba(99,102,241,0.4), 0 0 0 2px rgba(255,255,255,0.1); cursor: pointer; display: flex; align-items: center; gap: 0.5rem; z-index: 150; transition: all 0.3s cubic-bezier(0.4,0,0.2,1); font-family: 'Space Grotesk', sans-serif; letter-spacing: 0.02em; animation: fabPulse 2s ease-in-out infinite; } .fab:hover { transform: scale(1.05) translateY(-2px); box-shadow: 0 8px 32px rgba(99,102,241,0.6), 0 0 0 3px rgba(255,255,255,0.2); background: linear-gradient(135deg, #4f46e5, #0d9488); } .fab svg { stroke: white; }
+        @keyframes fabPulse { 0%,100%{ box-shadow:0 4px 24px rgba(99,102,241,0.4),0 0 0 2px rgba(255,255,255,0.1) } 50%{ box-shadow:0 6px 32px rgba(16,185,129,0.5),0 0 0 3px rgba(255,255,255,0.15) } }
+        .modal-overlay { position:fixed; inset:0; z-index:500; background:rgba(0,0,0,.75); backdrop-filter:blur(6px); display:none; align-items:center; justify-content:center; padding:1rem; } .modal-overlay.open { display:flex; }
+        .modal { background:var(--bg-card); border:1px solid var(--border); border-radius:20px; width:100%; max-width:540px; max-height:92vh; overflow-y:auto; padding:2rem; position:relative; box-shadow:0 20px 50px rgba(0,0,0,.6); animation:modalIn .3s ease; }
+        @keyframes modalIn { from{opacity:0;transform:translateY(20px) scale(.97)} to{opacity:1;transform:translateY(0) scale(1)} }
+        .modal-close { position:absolute; top:1.1rem; right:1.1rem; background:rgba(255,255,255,.06); border:none; color:var(--text-2); width:32px; height:32px; border-radius:50%; font-size:1rem; cursor:pointer; transition:var(--t); display:flex; align-items:center; justify-content:center; } .modal-close:hover { background:rgba(255,255,255,.12); color:var(--text); }
+        .modal-title { font-family:'Space Grotesk',sans-serif; font-size:1.3rem; font-weight:700; margin-bottom:.3rem; } .modal-sub { font-size:.82rem; color:var(--text-2); margin-bottom:1.5rem; }
+        .m-field { display:flex; flex-direction:column; gap:.4rem; margin-bottom:1rem; } .m-label { font-size:.8rem; color:var(--text-2); font-weight:500; }
+        .m-input, .m-select, .m-textarea { background:rgba(11,14,20,.7); border:1px solid var(--border); padding:.75rem .9rem; border-radius:10px; color:var(--text); font-size:.88rem; outline:none; transition:var(--t); width:100%; } .m-select option { background:var(--bg-card); } .m-textarea { resize:vertical; min-height:70px; font-family:inherit; }
+        .m-input:focus, .m-select:focus, .m-textarea:focus { border-color:var(--primary); box-shadow:0 0 0 3px rgba(99,102,241,.12); }
+        .m-row { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; } .rawg-row { display:flex; gap:.5rem; align-items:flex-start; } .rawg-row .m-input { flex:1; }
+        .rawg-btn { background:rgba(99,102,241,.15); border:1px solid rgba(99,102,241,.3); color:var(--primary); padding:.75rem .9rem; border-radius:10px; font-size:.8rem; font-weight:600; cursor:pointer; transition:var(--t); white-space:nowrap; font-family:'Space Grotesk',sans-serif; } .rawg-btn:hover { background:rgba(99,102,241,.28); }
+        .rawg-preview { border-radius:10px; height:110px; background:rgba(255,255,255,.03); border:1px solid var(--border); position:relative; display:flex; align-items:center; justify-content:center; margin-top:.5rem; overflow:hidden; } .rawg-preview img { position:absolute; inset:0; width:100%; height:100%; object-fit:cover; } .rawg-preview .r-overlay { position:absolute; inset:0; background:linear-gradient(to top,rgba(11,14,20,.8),transparent); } .rawg-preview .r-name { position:absolute; bottom:.5rem; left:.75rem; font-size:.8rem; font-weight:600; z-index:1; color:white; text-shadow:0 1px 2px black; } .rawg-placeholder { color:var(--text-2); font-size:.82rem; text-align:center; padding:1rem; }
+        .key-note { background:rgba(16,185,129,.08); border:1px solid rgba(16,185,129,.2); border-radius:8px; padding:.7rem .9rem; font-size:.78rem; color:var(--green); display:flex; align-items:flex-start; gap:.5rem; line-height:1.4; margin-bottom:1rem; }
+        .warning-note { background:rgba(251,191,36,.08); border:1px solid rgba(251,191,36,.2); border-radius:8px; padding:.7rem .9rem; font-size:.78rem; color:var(--gold); display:flex; align-items:flex-start; gap:.5rem; line-height:1.4; margin-bottom:1rem; }
+        .cost-note { background:rgba(245,158,11,.08); border:1px solid rgba(245,158,11,.2); border-radius:8px; padding:.7rem .9rem; font-size:.78rem; color:var(--money); display:flex; align-items:flex-start; gap:.5rem; line-height:1.4; margin-bottom:1rem; }
+        .divider-m { height:1px; background:var(--border); margin:.75rem 0 1rem; }
+        .btn-salvar { width:100%; background:var(--primary); color:#fff; border:none; padding:.9rem; border-radius:12px; font-size:.95rem; font-weight:700; cursor:pointer; transition:var(--t); margin-top:.5rem; font-family:'Space Grotesk',sans-serif; } .btn-salvar:hover { background:var(--primary-h); transform:translateY(-2px); } .btn-salvar:disabled { opacity:.45; cursor:not-allowed; transform:none; }
+        .detail-grid { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; margin:.75rem 0; } .detail-item { background:rgba(255,255,255,.03); border-radius:8px; padding:.75rem; } .detail-item dt { font-size:.7rem; color:var(--text-2); text-transform:uppercase; letter-spacing:.05em; margin-bottom:.25rem; } .detail-item dd { font-size:.88rem; font-weight:600; }
+        .detail-creator-row { display:flex; align-items:center; gap:.75rem; margin:.75rem 0; padding:.75rem; background:rgba(255,255,255,.03); border-radius:10px; } .detail-creator-avatar { width:40px; height:40px; border-radius:50%; background:#2e3748; display:flex; align-items:center; justify-content:center; font-weight:700; overflow:hidden; border:2px solid var(--primary); flex-shrink:0; position:relative; } .detail-creator-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; position:absolute; inset:0; } .detail-creator-info { flex:1; } .detail-creator-name { font-weight:600; font-size:.9rem; color:var(--text); text-decoration:none; } .detail-creator-name:hover { color:var(--primary); } .detail-creator-level { font-size:.75rem; color:var(--text-2); display:flex; align-items:center; gap:.3rem; }
+        .steam-guide { background:rgba(56,189,248,.08); border:1px solid rgba(56,189,248,.2); border-radius:8px; padding:.7rem .9rem; font-size:.78rem; color:var(--diamond); line-height:1.4; margin-top:.75rem; }
+        .chat-badge { background: #ef4444; color: #fff; border-radius: 50%; min-width: 18px; height: 18px; font-size: 0.65rem; font-weight: 700; display: inline-flex; align-items: center; justify-content: center; position: absolute; top: -4px; right: -8px; pointer-events: none; animation: badgePop 0.3s ease; }
+        @keyframes badgePop { 0%{transform:scale(0)} 50%{transform:scale(1.3)} 100%{transform:scale(1)} }
+        .rewards-panel { background:var(--bg-card); border:1px solid var(--border); border-radius:14px; padding:1rem 1.1rem; display:none; } .rewards-panel.show { display:block; }
+        .rewards-panel-title { font-family:'Space Grotesk',sans-serif; font-size:.95rem; font-weight:700; display:flex; align-items:center; gap:.5rem; margin-bottom:.85rem; }
+        .rewards-panel-title .rp-badge { background:#ef4444; color:#fff; border-radius:99px; font-size:.65rem; font-weight:700; padding:.1rem .5rem; }
+        .rewards-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(240px,1fr)); gap:.75rem; }
+        .reward-card { background:rgba(255,255,255,.025); border:1px solid var(--border); border-radius:12px; padding:.85rem; display:flex; flex-direction:column; gap:.5rem; } .reward-card.win { border-left:3px solid var(--gold); }
+        .reward-card-head { display:flex; justify-content:space-between; align-items:flex-start; gap:.5rem; } .reward-card-game { font-weight:700; font-size:.88rem; }
+        .reward-card-tag { font-size:.65rem; font-weight:700; padding:.2rem .5rem; border-radius:6px; text-transform:uppercase; white-space:nowrap; } .reward-card-tag.win { background:rgba(251,191,36,.12); color:var(--gold); border:1px solid rgba(251,191,36,.3); }
+        .reward-card-row { font-size:.75rem; color:var(--text-2); display:flex; justify-content:space-between; } .reward-card-row b { color:var(--text); }
+        .reward-btn { width:100%; border:none; padding:.6rem; border-radius:8px; font-weight:700; font-size:.82rem; cursor:pointer; transition:var(--t); font-family:'Space Grotesk',sans-serif; } .reward-btn.resgatar { background:var(--green); color:#fff; } .reward-btn.resgatar:hover { background:#0d9c6f; } .reward-btn.resgatado { background:rgba(255,255,255,.06); color:var(--text-2); cursor:default; }
+        .reward-key-box { background:rgba(16,185,129,.08); border:1px dashed rgba(16,185,129,.3); border-radius:8px; padding:.5rem .65rem; font-family:monospace; font-size:.8rem; color:var(--green); display:flex; justify-content:space-between; align-items:center; gap:.5rem; word-break:break-all; } .reward-key-copy { background:rgba(16,185,129,.15); border:none; color:var(--green); padding:.3rem .55rem; border-radius:6px; font-size:.7rem; font-weight:700; cursor:pointer; flex-shrink:0; }
+        @media (max-width:768px) { .navbar-links { display:none; } .mobile-nav { display:block; } .main-layout { padding:0 1rem; } .navbar-inner { padding:.65rem 1rem; flex-wrap:wrap; gap:.5rem; } .upill-name { display:none; } .fab { bottom:5.5rem; right:1rem; padding:.9rem; border-radius:50%; } .fab .fab-txt { display:none; } .hero-title { font-size:1.4rem; } .m-row { grid-template-columns:1fr; } .detail-grid { grid-template-columns:1fr; } .guest-features { grid-template-columns:1fr; } .quick-panel { grid-template-columns:1fr; } .rewards-grid { grid-template-columns:1fr; } }
+        @media (min-width:769px) { .mobile-nav { display:none; } }
+    </style>
+</head>
+<body>
+<div id="page-loader"><div class="spin"></div><p style="color:var(--text-2);font-size:.88rem;">Carregando Looto...</p></div>
+<div class="guest-overlay" id="guest-overlay"><div class="guest-modal"><h2>🎮 Bem-vindo à Looto!</h2><p>Participe de sorteios de games, ganhe pontos e faça parte da comunidade!</p><div class="guest-features"><div class="guest-feat">🎁 Sorteios de jogos</div><div class="guest-feat">💰 Looto Money</div><div class="guest-feat">👑 Suba de nível</div><div class="guest-feat">💬 Comunidade ativa</div><div class="guest-feat">🔑 Keys originais</div><div class="guest-feat">🎡 Mini jogos</div></div><div class="guest-buttons"><a href="login.html" class="gbtn gbtn-primary">🔐 Entrar</a><a href="login.html?tab=register" class="gbtn gbtn-outline">📝 Criar Conta</a></div></div></div>
+<div id="toast"></div>
+<nav class="navbar"><div class="navbar-inner"><a href="looto.html" class="navbar-brand"><span class="brand-icon"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg></span>Looto</a><div class="navbar-links"><a href="looto.html" class="navbar-link active"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span>Sorteios</a><a href="loja.html" class="navbar-link"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span>Loja</a><a href="minigames.html" class="navbar-link"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg></span>Minijogos</a><a href="chat.html" class="navbar-link" style="position:relative;"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>Chat<span id="chat-badge" class="chat-badge" style="display:none;">0</span></a></div><div id="header-auth-area"><button class="login-btn-header" onclick="window.location.href='login.html'">🔐 Entrar</button></div></div></nav>
+<nav class="mobile-nav"><div class="mobile-nav-inner"><a href="looto.html" class="mobile-nav-link active"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg></span><span class="nav-label">Sorteios</span></a><a href="loja.html" class="mobile-nav-link"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/><line x1="3" y1="6" x2="21" y2="6"/><path d="M16 10a4 4 0 0 1-8 0"/></svg></span><span class="nav-label">Loja</span></a><a href="minigames.html" class="mobile-nav-link"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polygon points="10,8 16,12 10,16"/></svg></span><span class="nav-label">Jogos</span></a><a href="chat.html" class="mobile-nav-link"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span><span class="nav-label">Chat</span></a><a href="conta.html" class="mobile-nav-link"><span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span><span class="nav-label">Perfil</span></a></div></nav>
+
+<div class="main-layout">
+    <section class="hero-banner" id="hero-banner"><div class="hero-bg" id="hero-bg"></div><div class="hero-overlay"></div><div class="hero-inner"><div class="hero-badges"><span class="hbadge hbadge-purple">Grande Sorteio</span><span class="hbadge" id="hero-status-badge">Em Breve</span></div><h2 class="hero-title" id="hero-title">Algo épico está a caminho</h2><p class="hero-sub" id="hero-sub">O próximo grande sorteio está sendo preparado pelo administrador.</p><div class="hero-countdown" id="hero-countdown" style="display:none;">⏱️ <span id="hero-timer">--h --m --s</span></div><button class="hero-cta" id="hero-btn" disabled>🔔 Avisem-me quando abrir</button></div></section>
+
+    <!-- ═══ PAINEL DUPLO (BAÚ + PROGRESSO) ═══ -->
+    <div class="quick-panel">
+        <div class="quick-panel-card" onclick="abrirBauRecompensas()" id="bau-panel-card">
+            <div class="quick-panel-icon">
+                🎁
+                <span class="quick-panel-badge" id="bau-panel-badge" style="display:none;">0</span>
+            </div>
+            <div class="quick-panel-info">
+                <div class="quick-panel-label">Recompensas</div>
+                <div class="quick-panel-value" id="bau-panel-title">Nenhuma</div>
+                <div class="quick-panel-desc" id="bau-panel-desc">Clique para abrir o baú</div>
+            </div>
+        </div>
+        <a href="conta.html" class="quick-panel-card" id="progress-panel-card">
+            <div class="quick-panel-icon" id="progress-panel-icon" style="background:#2e3748;"><span style="font-weight:700;">?</span></div>
+            <div class="quick-panel-info">
+                <div class="quick-panel-label" id="progress-panel-nivel">Carregando...</div>
+                <div class="quick-panel-value" id="progress-panel-xp">0 XP</div>
+                <div class="quick-panel-desc" id="progress-panel-money">💰 0 LootoMoney</div>
+                <div class="quick-panel-progress"><div class="quick-panel-progress-fill" id="progress-panel-bar" style="width:0%;"></div></div>
+            </div>
+        </a>
+    </div>
+
+    <div class="search-bar"><div class="search-wrap"><span class="s-icon">🔍</span><input type="text" class="search-input" id="search-input" placeholder="Buscar por jogo..."></div><select class="filter-select" id="filter-select"><option value="todos">🌍 Todos os Sorteios</option><option value="menos">🎯 Menos Participantes</option><option value="recentes">⏰ Mais Recentes</option><option value="publico">🟢 Apenas Públicos</option><option value="vip">👑 Apenas Prata/Ouro/Diamante</option></select></div>
+
+    <section><div class="section-title">Sorteios Ativos<span class="s-count" id="sorteios-count">0</span></div><div class="grid-sorteios" id="grid-sorteios"><div class="empty-state"><span class="empty-icon">⏳</span>Carregando sorteios...</div></div><div class="load-more-wrap" id="load-more-wrap" style="display:none;"><button class="load-more-btn" id="load-more-btn">🔄 Carregar Mais</button><span class="page-info" id="page-info"></span></div></section>
+
+    <div class="rewards-panel" id="rewards-panel">
+        <div class="rewards-panel-title">🎁 Meus Prêmios <span class="rp-badge" id="rewards-count" style="display:none;">0</span></div>
+        <div class="rewards-grid" id="rewards-grid"></div>
+    </div>
+</div>
+
+<button class="fab" id="fab-criar"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg><span class="fab-txt">Criar Sorteio</span></button>
+
+<div class="modal-overlay" id="modal-overlay"><div class="modal"><button class="modal-close" id="modal-close-btn">✕</button><div class="modal-title">🎁 Criar Novo Sorteio</div><div class="modal-sub">A imagem de capa é buscada automaticamente pelo RAWG.io.</div><div class="m-field"><label class="m-label">Nome do Jogo *</label><div class="rawg-row"><input type="text" class="m-input" id="m-game-name" placeholder="ex: Hollow Knight"><button class="rawg-btn" id="rawg-search-btn">🖼️ Buscar Capa</button></div><div class="rawg-preview" id="rawg-preview"><div class="rawg-placeholder">Digite o nome e clique em "Buscar Capa"</div></div></div><input type="hidden" id="m-wallpaper"><div class="divider-m"></div><div class="m-field"><label class="m-label">Título do Sorteio *</label><input type="text" class="m-input" id="m-titulo" placeholder="ex: Sorteio de Hollow Knight — Steam"></div><div class="m-field"><label class="m-label">🔑 Chave do Jogo (Key) *</label><div class="key-note">🔒 A key fica oculta. Apenas o vencedor receberá acesso.</div><input type="text" class="m-input" id="m-key" placeholder="XXXXX-XXXXX-XXXXX"></div><div class="m-row"><div class="m-field"><label class="m-label">Tipo de Acesso *</label><select class="m-select" id="m-tipo"><option value="publico">🌍 Público (Todos)</option><option value="prata">🥈 Prata+ (Criação Nível 10+)</option><option value="ouro">🥇 Ouro+ (Criação Nível 15+)</option><option value="diamante">💎 Diamante+ (Criação Nível 30+)</option><option value="exclusivo">⭐ Exclusivo (Criação por Assinantes)</option></select></div><div class="m-field"><label class="m-label" id="m-max-label">Máx. Participantes *</label><input type="number" class="m-input" id="m-max" value="50" min="2" max="50"></div></div><div class="m-row"><div class="m-field"><label class="m-label">Duração</label><input type="text" class="m-input" value="2 minutos" disabled style="opacity:.7;"></div><div class="m-field"><label class="m-label">Plataforma *</label><select class="m-select" id="m-plataforma"><option value="Steam">Steam</option><option value="Epic Games">Epic Games</option><option value="GOG">GOG</option><option value="Battle.net">Battle.net</option><option value="Origin">Origin</option><option value="Outro">Outro</option></select></div></div><div class="m-field"><label class="m-label">Descrição (opcional)</label><textarea class="m-textarea" id="m-desc" placeholder="Adicione uma mensagem..."></textarea></div><div class="warning-note" id="warning-note" style="display:none;"></div><button class="btn-salvar" id="btn-criar">🎁 Publicar Sorteio</button></div></div>
+<div class="modal-overlay" id="detail-modal-overlay"><div class="modal"><button class="modal-close" id="detail-modal-close-btn">✕</button><div class="modal-title" id="detail-title">Detalhes do Sorteio</div><div class="modal-sub" id="detail-sub"></div><div class="cost-note" id="cost-note">💰 Custo de entrada: <strong id="cost-value">5 Looto Money</strong></div><div class="detail-creator-row"><div class="detail-creator-avatar" id="detail-creator-avatar">👤</div><div class="detail-creator-info"><a href="#" class="detail-creator-name" id="detail-creator-name">-</a><div class="detail-creator-level" id="detail-creator-level">-</div></div><span class="user-level-badge" id="detail-creator-badge" style="position:static;">0</span></div><div class="detail-grid"><div class="detail-item"><dt>🎮 Jogo</dt><dd id="detail-game">-</dd></div><div class="detail-item"><dt>🖥️ Plataforma</dt><dd id="detail-platform">-</dd></div><div class="detail-item"><dt>👥 Participantes</dt><dd id="detail-parts">-</dd></div><div class="detail-item"><dt>⏱️ Tempo Restante</dt><dd id="detail-time">-</dd></div><div class="detail-item"><dt>🔒 Tipo</dt><dd id="detail-type">-</dd></div><div class="detail-item"><dt>💰 Entrada</dt><dd id="detail-cost" style="color:var(--money);">-</dd></div></div><div class="m-field"><label class="m-label">Descrição</label><p id="detail-desc" style="font-size:.85rem;color:var(--text-2);">-</p></div><div class="steam-guide" id="steam-guide" style="display:none;">🎮 <strong>Como resgatar na Steam:</strong><br>1. Abra o Steam e faça login<br>2. Clique em "Jogos" → "Ativar um código na Steam"<br>3. Siga as instruções e insira a key<br>4. O jogo será adicionado à sua biblioteca!</div><button class="btn-salvar" id="detail-enter-btn" style="margin-top:1rem;">🎁 Entrar no Sorteio</button></div></div>
+<div class="modal-overlay" id="bau-recompensas-overlay"><div class="modal"><button class="modal-close" onclick="fecharBauRecompensas()">✕</button><div class="modal-title">🎁 Baú de Recompensas</div><div class="modal-sub">Aqui estão suas recompensas recebidas recentemente.</div><div id="bau-lista" style="max-height: 400px; overflow-y: auto; margin-bottom: 1rem;"></div><button class="btn-salvar" id="btn-marcar-visto" onclick="marcarTudoVisto()">✅ Marcar tudo como visto</button></div></div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { getDatabase, ref, push, set, get, update, remove, onValue, query, orderByChild, limitToLast, runTransaction } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+    authDomain: "looto-f46e5.firebaseapp.com",
+    databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+    projectId: "looto-f46e5",
+    storageBucket: "looto-f46e5.firebasestorage.app",
+    messagingSenderId: "295066400995",
+    appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6",
+    measurementId: "G-KP9RDFZ41M"
+};
+
+const app = initializeApp(firebaseConfig);
+getAnalytics(app);
+const auth = getAuth(app);
+const db = getDatabase(app);
+const RAWG_KEY = '834abf550c2e4781a7030ce0591deedc';
+
+let currentUser = null, userData = {}, allSorteios = [], filteredSorteios = [], visibleCount = 6;
+let heroTimerID = null, currentDetailId = null, preventDoubleClick = {};
+const userCache = new Map(), USER_CACHE_TTL = 5 * 60 * 1000;
+
+function playNotificationSound(type = 'default') {
+    try {
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+        const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+        o.connect(g); g.connect(audioCtx.destination);
+        if (type === 'treasure' || type === 'win') {
+            o.frequency.setValueAtTime(660, audioCtx.currentTime);
+            o.frequency.setValueAtTime(880, audioCtx.currentTime + 0.1);
+            o.frequency.setValueAtTime(1100, audioCtx.currentTime + 0.2);
+            g.gain.setValueAtTime(0.3, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.3);
+        } else if (type === 'lose') {
+            o.frequency.setValueAtTime(440, audioCtx.currentTime);
+            o.frequency.setValueAtTime(330, audioCtx.currentTime + 0.15);
+            g.gain.setValueAtTime(0.2, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.3);
+            o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.3);
+        } else {
+            o.frequency.setValueAtTime(800, audioCtx.currentTime);
+            g.gain.setValueAtTime(0.15, audioCtx.currentTime);
+            g.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + 0.1);
+            o.start(audioCtx.currentTime); o.stop(audioCtx.currentTime + 0.1);
+        }
+    } catch(e) {}
+}
+
+function gerarNiveis() {
+    const ranks = [
+        { min:0, max:4, nome:'Bronze', icon:'🥉', cor:'#cd7f32' },
+        { min:5, max:9, nome:'Ferro', icon:'⚙️', cor:'#8b8b8b' },
+        { min:10, max:14, nome:'Prata', icon:'🪙', cor:'#9ca3af' },
+        { min:15, max:19, nome:'Ouro', icon:'🥇', cor:'#f59e0b' },
+        { min:20, max:24, nome:'Platina', icon:'🪨', cor:'#a855f7' },
+        { min:25, max:29, nome:'Esmeralda', icon:'💚', cor:'#10b981' },
+        { min:30, max:34, nome:'Rubi', icon:'❤️', cor:'#ef4444' },
+        { min:35, max:39, nome:'Safira', icon:'💙', cor:'#3b82f6' },
+        { min:40, max:44, nome:'Épico', icon:'👑', cor:'#fbbf24' },
+        { min:45, max:49, nome:'Lendário', icon:'🌟', cor:'#ff8c00' },
+        { min:50, max:54, nome:'Mítico', icon:'🔮', cor:'#ec4899' },
+        { min:55, max:59, nome:'Celestial', icon:'🌌', cor:'#6366f1' },
+        { min:60, max:64, nome:'Transcendente', icon:'⚡', cor:'#d946ef' },
+        { min:65, max:69, nome:'Divino', icon:'🕊️', cor:'#e0e0e0' },
+        { min:70, max:74, nome:'Supremo', icon:'💎', cor:'#38bdf8' },
+        { min:75, max:79, nome:'Imortal', icon:'🔥', cor:'#f97316' },
+        { min:80, max:84, nome:'Cósmico', icon:'🌠', cor:'#14b8a6' },
+        { min:85, max:89, nome:'Abissal', icon:'🌊', cor:'#0ea5e9' },
+        { min:90, max:94, nome:'Eterno', icon:'⏳', cor:'#eab308' },
+        { min:95, max:99, nome:'Looto Master', icon:'🏆', cor:'#22c55e' }
+    ];
+    const niveis = [];
+    for(const r of ranks) for(let i = r.min; i <= r.max; i++) niveis.push({ nivel: i, nome: r.nome, icon: r.icon, cor: r.cor, xpNecessario: Math.floor(100 * Math.pow(1.15, i)) });
+    return niveis;
+}
+const NIVEIS_100 = gerarNiveis();
+
+function getNivelByXP(xp) { for(let i = NIVEIS_100.length - 1; i >= 0; i--) if(xp >= NIVEIS_100[i].xpNecessario) return NIVEIS_100[i]; return NIVEIS_100[0]; }
+function getNivelData(nivelConta) { const idx = Math.min(nivelConta, 99); return NIVEIS_100[idx] || NIVEIS_100[0]; }
+function getContrastColor(hex) { if (!hex || hex.length < 7) return '#fff'; const r = parseInt(hex.slice(1,3),16), g = parseInt(hex.slice(3,5),16), b = parseInt(hex.slice(5,7),16); return (0.299*r + 0.587*g + 0.114*b) / 255 > 0.6 ? '#333' : '#fff'; }
+function sanitize(str) { const d = document.createElement('div'); d.textContent = str || ''; return d.innerHTML; }
+
+let CUSTO_ENTRADA = { publico:0, prata:0, ouro:0, diamante:0, exclusivo:0 };
+let CUSTO_PREMIUM = { publico:0, prata:0, ouro:0, diamante:0, exclusivo:0 };
+let LIMITES_POR_TIPO = { publico:{min:2,max:50}, prata:{min:10,max:80}, ouro:{min:20,max:150}, diamante:{min:30,max:300}, exclusivo:{min:2,max:500} };
+let LIMITE_DIARIO = { bronze:1, prata:2, ouro:3, diamante:5, exclusivo:10 };
+let NIVEL_REQ = { publico:0, prata:10, ouro:15, diamante:30, exclusivo:0 };
+let RECOMPENSAS = { vencedorXp:75, vencedorMoney:0, vencedorPote:0, participanteXp:20, participanteMoney:0, participantePote:0, criadorXp:100, criadorMoney:0, criadorPote:20, gsVencedorXp:1000, gsVencedorMoney:0, gsParticipanteXp:150, gsParticipanteMoney:0 };
+
+onValue(ref(db, 'configRecompensas'), (snap) => { if (snap.exists()) { const r = snap.val(); RECOMPENSAS = { vencedorXp: r.vencedorXp ?? 75, vencedorMoney: r.vencedorMoney ?? 0, vencedorPote: r.vencedorPote ?? 0, participanteXp: r.participanteXp ?? 20, participanteMoney: r.participanteMoney ?? 0, participantePote: r.participantePote ?? 0, criadorXp: r.criadorXp ?? 100, criadorMoney: r.criadorMoney ?? 0, criadorPote: r.criadorPote ?? 20, gsVencedorXp: r.gsVencedorXp ?? 1000, gsVencedorMoney: r.gsVencedorMoney ?? 0, gsParticipanteXp: r.gsParticipanteXp ?? 150, gsParticipanteMoney: r.gsParticipanteMoney ?? 0 }; }});
+onValue(ref(db, 'configCustos'), (snap) => { if (snap.exists()) { const c = snap.val(); CUSTO_ENTRADA = { publico: c.publico ?? 0, prata: c.prata ?? 0, ouro: c.ouro ?? 0, diamante: c.diamante ?? 0, exclusivo: c.exclusivo ?? 0 }; CUSTO_PREMIUM = { publico: c.publicoPremium ?? 0, prata: c.prataPremium ?? 0, ouro: c.ouroPremium ?? 0, diamante: c.diamantePremium ?? 0, exclusivo: c.exclusivoPremium ?? 0 }; LIMITES_POR_TIPO = { publico:{ min: c.limitePublicoMin ?? 2, max: c.limitePublicoMax ?? 50 }, prata:{ min: c.limitePrataMin ?? 10, max: c.limitePrataMax ?? 80 }, ouro:{ min: c.limiteOuroMin ?? 20, max: c.limiteOuroMax ?? 150 }, diamante:{ min: c.limiteDiamanteMin ?? 30, max: c.limiteDiamanteMax ?? 300 }, exclusivo:{ min: c.limiteExclusivoMin ?? 2, max: c.limiteExclusivoMax ?? 500 } }; LIMITE_DIARIO = { bronze: c.limiteBronzeDia ?? 1, prata: c.limitePrataDia ?? 2, ouro: c.limiteOuroDia ?? 3, diamante: c.limiteDiamanteDia ?? 5, exclusivo: c.limiteExclusivoDia ?? 10 }; renderSorteios(); }});
+
+function toast(msg, ok=false) { const el = document.getElementById('toast'); el.textContent = msg; el.className = 'show' + (ok ? ' ok' : ''); clearTimeout(toast._t); toast._t = setTimeout(() => el.classList.remove('show'), 4000); }
+function diffStr(ms) { if (ms <= 0) return 'Encerrado'; const h = Math.floor(ms / 3600000), m = Math.floor((ms % 3600000) / 60000), s = Math.floor((ms % 60000) / 1000); if (h > 0) return `${h}h ${m}m`; return `${m}m ${String(s).padStart(2,'0')}s`; }
+async function pushFeed(html, extra={}) { try { const fr = push(ref(db, 'feed')); await set(fr, { html, ts: Date.now(), ...extra }); } catch(e) {} }
+function getCustoEntrada(tipo) { return (userData.premium === true ? (CUSTO_PREMIUM[tipo] ?? CUSTO_ENTRADA[tipo] ?? 0) : (CUSTO_ENTRADA[tipo] ?? 0)); }
+
+// ═══════════ SORTEIO AUTOMÁTICO ═══════════
+const MIN_PARTICIPANTES = 10;
+let keyDeliveryLock = false;
+
+async function keyDelivery() {
+    if (keyDeliveryLock) return;
+    keyDeliveryLock = true;
+    try {
+        const [recSnap, custSnap] = await Promise.all([get(ref(db, 'configRecompensas')), get(ref(db, 'configCustos'))]);
+        if (recSnap.exists()) { const r = recSnap.val(); RECOMPENSAS = { vencedorXp: r.vencedorXp ?? 75, vencedorMoney: r.vencedorMoney ?? 0, vencedorPote: r.vencedorPote ?? 0, participanteXp: r.participanteXp ?? 20, participanteMoney: r.participanteMoney ?? 0, participantePote: r.participantePote ?? 0, criadorXp: r.criadorXp ?? 100, criadorMoney: r.criadorMoney ?? 0, criadorPote: r.criadorPote ?? 20, gsVencedorXp: r.gsVencedorXp ?? 1000, gsVencedorMoney: r.gsVencedorMoney ?? 0, gsParticipanteXp: r.gsParticipanteXp ?? 150, gsParticipanteMoney: r.gsParticipanteMoney ?? 0 }; }
+        if (custSnap.exists()) { const c = custSnap.val(); CUSTO_ENTRADA = { publico: c.publico ?? 0, prata: c.prata ?? 0, ouro: c.ouro ?? 0, diamante: c.diamante ?? 0, exclusivo: c.exclusivo ?? 0 }; }
+
+        const snap = await get(query(ref(db, 'sorteios'), orderByChild('expiraEm'), limitToLast(100)));
+        if (!snap.exists()) return;
+        const now = Date.now();
+        const processados = [];
+        snap.forEach(child => { const dados = child.val(); if (dados.expiraEm && dados.expiraEm < now && dados.ativo && !dados.keyEntregue) processados.push({ sorteioId: child.key, dados }); });
+
+        for (const { sorteioId, dados } of processados) {
+            const sorteioRef = ref(db, `sorteios/${sorteioId}`);
+            try {
+                await runTransaction(sorteioRef, (current) => {
+                    if (!current || current.keyEntregue || !current.ativo || current.expiraEm > now) return;
+                    const pIds = Object.keys(current.participantes || {});
+                    const info = { nomeJogo: current.nomeJogo, titulo: current.titulo, key: current.key, tipo: current.tipo, maxParticipantes: current.maxParticipantes, plataforma: current.plataforma, descricao: current.descricao, wallpaper: current.wallpaper, criadoPor: current.criadoPor, criadoPorNome: current.criadoPorNome, criadorNivel: current.criadorNivel, expiraEm: current.expiraEm, participantes: current.participantes || {}, ativo: true, keyEntregue: false };
+                    if (pIds.length < MIN_PARTICIPANTES) { current.keyEntregue = true; current.ativo = false; current.encerradoEm = now; current.status = 'cancelado'; current._ef = { cancelado: true, dados: info, sId: sorteioId }; return current; }
+                    const vId = pIds[Math.floor(Math.random() * pIds.length)];
+                    current.keyEntregue = true; current.ativo = false; current.encerradoEm = now; current.vencedorId = vId; current.vencedorNome = current.participantes[vId]?.nome || 'Anônimo';
+                    current._ef = { vId, dados: info, sId: sorteioId };
+                    return current;
+                }).then(async (result) => {
+                    if (result?.snapshot?.val()?._ef) {
+                        const ef = result.snapshot.val()._ef;
+                        if (ef.cancelado) await cancelarSorteio(ef.dados, ef.sId);
+                        else await realizarEntrega(ef.dados, ef.vId, ef.sId);
+                        await update(ref(db, `sorteios/${sorteioId}`), { _ef: null }).catch(() => {});
+                    }
+                }).catch(e => console.error('Erro no sorteio automático:', e));
+            } catch (e) { console.error('Transação falhou para', sorteioId, e); }
+        }
+    } catch(e) {} finally { keyDeliveryLock = false; }
+}
+setInterval(keyDelivery, 10000); setTimeout(keyDelivery, 3000);
+
+async function cancelarSorteio(dados, sorteioId) {
+    const participantesIds = Object.keys(dados.participantes || {});
+    await push(ref(db, 'chat'), { uid: 'bot', nome: 'LootoBot 🤖', texto: `⚠️ Sorteio de ${sanitize(dados.nomeJogo || dados.titulo)} cancelado por falta de participantes (mínimo ${MIN_PARTICIPANTES}).`, ts: Date.now(), type: 'system' });
+    await push(ref(db, 'logSorteios'), { sorteioId, nomeJogo: dados.nomeJogo || dados.titulo, status: 'cancelado', participantes: participantesIds.length, encerradoEm: Date.now(), tipo: dados.tipo });
+}
+async function adicionarAoBau(uid, tipo, xp, money, mensagem, sorteioId, extra={}) {
+    const refBau = push(ref(db, `recompensasRecebidas/${uid}`));
+    await set(refBau, { tipo, xp, money, mensagem, data: Date.now(), visto: false, sorteioId, ...extra });
+}
+async function realizarEntrega(dados, vencedorId, sorteioId) {
+    const v = dados.participantes?.[vencedorId] || {};
+    const participantesIds = Object.keys(dados.participantes || {}), totalParticipantes = participantesIds.length;
+    const tipo = dados.tipo || 'publico', custoPorPessoa = CUSTO_ENTRADA[tipo] || 0, poteTotal = totalParticipantes * custoPorPessoa, poteCriador = Math.floor(poteTotal * ((RECOMPENSAS.criadorPote || 0) / 100));
+    const ps = [];
+
+    await pushFeed(`🎉 <strong>${sanitize(v.nome || 'Alguém')}</strong> ganhou <strong>${sanitize(dados.nomeJogo || dados.titulo)}</strong>!`, { vencedorId, vencedorNome: v.nome || 'Alguém', jogo: dados.nomeJogo || dados.titulo, tipo: 'vencedor' });
+
+    try {
+        const vSnap = await get(ref(db, `usuarios/${vencedorId}`)), vData = vSnap.val() || {};
+        const xpGanho = (RECOMPENSAS.vencedorXp || 0), moneyGanho = (RECOMPENSAS.vencedorMoney || 0);
+        ps.push(update(ref(db, `usuarios/${vencedorId}`), { pontos: (vData.pontos||0) + xpGanho, dinheiro: (vData.dinheiro||0) + moneyGanho, nivelConta: getNivelByXP((vData.pontos||0) + xpGanho).nivel }));
+        await adicionarAoBau(vencedorId, 'vitoria', xpGanho, moneyGanho, `Vitória no sorteio de ${dados.nomeJogo}`, sorteioId, { key: dados.key || null, jogo: dados.nomeJogo || dados.titulo, plataforma: dados.plataforma || 'Steam', keyResgatada: false, entregaAutomatica: true });
+    } catch(e) {}
+
+    for (const uid of participantesIds) {
+        if (uid === vencedorId) continue;
+        try {
+            const pSnap = await get(ref(db, `usuarios/${uid}`)), pData = pSnap.val() || {};
+            const xpGanho = (RECOMPENSAS.participanteXp || 0), moneyGanho = (RECOMPENSAS.participanteMoney || 0);
+            ps.push(update(ref(db, `usuarios/${uid}`), { pontos: (pData.pontos||0) + xpGanho, dinheiro: (pData.dinheiro||0) + moneyGanho, nivelConta: getNivelByXP((pData.pontos||0) + xpGanho).nivel }));
+            await adicionarAoBau(uid, 'participacao', xpGanho, moneyGanho, `Participação no sorteio de ${dados.nomeJogo}`, sorteioId);
+        } catch(e) {}
+    }
+
+    if (dados.criadoPor) {
+        try {
+            const cSnap = await get(ref(db, `usuarios/${dados.criadoPor}`)), cData = cSnap.val() || {};
+            const xpGanho = (RECOMPENSAS.criadorXp || 0), moneyGanho = (RECOMPENSAS.criadorMoney || 0) + poteCriador;
+            ps.push(update(ref(db, `usuarios/${dados.criadoPor}`), { pontos: (cData.pontos||0) + xpGanho, dinheiro: (cData.dinheiro||0) + moneyGanho, nivelConta: getNivelByXP((cData.pontos||0) + xpGanho).nivel }));
+            await adicionarAoBau(dados.criadoPor, 'criador', xpGanho, moneyGanho, `Criador do sorteio de ${dados.nomeJogo}`, sorteioId);
+        } catch(e) {}
+    }
+    ps.push(push(ref(db, 'logSorteios'), { sorteioId, nomeJogo: dados.nomeJogo || dados.titulo, vencedor: v.nome, participantes: totalParticipantes, encerradoEm: Date.now(), tipo: dados.tipo }));
+    await Promise.all(ps);
+}
+
+// ═══════════ CACHE LOCAL ═══════════
+const CACHE_KEY = 'looto_resgates_cache_v1';
+function getResgateCache() { try { return JSON.parse(localStorage.getItem(CACHE_KEY)) || {}; } catch(e) { return {}; } }
+function setResgateCache(obj) { try { localStorage.setItem(CACHE_KEY, JSON.stringify(obj)); } catch(e) {} }
+function marcarResgatadoLocal(itemId) { const c = getResgateCache(); c[itemId] = { resgatado: true, ts: Date.now() }; setResgateCache(c); }
+function jaResgatadoLocal(itemId) { return !!(getResgateCache()[itemId]?.resgatado); }
+
+// ═══════════ ATUALIZAÇÃO DO PAINEL DUPLO ═══════════
+function atualizarPainelProgresso() {
+    if (!currentUser) return;
+    const nd = getNivelByXP(userData.pontos || 0);
+    const pontos = userData.pontos || 0;
+    const money = userData.dinheiro || 0;
+    const iconEl = document.getElementById('progress-panel-icon');
+    const usandoGif = userData.usandoGif || userData.usandoGifAvatar || false;
+    const gifUrl = userData.gifUrl || userData.gifAvatarUrl || '';
+    const fotoUrl = usandoGif && gifUrl ? gifUrl : (userData.fotoUrl || '');
+    if (fotoUrl) {
+        iconEl.innerHTML = `<img src="${fotoUrl}" style="width:100%;height:100%;border-radius:12px;object-fit:cover;">`;
+    } else {
+        const inicial = (userData.username || '?')[0]?.toUpperCase() || '?';
+        iconEl.innerHTML = `<span style="font-weight:700;color:#fff;">${inicial}</span>`;
+    }
+    iconEl.style.background = nd.cor;
+    document.getElementById('progress-panel-nivel').textContent = `${nd.nome} · Nv.${nd.nivel + 1}`;
+    document.getElementById('progress-panel-xp').textContent = `${pontos.toLocaleString()} XP`;
+    document.getElementById('progress-panel-money').textContent = `💰 ${money.toLocaleString()} LootoMoney`;
+
+    let prog = { xpAtual: 0, xpProximo: 1 };
+    for (let i = 0; i < 100; i++) {
+        const atual = Math.floor(100 * Math.pow(1.15, i));
+        const proximo = Math.floor(100 * Math.pow(1.15, i + 1));
+        if (pontos >= atual && pontos < proximo) { prog = { xpAtual: pontos - atual, xpProximo: proximo - atual }; break; }
+    }
+    const pct = Math.min(100, Math.round((prog.xpAtual / (prog.xpProximo || 1)) * 100));
+    document.getElementById('progress-panel-bar').style.width = `${pct}%`;
+    document.getElementById('progress-panel-bar').style.background = nd.cor;
+}
+
+function iniciarListenerRecompensasPainel(uid) {
+    onValue(ref(db, `recompensasRecebidas/${uid}`), (snap) => {
+        const badge = document.getElementById('bau-panel-badge');
+        const title = document.getElementById('bau-panel-title');
+        const desc = document.getElementById('bau-panel-desc');
+        if (snap.exists()) {
+            const dados = snap.val();
+            const itens = Object.entries(dados).map(([key, val]) => ({ id: key, ...val }));
+            const naoLidas = itens.filter(i => !i.visto);
+            if (naoLidas.length > 0) {
+                badge.textContent = naoLidas.length > 99 ? '99+' : naoLidas.length;
+                badge.style.display = 'flex';
+                title.textContent = `${naoLidas.length} item(ns)`;
+                desc.textContent = 'Clique para ver suas recompensas';
+            } else {
+                badge.style.display = 'none';
+                title.textContent = 'Nenhuma';
+                desc.textContent = 'Você ainda não tem recompensas';
+            }
+        } else {
+            badge.style.display = 'none';
+            title.textContent = 'Nenhuma';
+            desc.textContent = 'Você ainda não tem recompensas';
+        }
+    });
+}
+
+// ═══════════ LISTENERS ═══════════
+let unsubSorteios, unsubGrandeSorteio, unsubRewards;
+function listenSorteios() {
+    unsubSorteios = onValue(query(ref(db, 'sorteios'), orderByChild('expiraEm'), limitToLast(50)), snap => {
+        allSorteios = []; const now = Date.now();
+        snap.forEach(child => { const d = child.val(); if (d.ativo && d.expiraEm && d.expiraEm > now) allSorteios.push({ id: child.key, ...d }); });
+        allSorteios.sort((a,b) => (b.criadoEm||0) - (a.criadoEm||0));
+        applyFilter();
+    });
+}
+function listenGrandeSorteio() {
+    unsubGrandeSorteio = onValue(ref(db, 'grandesorteio'), snap => {
+        const d = snap.val();
+        if (!d) { document.getElementById('hero-status-badge').textContent = 'Em Breve'; document.getElementById('hero-btn').disabled = true; return; }
+        document.getElementById('hero-title').textContent = sanitize(d.titulo||'Grande Sorteio');
+        document.getElementById('hero-sub').textContent = sanitize(d.descricao||'');
+        if (d.wallpaper) document.getElementById('hero-bg').style.backgroundImage = `url('${d.wallpaper}')`;
+        if (!d.ativo || d.emBreve) {
+            document.getElementById('hero-status-badge').textContent = 'Em Breve'; document.getElementById('hero-status-badge').className = 'hbadge hbadge-gold';
+            document.getElementById('hero-btn').disabled = true; document.getElementById('hero-countdown').style.display = 'none';
+        } else {
+            document.getElementById('hero-status-badge').textContent = '🔴 AO VIVO'; document.getElementById('hero-status-badge').className = 'hbadge hbadge-live';
+            document.getElementById('hero-countdown').style.display = 'flex'; startHeroTimer(d.expiraEm);
+            const nd = getNivelByXP(userData.pontos||0); const req = { publico:0, prata:10, ouro:15, diamante:30 }[d.nivelAcesso||'publico']||0;
+            const temAcesso = currentUser && nd.nivel >= req;
+            const btn = document.getElementById('hero-btn');
+            if (!currentUser) { btn.disabled=false; btn.className='hero-cta'; btn.textContent='🔐 Faça login'; btn.onclick=()=>window.location.href='login.html'; }
+            else if (!temAcesso) { btn.disabled=true; btn.className='hero-cta exclusive'; btn.style.borderColor=nd.cor; btn.style.color=nd.cor; btn.textContent=`🔒 (Nvl ${req}+)`; }
+            else { btn.disabled=false; btn.className='hero-cta'; btn.textContent='🎁 Participar'; btn.onclick=()=>window.location.href=d.redirectUrl||'gsorteio.html'; }
+        }
+    });
+}
+function timeAgo(ts) { if (!ts) return 'agora'; const d = Math.floor((Date.now() - ts) / 1000); if (d < 60) return 'agora'; if (d < 3600) return `há ${Math.floor(d/60)}m`; return `há ${Math.floor(d/3600)}h`; }
+function startHeroTimer(expiraEm) { if (heroTimerID) clearInterval(heroTimerID); heroTimerID = setInterval(() => { const diff = expiraEm - Date.now(); document.getElementById('hero-timer').textContent = diffStr(diff); if (diff <= 0) clearInterval(heroTimerID); }, 1000); }
+
+// ═══════════ AUTH ═══════════
+function iniciarMonitoramentoUsuario(uid) {
+    onValue(ref(db, `usuarios/${uid}`), (snap) => {
+        if (snap.exists()) {
+            userData = snap.val(); userData.pontos = userData.pontos || 0; userData.dinheiro = userData.dinheiro || 0; userData.premium = userData.premium || false;
+            const nd = getNivelByXP(userData.pontos); userData.nivelConta = nd.nivel;
+            renderHeader(); renderSorteios(); atualizarPainelProgresso();
+        }
+    });
+}
+onAuthStateChanged(auth, async (user) => {
+    if (unsubSorteios) unsubSorteios(); if (unsubGrandeSorteio) unsubGrandeSorteio(); if (unsubRewards) unsubRewards(); if (heroTimerID) clearInterval(heroTimerID);
+    if (!user) {
+        currentUser = null; userData = {};
+        document.getElementById('header-auth-area').innerHTML = '<button class="login-btn-header" onclick="window.location.href=\'login.html\'">🔐 Entrar</button>';
+        document.getElementById('guest-overlay').classList.add('open'); document.getElementById('page-loader').classList.add('gone');
+        document.getElementById('rewards-panel').classList.remove('show');
+        document.getElementById('bau-panel-title').textContent = 'Nenhuma';
+        document.getElementById('bau-panel-desc').textContent = 'Clique para abrir o baú';
+        document.getElementById('progress-panel-nivel').textContent = 'Faça login';
+        listenSorteios(); listenGrandeSorteio(); return;
+    }
+    currentUser = user; document.getElementById('guest-overlay').classList.remove('open');
+    const snap = await get(ref(db, 'usuarios/' + user.uid)); userData = snap.val() || {};
+    userData.pontos = userData.pontos || 0; userData.dinheiro = userData.dinheiro || 0; userData.premium = userData.premium || false;
+    const nd = getNivelByXP(userData.pontos); userData.nivelConta = nd.nivel;
+    renderHeader(); iniciarMonitoramentoUsuario(user.uid); iniciarListenerRecompensasPainel(user.uid);
+    document.getElementById('page-loader').classList.add('gone');
+    listenSorteios(); listenGrandeSorteio(); atualizarPainelProgresso();
+});
+
+function renderHeader() {
+    if (!currentUser) return;
+    const nome = sanitize(userData.username || currentUser.displayName || 'Usuário');
+    const nd = getNivelByXP(userData.pontos||0);
+    const usandoGif = userData.usandoGif || userData.usandoGifAvatar || false;
+    const gifUrl = userData.gifUrl || userData.gifAvatarUrl || '';
+    const fotoUrl = usandoGif && gifUrl ? gifUrl : (userData.fotoUrl || '');
+    document.getElementById('header-auth-area').innerHTML = `<a href="conta.html" class="user-pill"><div class="upill-avatar">${fotoUrl ? `<img src="${fotoUrl}" alt="av">` : nome[0]?.toUpperCase() || '?'}</div><div class="upill-info"><div class="upill-name">${nome}</div><div class="upill-row"><span class="upill-money">💰 ${userData.dinheiro||0}</span><span class="upill-xp">⭐ ${userData.pontos||0} XP</span></div></div><span class="user-level-badge" style="background:${nd.cor}; color:${getContrastColor(nd.cor)};">${nd.nivel+1}</span></a>`;
+    atualizarPainelProgresso();
+}
+
+function applyFilter() {
+    const q = document.getElementById('search-input').value.toLowerCase().trim();
+    const f = document.getElementById('filter-select').value;
+    filteredSorteios = allSorteios.filter(s => {
+        if (q && !(s.nomeJogo||'').toLowerCase().includes(q) && !(s.titulo||'').toLowerCase().includes(q)) return false;
+        if (f === 'publico' && s.tipo !== 'publico') return false;
+        if (f === 'vip' && s.tipo === 'publico') return false;
+        return true;
+    });
+    if (f === 'menos') filteredSorteios.sort((a,b) => Object.keys(a.participantes||{}).length - Object.keys(b.participantes||{}).length);
+    visibleCount = 6; renderSorteios();
+}
+
+function renderSorteios() {
+    const grid = document.getElementById('grid-sorteios'); const total = filteredSorteios.length;
+    document.getElementById('sorteios-count').textContent = total;
+    if (total === 0) { grid.innerHTML = '<div class="empty-state"><span class="empty-icon">🎲</span>Nenhum sorteio ativo.<br>Que tal criar um?</div>'; document.getElementById('load-more-wrap').style.display = 'none'; return; }
+    grid.innerHTML = filteredSorteios.slice(0, visibleCount).map(buildCard).join('');
+    const wrap = document.getElementById('load-more-wrap');
+    if (total > visibleCount) { wrap.style.display = 'flex'; document.getElementById('page-info').textContent = `PÁGINA ${Math.ceil(visibleCount/6)} DE ${Math.ceil(total/6)}`; } else wrap.style.display = 'none';
+    grid.querySelectorAll('.card-thumb').forEach(thumb => { thumb.addEventListener('click', e => { const card = e.target.closest('.card'); const btn = card?.querySelector('[data-sorteio-id]'); if (btn) openDetailModal(btn.dataset.sorteioId); }); });
+    grid.querySelectorAll('[data-sorteio-id]').forEach(btn => { btn.addEventListener('click', e => { e.stopPropagation(); if (!currentUser) { toast('Faça login!'); window.location.href='login.html'; return; } entrarSorteio(btn.dataset.sorteioId); }); });
+    grid.querySelectorAll('.host-dot').forEach(dot => { dot.addEventListener('click', e => { e.stopPropagation(); if (!currentUser) { toast('Faça login!'); window.location.href='login.html'; return; } if (dot.dataset.uid) window.location.href = `conta.html?uid=${dot.dataset.uid}`; }); });
+    loadCreatorAvatars();
+}
+async function loadCreatorAvatars() {
+    const dots = document.querySelectorAll('.host-dot:not([data-loaded])'); const uidsToFetch = [...new Set([...dots].map(d=>d.dataset.uid).filter(Boolean))];
+    if(!uidsToFetch.length) return; const results = await Promise.all(uidsToFetch.map(uid => getUserData(uid))); const dataMap = {};
+    uidsToFetch.forEach((uid,i) => { dataMap[uid] = results[i]; });
+    dots.forEach(dot => {
+        const uid = dot.dataset.uid; if(!uid || dot.dataset.loaded) return; dot.dataset.loaded = '1';
+        const data = dataMap[uid] || {}; const nd = getNivelByXP(data.pontos||0);
+        const usandoGif = data.usandoGif || data.usandoGifAvatar || false; const gifUrl = data.gifUrl || data.gifAvatarUrl || '';
+        const fotoUrl = usandoGif && gifUrl ? gifUrl : (data.fotoUrl || '');
+        if (fotoUrl) dot.innerHTML = `<img src="${fotoUrl}" alt="av"><span class="host-level-mini" style="background:${nd.cor}; color:${getContrastColor(nd.cor)};">${nd.nivel+1}</span>`;
+        else dot.innerHTML = `${sanitize((data.username||'?')[0].toUpperCase())}<span class="host-level-mini" style="background:${nd.cor}; color:${getContrastColor(nd.cor)};">${nd.nivel+1}</span>`;
+    });
+}
+function buildCard(s) {
+    const parts = Object.keys(s.participantes||{}).length; const max = s.maxParticipantes || 100; const pct = Math.min(100, Math.round(parts/max*100));
+    const isOwner = currentUser && s.criadoPor === currentUser.uid; const jaEntrou = currentUser && s.participantes?.[currentUser?.uid];
+    const lotado = parts >= max; const diff = s.expiraEm ? s.expiraEm - Date.now() : 0;
+    const custo = getCustoEntrada(s.tipo);
+    const tipoBadgeMap = {
+        publico:'<span class="cbadge cbadge-pub">🌍 Público</span>', prata:'<span class="cbadge cbadge-vip">🥈 Prata+</span>',
+        ouro:'<span class="cbadge cbadge-vip">🥇 Ouro+</span>', diamante:'<span class="cbadge cbadge-dia">💎 Diamante+</span>',
+        exclusivo:'<span class="cbadge" style="color:#ec4899;border:1px solid rgba(236,72,153,0.4);">⭐ Exclusivo</span>'
+    };
+    let btnHtml;
+    if (!currentUser) btnHtml = '<button class="btn-card outline" onclick="window.location.href=\'login.html\'">🔐 Login</button>';
+    else if (isOwner) btnHtml = '<button class="btn-card outline" disabled>👑 Seu Sorteio</button>';
+    else if (jaEntrou) btnHtml = '<button class="btn-card outline" disabled>✅ Inscrito</button>';
+    else if (lotado) btnHtml = '<button class="btn-card outline" disabled>🔴 Lotado</button>';
+    else if ((userData.dinheiro||0) < custo) btnHtml = `<button class="btn-card outline" disabled>💰 Faltam ${custo - (userData.dinheiro||0)}</button>`;
+    else btnHtml = `<button class="btn-card" data-sorteio-id="${s.id}">💰 ${custo} Entrar</button>`;
+    const cd = getNivelData(s.criadorNivel||0); const criadorNome = sanitize(s.criadoPorNome||'Anônimo');
+    return `<div class="card"><div class="card-thumb" ${s.wallpaper?`style="background-image:url('${s.wallpaper}')"`:''} data-sorteio-id="${s.id}"><div class="thumb-top"><div style="display:flex;gap:.3rem;">${tipoBadgeMap[s.tipo]||tipoBadgeMap.publico}${s.plataforma?`<span class="cbadge" style="color:var(--text-2);">${sanitize(s.plataforma)}</span>`:''}</div><div style="display:flex;gap:.3rem;"><span class="cbadge cbadge-cost">💰 ${custo}</span><span class="cbadge cbadge-time">⏱️ ${diffStr(diff)}</span></div></div></div><div class="card-body"><h3 class="card-title" title="${sanitize(s.nomeJogo||s.titulo||'—')}">${sanitize(s.nomeJogo||s.titulo||'—')}</h3><div class="card-host"><div class="host-dot" style="background:${cd.cor}; color:${getContrastColor(cd.cor)};" data-uid="${s.criadoPor||''}">${(criadorNome||'A')[0].toUpperCase()}</div>por <strong style="color:var(--text);margin-left:.15rem;">${criadorNome}</strong></div><div class="card-prog"><div class="prog-row"><span>Participantes</span><span>${parts}/${max}</span></div><div class="prog-track"><div class="prog-fill" style="width:${pct}%;"></div></div></div>${btnHtml}</div></div>`;
+}
+function setUserCache(uid, data) { userCache.set(uid, { data, ts: Date.now() }); if(userCache.size > 200) { const now = Date.now(); for(const [k,v] of userCache) if(now - v.ts > USER_CACHE_TTL) userCache.delete(k); } }
+async function getUserData(uid) { const cached = userCache.get(uid); if(cached && Date.now() - cached.ts < USER_CACHE_TTL) return cached.data; try { const snap = await get(ref(db, 'usuarios/' + uid)); const data = snap.val() || {}; setUserCache(uid, data); return data; } catch(_) { return {}; } }
+
+async function entrarSorteio(id) {
+    const key = 'enter_' + id; if (preventDoubleClick[key]) return;
+    preventDoubleClick[key] = true; setTimeout(() => { delete preventDoubleClick[key]; }, 3000);
+    const s = allSorteios.find(x => x.id === id); if (!s) { toast('Sorteio não encontrado!'); return; }
+    if (s.criadoPor === currentUser.uid) { toast('Você não pode entrar no seu próprio sorteio!'); return; }
+    if (s.participantes?.[currentUser?.uid]) { toast('Você já está inscrito!'); return; }
+    if (Object.keys(s.participantes||{}).length >= s.maxParticipantes) { toast('Lotado!'); return; }
+    const custo = getCustoEntrada(s.tipo);
+    if ((userData.dinheiro||0) < custo) { toast('💰 Money insuficiente!'); return; }
+    try {
+        const partes = s.participantes || {}; partes[currentUser.uid] = { uid: currentUser.uid, nome: userData.username || currentUser.displayName, entradoEm: Date.now() };
+        await update(ref(db, `sorteios/${id}`), { participantes: partes });
+        await update(ref(db, 'usuarios/'+currentUser.uid), { dinheiro: (userData.dinheiro||0) - custo, sorteiosParticipados: (userData.sorteiosParticipados||0) + 1 });
+        userData.dinheiro -= custo; document.querySelector('.upill-money').textContent = `💰 ${userData.dinheiro}`;
+        toast(`🎉 Entrou! -${custo} Money`, true); closeDetailModal();
+    } catch(e) { toast('Erro: ' + e.message); }
+}
+function updateMaxParticipantes() {
+    const tipo = document.getElementById('m-tipo').value; const limites = LIMITES_POR_TIPO[tipo] || LIMITES_POR_TIPO.publico;
+    const maxInput = document.getElementById('m-max'); maxInput.min = limites.min; maxInput.max = limites.max;
+    if (parseInt(maxInput.value) < limites.min) maxInput.value = limites.min;
+    if (parseInt(maxInput.value) > limites.max) maxInput.value = limites.max;
+    document.getElementById('m-max-label').textContent = `Máx. Participantes (${limites.min}-${limites.max})`;
+}
+function updateWarningMessage() { const tipo = document.getElementById('m-tipo').value; const custo = CUSTO_ENTRADA[tipo] || 0; document.getElementById('warning-note').style.display = 'flex'; document.getElementById('warning-note').innerHTML = `⚠️ Quem entrar neste sorteio paga: <strong>${custo} LootMoney</strong> (definido pelo admin)`; }
+async function criarSorteio() {
+    if (!currentUser) { toast('Faça login!'); return; }
+    const titulo = document.getElementById('m-titulo').value.trim(), nomeJogo = document.getElementById('m-game-name').value.trim(), key = document.getElementById('m-key').value.trim();
+    const tipo = document.getElementById('m-tipo').value, max = parseInt(document.getElementById('m-max').value) || 50, plataforma = document.getElementById('m-plataforma').value;
+    const wallpaper = document.getElementById('m-wallpaper').value.trim(), desc = document.getElementById('m-desc').value.trim();
+    if (!nomeJogo || !titulo || !key || !wallpaper) { toast('⚠️ Preencha todos os campos obrigatórios!'); return; }
+    if (tipo === 'exclusivo' && !userData.premium) { toast('🔒 Apenas assinantes podem criar sorteios exclusivos!'); return; }
+    const nd = getNivelByXP(userData.pontos||0);
+    if (tipo !== 'exclusivo' && nd.nivel < (NIVEL_REQ[tipo]||0)) { toast(`🔒 Nível ${NIVEL_REQ[tipo]}+ necessário para criar este tipo!`); return; }
+    const limitesTipo = LIMITES_POR_TIPO[tipo] || LIMITES_POR_TIPO.publico; if (max < limitesTipo.min || max > limitesTipo.max) { toast(`Máx: ${limitesTipo.min}-${limitesTipo.max}`); return; }
+    const snap = await get(ref(db, 'sorteios')); let countDia = 0; const umDia = Date.now() - 86400000;
+    if(snap.exists()) snap.forEach(c => { if (c.val().criadoPor === currentUser.uid && c.val().criadoEm > umDia) countDia++; });
+    const limiteDiario = tipo === 'exclusivo' ? (LIMITE_DIARIO.exclusivo || 10) : nd.nivel >= 60 ? (LIMITE_DIARIO.diamante || 5) : nd.nivel >= 15 ? (LIMITE_DIARIO.ouro || 3) : nd.nivel >= 10 ? (LIMITE_DIARIO.prata || 2) : (LIMITE_DIARIO.bronze || 1);
+    if (countDia >= limiteDiario) { toast(`Limite: ${limiteDiario}/dia`); return; }
+    const btn = document.getElementById('btn-criar'); btn.disabled = true; btn.textContent = '⏳ Publicando...';
+    try {
+        const novoRef = push(ref(db, 'sorteios'));
+        await set(novoRef, { titulo: sanitize(titulo), nomeJogo: sanitize(nomeJogo), key, tipo, maxParticipantes: max, plataforma, descricao: sanitize(desc), wallpaper, criadoPor: currentUser.uid, criadoPorNome: sanitize(userData.username || currentUser.displayName || 'Anônimo'), criadorNivel: nd.nivel, criadoEm: Date.now(), expiraEm: Date.now() + 120000, ativo: true, participantes: {} });
+        await update(ref(db, 'usuarios/'+currentUser.uid), { sorteiosCriados: (userData.sorteiosCriados||0) + 1 });
+        toast('✅ Sorteio publicado!', true); closeModal();
+        ['m-titulo','m-game-name','m-key','m-desc','m-wallpaper'].forEach(id => document.getElementById(id).value = '');
+        document.getElementById('rawg-preview').innerHTML = '<div class="rawg-placeholder">Digite o nome e clique em "Buscar Capa"</div>';
+    } catch(e) { toast('Erro: ' + e.message); } finally { btn.disabled = false; btn.textContent = '🎁 Publicar Sorteio'; }
+}
+async function buscarRAWG() {
+    const nome = document.getElementById('m-game-name').value.trim(); if (!nome) { toast('Digite o nome do jogo!'); return; }
+    const prev = document.getElementById('rawg-preview'); prev.innerHTML = '<div class="rawg-placeholder">🔍 Buscando...</div>';
+    try {
+        const res = await fetch(`https://api.rawg.io/api/games?key=${RAWG_KEY}&search=${encodeURIComponent(nome)}&page_size=1`);
+        const data = await res.json(); if (!data.results?.length) { prev.innerHTML = '<div class="rawg-placeholder">❌ Não encontrado</div>'; return; }
+        const jogo = data.results[0]; document.getElementById('m-wallpaper').value = jogo.background_image || '';
+        if (!document.getElementById('m-titulo').value) document.getElementById('m-titulo').value = `Sorteio de ${jogo.name}`;
+        prev.innerHTML = jogo.background_image ? `<img src="${jogo.background_image}" alt="${sanitize(jogo.name)}"><div class="r-overlay"></div><div class="r-name">✅ ${sanitize(jogo.name)}</div>` : '<div class="rawg-placeholder">⚠️ Sem imagem</div>';
+    } catch(e) { prev.innerHTML = '<div class="rawg-placeholder">❌ Erro na API</div>'; }
+}
+function openModal() { if (!currentUser) { toast('Faça login!'); window.location.href='login.html'; return; } updateTypeSelect(); document.getElementById('modal-overlay').classList.add('open'); }
+function closeModal() { document.getElementById('modal-overlay').classList.remove('open'); }
+function updateTypeSelect() {
+    const nd = getNivelByXP(userData.pontos||0); const premium = userData.premium === true; const select = document.getElementById('m-tipo');
+    select.querySelectorAll('option').forEach(opt => { if (opt.value === 'exclusivo') opt.disabled = !premium; else opt.disabled = nd.nivel < (NIVEL_REQ[opt.value]||0); });
+    updateMaxParticipantes(); updateWarningMessage();
+}
+async function openDetailModal(id) {
+    const s = allSorteios.find(x => x.id === id); if (!s) return; currentDetailId = id;
+    const custo = getCustoEntrada(s.tipo);
+    document.getElementById('detail-title').textContent = sanitize(s.titulo || s.nomeJogo);
+    document.getElementById('detail-sub').textContent = `Sorteio de ${sanitize(s.nomeJogo)}`;
+    document.getElementById('cost-value').textContent = `${custo} LootMoney`;
+    document.getElementById('detail-game').textContent = sanitize(s.nomeJogo || '-');
+    document.getElementById('detail-platform').textContent = sanitize(s.plataforma || '-');
+    const parts = Object.keys(s.participantes||{}).length;
+    document.getElementById('detail-parts').textContent = `${parts}/${s.maxParticipantes}`;
+    document.getElementById('detail-time').textContent = s.expiraEm ? diffStr(s.expiraEm - Date.now()) : '-';
+    document.getElementById('detail-type').textContent = {publico:'🌍 Público',prata:'🥈 Prata+',ouro:'🥇 Ouro+',diamante:'💎 Diamante+',exclusivo:'⭐ Exclusivo'}[s.tipo] || s.tipo;
+    document.getElementById('detail-cost').textContent = `💰 ${custo} LootMoney`;
+    document.getElementById('detail-desc').textContent = sanitize(s.descricao || 'Sem descrição.');
+    document.getElementById('steam-guide').style.display = s.plataforma === 'Steam' ? 'block' : 'none';
+    const criadorData = await getUserData(s.criadoPor || '');
+    const criadorNome = sanitize(s.criadoPorNome || criadorData.username || 'Anônimo');
+    const cd = getNivelByXP(criadorData.pontos || 0);
+    document.getElementById('detail-creator-name').textContent = criadorNome;
+    document.getElementById('detail-creator-name').href = currentUser ? `conta.html?uid=${s.criadoPor||''}` : '#';
+    document.getElementById('detail-creator-level').innerHTML = `${sanitize(cd.nome)} — Nível ${cd.nivel}`;
+    document.getElementById('detail-creator-badge').textContent = cd.nivel + 1;
+    document.getElementById('detail-creator-badge').style.background = cd.cor;
+    document.getElementById('detail-creator-badge').style.color = getContrastColor(cd.cor);
+    const avatarEl = document.getElementById('detail-creator-avatar');
+    const criadorUsandoGif = criadorData.usandoGif || criadorData.usandoGifAvatar || false;
+    const criadorGifUrl = criadorData.gifUrl || criadorData.gifAvatarUrl || '';
+    const criadorFoto = criadorUsandoGif && criadorGifUrl ? criadorGifUrl : (criadorData.fotoUrl || '');
+    if (criadorFoto) avatarEl.innerHTML = `<img src="${criadorFoto}" alt="av">`; else avatarEl.textContent = criadorNome[0]?.toUpperCase() || '?';
+    const btn = document.getElementById('detail-enter-btn'); const isOwner = currentUser && s.criadoPor === currentUser.uid;
+    const jaEntrou = currentUser && s.participantes?.[currentUser?.uid]; const lotado = parts >= s.maxParticipantes;
+    if (!currentUser) { btn.disabled=false; btn.textContent='🔐 Faça login'; btn.onclick=()=>window.location.href='login.html'; }
+    else if (isOwner) { btn.disabled=true; btn.textContent='👑 Seu Sorteio'; }
+    else if (jaEntrou) { btn.disabled=true; btn.textContent='✅ Inscrito'; }
+    else if (lotado) { btn.disabled=true; btn.textContent='🔴 Lotado'; }
+    else if ((userData.dinheiro||0) < custo) { btn.disabled=true; btn.textContent='💰 Sem saldo'; }
+    else { btn.disabled=false; btn.textContent=`💰 ${custo} - Entrar`; btn.onclick=()=>entrarSorteio(id); }
+    document.getElementById('detail-modal-overlay').classList.add('open');
+}
+function closeDetailModal() { document.getElementById('detail-modal-overlay').classList.remove('open'); }
+
+// ═══════════ MEUS PRÊMIOS ═══════════
+function iniciarListenerMeusPremios(uid) {
+    if (unsubRewards) unsubRewards();
+    unsubRewards = onValue(query(ref(db, `recompensasRecebidas/${uid}`), orderByChild('data'), limitToLast(20)), (snap) => {
+        const panel = document.getElementById('rewards-panel'), grid = document.getElementById('rewards-grid'), countEl = document.getElementById('rewards-count');
+        if (!snap.exists()) { panel.classList.remove('show'); return; }
+        const itens = []; snap.forEach(c => itens.push({ id: c.key, ...c.val() }));
+        const premiosComKey = itens.filter(i => i.tipo === 'vitoria' && i.key);
+        if (!premiosComKey.length) { panel.classList.remove('show'); return; }
+        premiosComKey.sort((a,b) => (b.data||0) - (a.data||0));
+        const naoResgatados = premiosComKey.filter(i => !i.keyResgatada && !jaResgatadoLocal(i.id));
+        countEl.style.display = naoResgatados.length ? 'inline-block' : 'none';
+        countEl.textContent = naoResgatados.length;
+        panel.classList.add('show');
+        grid.innerHTML = premiosComKey.map(item => {
+            const resgatado = item.keyResgatada || jaResgatadoLocal(item.id);
+            return `<div class="reward-card win">
+                <div class="reward-card-head"><div class="reward-card-game">🎮 ${sanitize(item.jogo || 'Jogo')}</div><span class="reward-card-tag win">🏆 Vencedor</span></div>
+                <div class="reward-card-row"><span>Plataforma</span><b>${sanitize(item.plataforma || 'Steam')}</b></div>
+                <div class="reward-card-row"><span>Recebido</span><b>${item.data ? new Date(item.data).toLocaleDateString('pt-BR') : '-'}</b></div>
+                ${resgatado
+                    ? `<div class="reward-key-box"><span>${sanitize(item.key)}</span><button class="reward-key-copy" data-key="${sanitize(item.key)}">Copiar</button></div><button class="reward-btn resgatado" disabled>✅ Key resgatada</button>`
+                    : `<button class="reward-btn resgatar" data-resgatar-id="${item.id}">🔑 Resgatar Key</button>`
+                }
+            </div>`;
+        }).join('');
+        grid.querySelectorAll('[data-resgatar-id]').forEach(btn => {
+            btn.addEventListener('click', () => resgatarKey(btn.dataset.resgatarId, premiosComKey.find(i => i.id === btn.dataset.resgatarId)));
+        });
+        grid.querySelectorAll('.reward-key-copy').forEach(btn => {
+            btn.addEventListener('click', () => { navigator.clipboard?.writeText(btn.dataset.key); toast('🔑 Key copiada!', true); });
+        });
+    });
+}
+async function resgatarKey(itemId, item) {
+    if (!currentUser || !item) return;
+    try {
+        await update(ref(db, `recompensasRecebidas/${currentUser.uid}/${itemId}`), { keyResgatada: true, resgatadoEm: Date.now() });
+        marcarResgatadoLocal(itemId);
+        playNotificationSound('treasure');
+        toast('🔑 Key resgatada com sucesso!', true);
+    } catch(e) {
+        marcarResgatadoLocal(itemId);
+        toast('🔑 Key resgatada (salva localmente)!', true);
+    }
+}
+
+// ═══════════ BAÚ DE RECOMPENSAS ═══════════
+let bauNotificacaoAtiva = null;
+function mostrarPopupResgate(item) {
+    if (bauNotificacaoAtiva) return;
+    const overlay = document.createElement('div');
+    overlay.style.cssText = 'position:fixed;inset:0;z-index:9999;background:rgba(0,0,0,0.85);backdrop-filter:blur(8px);display:flex;align-items:center;justify-content:center;padding:1rem;';
+    const icone = item.tipo === 'vitoria' ? '🏆' : item.tipo === 'participacao' ? '🎲' : '👑';
+    const cor = item.tipo === 'vitoria' ? '#10b981' : item.tipo === 'participacao' ? '#9ca3af' : '#fbbf24';
+    overlay.innerHTML = `<div style="background:linear-gradient(135deg,#1a1d2e,#0f1220);border:2px solid ${cor};border-radius:20px;padding:2.5rem;text-align:center;max-width:420px;width:100%;"><span style="font-size:4rem;">${icone}</span><h2 style="color:${cor};">${item.mensagem}</h2><p style="color:#9ca3af;">Você recebeu recompensas!</p><div style="font-size:1.2rem; margin:1rem 0;">⭐ +${item.xp} XP<br>💰 +${item.money} LootMoney</div><button id="btn-resgatar-bau" style="background:${cor};color:#fff;border:none;padding:.8rem 2.5rem;border-radius:50px;font-weight:700;cursor:pointer;margin-right:0.5rem;">🎁 Resgatar</button><button id="btn-fechar-bau" style="background:transparent;border:1px solid rgba(255,255,255,.2);color:var(--text-2);padding:.5rem 1.5rem;border-radius:50px;margin-top:.8rem;cursor:pointer;">Fechar</button></div>`;
+    document.body.appendChild(overlay);
+    bauNotificacaoAtiva = true;
+    document.getElementById('btn-resgatar-bau').onclick = async () => {
+        document.getElementById('btn-resgatar-bau').disabled = true;
+        try { await update(ref(db, `recompensasRecebidas/${currentUser.uid}/${item.id}`), { visto: true }); toast('✅ Recompensa resgatada!', true); } catch(e) { toast('Erro: ' + e.message); }
+        overlay.remove(); bauNotificacaoAtiva = null;
+    };
+    document.getElementById('btn-fechar-bau').onclick = () => { overlay.remove(); bauNotificacaoAtiva = null; };
+}
+window.abrirBauRecompensas = async function() {
+    if (!currentUser) return;
+    document.getElementById('bau-recompensas-overlay').classList.add('open');
+    const snap = await get(ref(db, `recompensasRecebidas/${currentUser.uid}`));
+    const bauLista = document.getElementById('bau-lista');
+    if (snap.exists()) {
+        const dados = snap.val(), itens = Object.entries(dados).map(([key, val]) => ({ id: key, ...val }));
+        itens.sort((a, b) => (b.data || 0) - (a.data || 0));
+        bauLista.innerHTML = itens.map(item => {
+            const icone = item.tipo === 'vitoria' ? '🏆' : item.tipo === 'participacao' ? '🎲' : item.tipo === 'criador' ? '👑' : '🎁';
+            const cor = item.tipo === 'vitoria' ? 'var(--green)' : item.tipo === 'participacao' ? 'var(--text-2)' : 'var(--gold)';
+            return `<div style="background:rgba(255,255,255,0.02); border-left:3px solid ${cor}; padding:0.7rem; margin-bottom:0.5rem; border-radius:0 8px 8px 0; ${!item.visto ? 'opacity:1;' : 'opacity:0.5;'}"><div style="display:flex; justify-content:space-between; align-items:center;"><span>${icone} <strong>${item.mensagem || 'Recompensa'}</strong></span>${!item.visto ? '<span style="background:var(--primary); color:#fff; font-size:0.6rem; padding:0.15rem 0.4rem; border-radius:99px;">NOVA</span>' : ''}</div><div style="font-size:0.8rem; color:var(--text-2); margin-top:0.3rem;">⭐ +${item.xp || 0} XP &nbsp;|&nbsp; 💰 +${item.money || 0} LootMoney</div><div style="font-size:0.65rem; color:var(--text-2); margin-top:0.2rem;">${new Date(item.data).toLocaleString('pt-BR')}</div></div>`;
+        }).join('');
+    } else { bauLista.innerHTML = '<p style="text-align:center;color:var(--text-2);padding:2rem;">Nenhuma recompensa ainda.</p>'; }
+};
+window.fecharBauRecompensas = function() { document.getElementById('bau-recompensas-overlay').classList.remove('open'); };
+window.marcarTudoVisto = async function() {
+    if (!currentUser) return;
+    const snap = await get(ref(db, `recompensasRecebidas/${currentUser.uid}`));
+    if (!snap.exists()) return;
+    const updates = {}; snap.forEach(child => { if (!child.val().visto) updates[`${child.key}/visto`] = true; });
+    if (Object.keys(updates).length > 0) { await update(ref(db, `recompensasRecebidas/${currentUser.uid}`), updates); toast('✅ Tudo marcado como visto!', true); }
+    fecharBauRecompensas();
+};
+
+// ═══════════ EVENT LISTENERS ═══════════
+document.getElementById('fab-criar').addEventListener('click', openModal);
+document.getElementById('modal-close-btn').addEventListener('click', closeModal);
+document.getElementById('modal-overlay').addEventListener('click', e => { if (e.target===document.getElementById('modal-overlay')) closeModal(); });
+document.getElementById('detail-modal-close-btn').addEventListener('click', closeDetailModal);
+document.getElementById('detail-modal-overlay').addEventListener('click', e => { if (e.target===document.getElementById('detail-modal-overlay')) closeDetailModal(); });
+document.getElementById('rawg-search-btn').addEventListener('click', buscarRAWG);
+document.getElementById('m-game-name').addEventListener('keydown', e => { if (e.key==='Enter') buscarRAWG(); });
+document.getElementById('btn-criar').addEventListener('click', criarSorteio);
+document.getElementById('load-more-btn').addEventListener('click', () => { visibleCount+=6; renderSorteios(); });
+document.getElementById('search-input').addEventListener('input', () => { clearTimeout(window.searchDebounce); window.searchDebounce = setTimeout(applyFilter, 300); });
+document.getElementById('filter-select').addEventListener('change', applyFilter);
+document.getElementById('m-tipo').addEventListener('change', () => { updateMaxParticipantes(); updateWarningMessage(); });
+document.addEventListener('keydown', e => { if (e.key==='Escape') { closeModal(); closeDetailModal(); } });
+
+// Badge do chat
+let lastChatCheck = Date.now();
+onValue(query(ref(db, 'chat'), orderByChild('ts'), limitToLast(50)), (snap) => {
+    if (!snap.exists()) return;
+    let unread = 0;
+    snap.forEach(c => { const m = c.val(); if (m.ts > lastChatCheck && m.uid !== currentUser?.uid) { unread++; if (m.type === 'treasure' && m.uid === currentUser?.uid) playNotificationSound('treasure'); else if (m.type === 'system') playNotificationSound('default'); } });
+    const badge = document.getElementById('chat-badge'); if (unread > 0) { badge.textContent = unread > 99 ? '99+' : unread; badge.style.display = 'flex'; } else badge.style.display = 'none';
+});
+
+// Limpeza periódica
+setInterval(async () => {
+    const now = Date.now();
+    try {
+        const [feedSnap, sortSnap] = await Promise.all([get(query(ref(db, 'feed'), orderByChild('ts'), limitToLast(50))), get(query(ref(db, 'sorteios'), orderByChild('expiraEm'), limitToLast(100)))]);
+        const removes = [];
+        if(feedSnap.exists()) feedSnap.forEach(c => { if(now - c.val().ts > 1800000) removes.push(remove(ref(db, 'feed/'+c.key))); });
+        if(sortSnap.exists()) sortSnap.forEach(c => { if(c.val().expiraEm && now - c.val().expiraEm > 86400000) removes.push(remove(ref(db, 'sorteios/'+c.key))); });
+        if(removes.length) await Promise.all(removes);
+    } catch(_) {}
+}, 60000);
+</script>
+<script type="module" src="presence.js"></script>
+</body>
+</html>

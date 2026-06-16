@@ -1,0 +1,1434 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Looto | Loja de Games & Cosméticos</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --bg-card: #151a26;
+            --text: #f3f4f6;
+            --text-2: #9ca3af;
+            --primary: #6366f1;
+            --primary-h: #4f46e5;
+            --green: #10b981;
+            --gold: #fbbf24;
+            --pink: #ec4899;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --border: rgba(255,255,255,0.06);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --nav-bg: rgba(11, 14, 20, 0.95);
+            --nav-border: rgba(255, 255, 255, 0.06);
+            --nav-text: #9ca3af;
+            --nav-text-hover: #f3f4f6;
+            --nav-active: #6366f1;
+            --nav-active-bg: rgba(99, 102, 241, 0.1);
+            --nav-mobile-bg: #151a26;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        /* ═══ PC NAV ═══ */
+        .navbar {
+            background: var(--nav-bg);
+            border-bottom: 1px solid var(--nav-border);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            backdrop-filter: blur(16px);
+        }
+
+        .navbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .navbar-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #f3f4f6;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .navbar-brand .brand-icon { color: var(--primary); }
+
+        .navbar-links { display: flex; gap: 0.25rem; align-items: center; }
+
+        .navbar-link {
+            color: var(--nav-text);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.45rem 0.85rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            position: relative;
+        }
+
+        .navbar-link:hover {
+            color: var(--nav-text-hover);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .navbar-link.active {
+            color: var(--nav-active);
+            background: var(--nav-active-bg);
+            font-weight: 600;
+        }
+
+        .navbar-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: var(--nav-active);
+            border-radius: 2px;
+        }
+
+        .navbar-link .nav-icon { width: 18px; height: 18px; }
+        .navbar-link .nav-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        .btn-back-nav {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0.5rem 1.1rem;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            font-family: 'Space Grotesk', sans-serif;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .btn-back-nav:hover { background: var(--primary-h); transform: translateY(-1px); }
+
+        /* ═══ MOBILE BOTTOM NAV ═══ */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-mobile-bg);
+            border-top: 1px solid var(--nav-border);
+            z-index: 199;
+            padding: 0.5rem 0.25rem;
+            padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+        .mobile-nav-inner {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .mobile-nav-link {
+            color: #9ca3af;
+            text-decoration: none;
+            font-size: 0.65rem;
+            font-weight: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.35rem 0.5rem;
+            border-radius: 10px;
+            transition: all 0.25s ease;
+            min-width: 50px;
+            position: relative;
+        }
+        .mobile-nav-link:hover { color: #f3f4f6; }
+        .mobile-nav-link.active { color: var(--nav-active); }
+        .mobile-nav-link.active::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--nav-active);
+            border-radius: 50%;
+        }
+        .mobile-nav-link .nav-icon { width: 22px; height: 22px; display: flex; align-items: center; justify-content: center; }
+        .mobile-nav-link .nav-icon svg { width: 100%; height: 100%; stroke: #9ca3af; fill: none; stroke-width: 2; }
+        .mobile-nav-link.active .nav-icon svg { stroke: var(--nav-active); }
+        .mobile-nav-link:hover .nav-icon svg { stroke: #f3f4f6; }
+        .mobile-nav-link .nav-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
+        /* ═══ MAIN CONTENT ═══ */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* Search Bar */
+        .search-bar {
+            max-width: 700px;
+            margin: 0 auto 2rem auto;
+            display: flex;
+            gap: 0.8rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .search-bar input {
+            flex: 2;
+            min-width: 200px;
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            padding: 0.8rem 1.2rem;
+            border-radius: 50px;
+            color: var(--text);
+            font-size: 0.9rem;
+            outline: none;
+            transition: var(--transition);
+        }
+        .search-bar input:focus { border-color: var(--primary); }
+        .search-bar input::placeholder { color: var(--text-2); }
+        
+        .search-bar select {
+            background: rgba(255,255,255,0.08);
+            border: 1px solid var(--border);
+            padding: 0.8rem 1.2rem;
+            border-radius: 50px;
+            color: var(--text);
+            font-size: 0.85rem;
+            cursor: pointer;
+            outline: none;
+        }
+        .search-bar select option {
+            background: var(--bg-card);
+            color: var(--text);
+        }
+        .search-bar select:focus { border-color: var(--primary); }
+
+        /* Sections */
+        .section {
+            margin-bottom: 3rem;
+        }
+        .section-header {
+            display: flex;
+            align-items: baseline;
+            justify-content: space-between;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .section-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .view-all {
+            color: var(--primary);
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .view-all:hover { color: var(--primary-h); text-decoration: underline; }
+
+        /* Products Grid */
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .product-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            overflow: hidden;
+            transition: var(--transition);
+            position: relative;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--primary);
+            box-shadow: 0 12px 32px rgba(0,0,0,0.25);
+        }
+
+        .product-badge {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            color: #fff;
+            font-size: 0.7rem;
+            padding: 0.2rem 0.7rem;
+            border-radius: 50px;
+            font-weight: 600;
+            z-index: 1;
+        }
+        .product-badge.discount { background: var(--red); }
+        .product-badge.low-stock { background: var(--orange); }
+        .product-badge.rarity-comum { background: #9ca3af; }
+        .product-badge.rarity-raro { background: #6366f1; }
+        .product-badge.rarity-epico { background: #a855f7; }
+        .product-badge.rarity-lendario { background: #fbbf24; color: #000; }
+
+        .product-image {
+            width: 100%;
+            height: 160px;
+            background: linear-gradient(135deg, #1a1d2e, #0f1220);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            border-bottom: 1px solid var(--border);
+            overflow: hidden;
+            position: relative;
+        }
+        .product-image img,
+        .product-image video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .product-info {
+            padding: 1rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        .product-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1rem;
+            font-weight: 700;
+            margin-bottom: 0.3rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .product-platform {
+            font-size: 0.7rem;
+            color: var(--text-2);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+        .product-price {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--gold);
+            margin-bottom: 0.3rem;
+            margin-top: auto;
+        }
+        .product-price small {
+            font-size: 0.7rem;
+            color: var(--text-2);
+        }
+        .product-price-real {
+            font-size: 0.8rem;
+            color: var(--green);
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+        .product-old-price {
+            font-size: 0.7rem;
+            color: var(--red);
+            text-decoration: line-through;
+            margin-left: 0.5rem;
+        }
+        .product-stock {
+            font-size: 0.7rem;
+            color: var(--text-2);
+            margin-bottom: 0.8rem;
+        }
+        .product-stock.in-stock { color: var(--green); }
+        .product-stock.low { color: var(--orange); }
+        .product-stock.out { color: var(--red); }
+
+        .buy-btn {
+            width: 100%;
+            background: var(--primary);
+            border: none;
+            padding: 0.6rem;
+            border-radius: 50px;
+            color: #fff;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 0.5rem;
+        }
+        .buy-btn:hover { background: var(--primary-h); transform: scale(1.02); }
+        .buy-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        .buy-btn.owned {
+            background: var(--green);
+        }
+
+        /* User Pill no Header */
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 0.35rem 0.9rem 0.35rem 0.55rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            position: relative;
+        }
+        .user-pill:hover { border-color: var(--primary); }
+        .upill-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #2e3748;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 2px solid var(--primary);
+            overflow: hidden;
+        }
+        .upill-avatar img { width: 100%; height: 100%; object-fit: cover; }
+        .upill-info { display: flex; flex-direction: column; gap: 1px; }
+        .upill-name { font-size: 0.8rem; font-weight: 600; }
+        .upill-money { font-size: 0.7rem; color: var(--orange); font-weight: 600; }
+        .login-btn-header {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0.45rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .login-btn-header:hover { background: var(--primary-h); }
+
+        /* Delivery Badge */
+        .delivery-badge {
+            display: inline-block;
+            padding: 0.15rem 0.5rem;
+            border-radius: 99px;
+            font-size: 0.6rem;
+            font-weight: 600;
+            margin-left: 0.5rem;
+        }
+        .delivery-badge.auto { background: rgba(16,185,129,0.15); color: var(--green); }
+        .delivery-badge.manual { background: rgba(245,158,11,0.15); color: var(--orange); }
+
+        /* Modal */
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.95);
+            backdrop-filter: blur(12px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 1rem;
+        }
+        .modal.active { display: flex; }
+        .modal-content {
+            background: var(--bg-card);
+            border-radius: 24px;
+            max-width: 900px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            border: 1px solid var(--border);
+        }
+        .modal-header {
+            padding: 1rem 1.5rem;
+            border-bottom: 1px solid var(--border);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            background: var(--bg-card);
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+        .modal-header h3 { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; }
+        .close-modal {
+            background: none;
+            border: none;
+            color: var(--text-2);
+            font-size: 1.5rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .close-modal:hover { color: var(--red); }
+        
+        .modal-filters {
+            display: flex;
+            gap: 0.8rem;
+            align-items: center;
+            flex-wrap: wrap;
+            background: rgba(0,0,0,0.3);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+        }
+        .modal-filters select {
+            background: rgba(255,255,255,0.1);
+            border: 1px solid var(--border);
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            color: var(--text);
+            font-size: 0.8rem;
+            cursor: pointer;
+            outline: none;
+        }
+        .modal-filters select option {
+            background: var(--bg-card);
+            color: var(--text);
+        }
+        
+        .modal-body { padding: 1.5rem; }
+        .modal-products {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1rem;
+        }
+
+        /* Toast */
+        .toast {
+            position: fixed;
+            bottom: 2rem;
+            left: 50%;
+            transform: translateX(-50%) translateY(100px);
+            background: #1e1b4b;
+            border: 1px solid var(--primary);
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            color: white;
+            font-size: 0.85rem;
+            z-index: 1100;
+            transition: 0.3s;
+            opacity: 0;
+        }
+        .toast.show {
+            transform: translateX(-50%) translateY(0);
+            opacity: 1;
+        }
+        .toast.success { border-color: var(--green); background: #1a3a2a; }
+        .toast.error { border-color: var(--red); background: #3a1a1a; }
+
+        /* Loading */
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-2);
+        }
+
+        @media (max-width: 768px) {
+            .navbar-links { display: none; }
+            .mobile-nav { display: block; }
+            .navbar-inner { padding: 0.65rem 1rem; flex-wrap: wrap; gap: 0.5rem; }
+            .container { padding: 1rem; }
+            .products-grid { grid-template-columns: 1fr; gap: 1rem; }
+            .product-image { height: 140px; font-size: 2.5rem; }
+            .product-title { font-size: 0.9rem; }
+            .product-price { font-size: 1.1rem; }
+            .search-bar { flex-direction: column; gap: 0.5rem; }
+            .search-bar select { width: 100%; }
+            .upill-name { display: none; }
+            .modal-filters { width: 100%; justify-content: center; }
+            .modal-products { grid-template-columns: 1fr; gap: 0.8rem; }
+            .modal-header { flex-direction: column; align-items: stretch; }
+            .modal-header h3 { text-align: center; }
+        }
+        @media (min-width: 769px) {
+            .mobile-nav { display: none; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ═══ PC NAV ═══ -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="looto.html" class="navbar-brand">
+                <span class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                    </svg>
+                </span>
+                Looto
+            </a>
+            
+            <div class="navbar-links">
+                <a href="looto.html" class="navbar-link">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        </svg>
+                    </span>
+                    Sorteios
+                </a>
+                <a href="loja.html" class="navbar-link active">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <path d="M16 10a4 4 0 0 1-8 0"/>
+                        </svg>
+                    </span>
+                    Loja
+                </a>
+                <a href="minigames.html" class="navbar-link">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polygon points="10,8 16,12 10,16"/>
+                        </svg>
+                    </span>
+                    Minijogos
+                </a>
+                <a href="chat.html" class="navbar-link">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </span>
+                    Chat
+                </a>
+                <a href="conta.html" class="navbar-link">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </span>
+                    Perfil
+                </a>
+            </div>
+
+            <div id="header-auth-area">
+                <button class="login-btn-header" onclick="window.location.href='login.html'">🔐 Entrar</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══ MOBILE BOTTOM NAV ═══ -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-inner">
+            <a href="looto.html" class="mobile-nav-link">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Sorteios</span>
+            </a>
+            <a href="loja.html" class="mobile-nav-link active">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Loja</span>
+            </a>
+            <a href="minigames.html" class="mobile-nav-link">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="10,8 16,12 10,16"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Jogos</span>
+            </a>
+            <a href="chat.html" class="mobile-nav-link">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Chat</span>
+            </a>
+            <a href="conta.html" class="mobile-nav-link">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Perfil</span>
+            </a>
+        </div>
+    </nav>
+
+    <div id="toast" class="toast"></div>
+
+    <div class="container">
+        <!-- Search e Filtros -->
+        <div class="search-bar">
+            <input type="text" id="search-input" placeholder="🔍 Buscar...">
+            <select id="platform-filter">
+                <option value="all">Todas Plataformas</option>
+                <option value="steam">🎮 Steam</option>
+                <option value="xbox">🎮 Xbox</option>
+                <option value="epic">🎮 Epic Games</option>
+                <option value="psn">🎮 PlayStation</option>
+            </select>
+            <select id="sort-filter">
+                <option value="default">Ordenar por</option>
+                <option value="price_asc">💰 Menor Preço (LM)</option>
+                <option value="price_desc">💰 Maior Preço (LM)</option>
+            </select>
+        </div>
+
+        <!-- Games Section -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">🎮 Keys de Jogos <span class="delivery-badge auto" id="delivery-badge">Automático</span></div>
+                <div class="view-all" onclick="openModal('games')">Ver todos os jogos →</div>
+            </div>
+            <div class="products-grid" id="games-grid">
+                <div class="loading">Carregando jogos...</div>
+            </div>
+        </div>
+
+        <!-- XP Section -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">⭐ Comprar XP</div>
+                <div class="view-all" onclick="openModal('xp')">Ver todos os pacotes →</div>
+            </div>
+            <div class="products-grid" id="xp-grid">
+                <div class="loading">Carregando pacotes...</div>
+            </div>
+        </div>
+
+        <!-- Cosméticos Section -->
+        <div class="section">
+            <div class="section-header">
+                <div class="section-title">🎨 Cosméticos</div>
+                <div class="view-all" onclick="openModal('cosmeticos')">Ver todos os cosméticos →</div>
+            </div>
+            <div class="products-grid" id="cosmeticos-grid">
+                <div class="loading">Carregando cosméticos...</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal" id="products-modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 id="modal-title">Todos os Jogos</h3>
+                <div class="modal-filters" id="modal-filters">
+                    <select id="modal-platform-filter">
+                        <option value="all">Todas</option>
+                        <option value="steam">🎮 Steam</option>
+                        <option value="xbox">🎮 Xbox</option>
+                        <option value="epic">🎮 Epic</option>
+                        <option value="psn">🎮 PSN</option>
+                    </select>
+                    <select id="modal-sort-filter">
+                        <option value="default">Ordenar</option>
+                        <option value="price_asc">💰 Menor Preço</option>
+                        <option value="price_desc">💰 Maior Preço</option>
+                    </select>
+                </div>
+                <button class="close-modal" onclick="closeModal()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="modal-products" id="modal-products"></div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, get, update, push, set, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+        authDomain: "looto-f46e5.firebaseapp.com",
+        databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+        projectId: "looto-f46e5",
+        storageBucket: "looto-f46e5.firebasestorage.app",
+        messagingSenderId: "295066400995",
+        appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let currentUser = null;
+    let userData = {};
+    let userInventory = new Set();
+    let gamesList = [];
+    let xpList = [];
+    let cosmeticosList = [];
+    let entregaAutomatica = true;
+    const userCache = new Map();
+    const CACHE_TTL = 5 * 60 * 1000;
+
+    function toast(msg, type = 'success') {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = `toast show ${type}`;
+        clearTimeout(el._t);
+        el._t = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    async function verificarModoEntrega() {
+        try {
+            const snap = await get(ref(db, 'configLoja'));
+            if (snap.exists()) {
+                entregaAutomatica = snap.val().entregaAutomatica !== false;
+            }
+        } catch(e) { console.warn('Erro ao verificar modo de entrega:', e); }
+        const badge = document.getElementById('delivery-badge');
+        if(badge) {
+            badge.textContent = entregaAutomatica ? 'Automático' : 'Manual';
+            badge.className = 'delivery-badge ' + (entregaAutomatica ? 'auto' : 'manual');
+        }
+    }
+
+    async function getUserData(uid) {
+        const cached = userCache.get(uid);
+        if(cached && Date.now() - cached.ts < CACHE_TTL) return cached.data;
+        try {
+            const snap = await get(ref(db, 'usuarios/' + uid));
+            const data = snap.val() || {};
+            userCache.set(uid, { data, ts: Date.now() });
+            if(userCache.size > 200) {
+                const now = Date.now();
+                for(const [k,v] of userCache) { if(now - v.ts > CACHE_TTL) userCache.delete(k); }
+            }
+            return data;
+        } catch(e) { return {}; }
+    }
+
+    async function getUserInventory(uid) {
+        try {
+            const snap = await get(ref(db, `usuarios/${uid}/inventario`));
+            if (snap.exists()) {
+                const inv = snap.val();
+                return new Set(Object.values(inv).map(item => item.url || item.id));
+            }
+        } catch(e) { console.warn('Erro ao carregar inventário:', e); }
+        return new Set();
+    }
+
+    function renderHeader() {
+        if (!currentUser) {
+            document.getElementById('header-auth-area').innerHTML = '<button class="login-btn-header" onclick="window.location.href=\'login.html\'">🔐 Entrar</button>';
+            return;
+        }
+        const nome = userData.username || currentUser.displayName || 'Jogador';
+        const money = userData.dinheiro || 0;
+        const fotoUrl = userData.usandoGif ? userData.gifUrl : (userData.fotoUrl || '');
+        
+        document.getElementById('header-auth-area').innerHTML = `
+            <a href="conta.html" class="user-pill">
+                <div class="upill-avatar">${fotoUrl ? `<img src="${fotoUrl}" alt="avatar">` : (nome[0]?.toUpperCase() || '?')}</div>
+                <div class="upill-info">
+                    <div class="upill-name">${nome}</div>
+                    <div class="upill-money">💰 ${money}</div>
+                </div>
+            </a>`;
+    }
+
+    function isImageUrl(url) {
+        return url && (url.startsWith('http://') || url.startsWith('https://'));
+    }
+
+    function renderProductImage(product, isBackground = false) {
+        // Se for fundo de perfil, renderiza como background real
+        if (isBackground && product.url && isImageUrl(product.url)) {
+            const isVideo = product.url.match(/\.(mp4|webm|ogg)$/i);
+            if (isVideo) {
+                return `<video src="${product.url}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;"></video>`;
+            }
+            return `<img src="${product.url}" alt="${product.nome || product.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;position:absolute;top:0;left:0;">`;
+        }
+        
+        // Para wallpapers normais
+        if (product.url && isImageUrl(product.url)) {
+            const isVideo = product.url.match(/\.(mp4|webm|ogg)$/i);
+            if (isVideo || product.tipo === 'efeito') {
+                return `<video src="${product.url}" autoplay loop muted playsinline style="width:100%;height:100%;object-fit:cover;"></video>`;
+            }
+            return `<img src="${product.url}" alt="${product.nome || product.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`;
+        }
+        
+        // Fallback para jogos
+        if (product.bannerUrl && isImageUrl(product.bannerUrl)) {
+            return `<img src="${product.bannerUrl}" alt="${product.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`;
+        }
+        if (product.image) {
+            if (isImageUrl(product.image)) {
+                return `<img src="${product.image}" alt="${product.name}" loading="lazy" style="width:100%;height:100%;object-fit:cover;">`;
+            }
+            return product.image;
+        }
+        
+        // Ícones padrão
+        const platformIcons = { steam: '🎮', xbox: '🟢', epic: '🎮', psn: '🎮' };
+        if (product.platform) return platformIcons[product.platform] || '🎮';
+        if (product.tipo === 'fundo_perfil') return '🌌';
+        if (product.tipo === 'moldura') return '🖼️';
+        return '🎨';
+    }
+
+    function filterAndSortItems(list, searchTerm, platform, sortType) {
+        let filtered = list.filter(item => {
+            const name = item.name || item.nome || '';
+            const matchSearch = !searchTerm || name.toLowerCase().includes(searchTerm);
+            const matchPlatform = !platform || platform === 'all' || item.platform === platform;
+            return matchSearch && matchPlatform;
+        });
+        
+        const price = (item) => item.price || item.preco || 0;
+        
+        if (sortType === 'price_asc') {
+            filtered.sort((a, b) => price(a) - price(b));
+        } else if (sortType === 'price_desc') {
+            filtered.sort((a, b) => price(b) - price(a));
+        }
+        
+        return filtered;
+    }
+
+    function renderGames() {
+        const searchTerm = (document.getElementById('search-input')?.value || '').toLowerCase();
+        const platform = document.getElementById('platform-filter')?.value || 'all';
+        const sortType = document.getElementById('sort-filter')?.value || 'default';
+        
+        const filtered = filterAndSortItems(gamesList, searchTerm, platform, sortType);
+        
+        const grid = document.getElementById('games-grid');
+        if (!grid) return;
+        
+        if (filtered.length === 0) {
+            grid.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-2);">Nenhum jogo encontrado 🔍</div>';
+            return;
+        }
+        
+        grid.innerHTML = filtered.slice(0, 4).map(game => {
+            const stock = game.stock || 0;
+            const price = game.price || 0;
+            const oldPrice = game.oldPrice || (game.discount ? Math.round(price / (1 - game.discount/100)) : null);
+            const discount = game.discount || (oldPrice ? Math.round((1 - price/oldPrice)*100) : 0);
+            
+            return `
+            <div class="product-card">
+                ${discount > 0 ? `<div class="product-badge discount">-${discount}%</div>` : ''}
+                ${stock <= 3 && stock > 0 ? `<div class="product-badge low-stock">Últimos ${stock}</div>` : ''}
+                <div class="product-image">${renderProductImage(game)}</div>
+                <div class="product-info">
+                    <div class="product-title" title="${game.name}">${game.name}</div>
+                    <div class="product-platform">${game.platform === 'steam' ? '🎮 Steam' : game.platform === 'xbox' ? '🟢 Xbox' : game.platform === 'epic' ? '🎮 Epic' : '🎮 PSN'}</div>
+                    <div class="product-price">
+                        💰 ${price} <small>LootMoney</small>
+                        ${oldPrice && oldPrice > price ? `<span class="product-old-price">${oldPrice}</span>` : ''}
+                    </div>
+                    <div class="product-stock ${stock > 3 ? 'in-stock' : (stock > 0 ? 'low' : 'out')}">
+                        ${stock > 0 ? `📦 ${stock} em estoque` : '❌ Esgotado'}
+                    </div>
+                    <button class="buy-btn" onclick="window.buyGame('${game.id}')" ${stock <= 0 ? 'disabled' : ''}>
+                        ${stock > 0 ? '🛒 Comprar' : 'Indisponível'}
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderXP() {
+        const grid = document.getElementById('xp-grid');
+        if (!grid) return;
+        
+        if (xpList.length === 0) {
+            grid.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-2);">Nenhum pacote disponível ⭐</div>';
+            return;
+        }
+        
+        grid.innerHTML = xpList.slice(0, 4).map(pack => {
+            const price = pack.price || 0;
+            const discount = pack.discount || 0;
+            
+            return `
+            <div class="product-card">
+                ${discount > 0 ? `<div class="product-badge discount">-${discount}%</div>` : ''}
+                <div class="product-image">${renderProductImage(pack)}</div>
+                <div class="product-info">
+                    <div class="product-title">${pack.name}</div>
+                    <div class="product-platform">+${pack.xp || 0} XP</div>
+                    <div class="product-price">
+                        💰 ${price} <small>LootMoney</small>
+                    </div>
+                    <button class="buy-btn" onclick="window.buyXP('${pack.id}')">🛒 Comprar</button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderCosmeticos() {
+        const grid = document.getElementById('cosmeticos-grid');
+        if (!grid) return;
+        
+        if (cosmeticosList.length === 0) {
+            grid.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-2);">Nenhum cosmético disponível 🎨</div>';
+            return;
+        }
+        
+        grid.innerHTML = cosmeticosList.slice(0, 4).map(item => {
+            const owned = userInventory.has(item.url || item.id);
+            const preco = item.preco || 0;
+            const precoReal = item.precoReal || 0;
+            const rarityClass = `rarity-${item.raridade || 'comum'}`;
+            const isFundoPerfil = item.tipo === 'fundo_perfil';
+            
+            return `
+            <div class="product-card">
+                <div class="product-badge ${rarityClass}">${item.raridade ? item.raridade.charAt(0).toUpperCase() + item.raridade.slice(1) : 'Comum'}</div>
+                <div class="product-image" style="${isFundoPerfil ? 'position:relative;' : ''}">${renderProductImage(item, isFundoPerfil)}</div>
+                <div class="product-info">
+                    <div class="product-title">${item.nome}</div>
+                    <div class="product-platform">${item.tipo === 'wallpaper' ? '🖼️ Wallpaper' : item.tipo === 'fundo_perfil' ? '🌌 Fundo de Perfil' : item.tipo === 'moldura' ? '🖼️ Moldura' : '✨ Efeito'}</div>
+                    <div class="product-price">
+                        💰 ${preco} <small>LootMoney</small>
+                    </div>
+                    ${precoReal > 0 ? `<div class="product-price-real">💵 R$ ${precoReal.toFixed(2)}</div>` : ''}
+                    <button class="buy-btn ${owned ? 'owned' : ''}" onclick="window.buyCosmetico('${item.id}')" ${owned ? 'disabled' : ''}>
+                        ${owned ? '✅ Adquirido' : '🛒 Comprar'}
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    // ═══ COMPRAR JOGO ═══
+    window.buyGame = async function(gameId) {
+        if (!currentUser) { toast('Faça login para comprar!', 'error'); return; }
+        
+        const game = gamesList.find(g => g.id === gameId);
+        if (!game) { toast('Jogo não encontrado!', 'error'); return; }
+        if ((game.stock || 0) <= 0) { toast('Produto esgotado!', 'error'); return; }
+        
+        const userMoney = userData.dinheiro || 0;
+        if (userMoney < (game.price || 0)) { toast('💰 Saldo insuficiente!', 'error'); return; }
+        
+        if (!confirm(`Comprar ${game.name} por ${game.price} LootMoney?`)) return;
+        
+        try {
+            const newMoney = userMoney - game.price;
+            const newStock = game.stock - 1;
+            
+            await update(ref(db, 'usuarios/' + currentUser.uid), { dinheiro: newMoney });
+            userData.dinheiro = newMoney;
+            
+            await update(ref(db, `store/games/${gameId}`), { stock: newStock });
+            game.stock = newStock;
+            
+            const purchaseRef = push(ref(db, `purchases/${currentUser.uid}`));
+            
+            const gameSnap = await get(ref(db, `store/games/${gameId}`));
+            const gameData = gameSnap.val() || {};
+            const key = gameData.key || '';
+            
+            if (entregaAutomatica && key) {
+                await set(purchaseRef, {
+                    type: 'game', itemId: gameId, itemName: game.name,
+                    platform: game.platform, price: game.price,
+                    purchasedAt: Date.now(), status: 'delivered'
+                });
+                
+                await update(ref(db, `store/games/${gameId}`), { key: '' });
+                
+                await push(ref(db, 'chat'), {
+                    uid: currentUser.uid,
+                    nome: userData.username || currentUser.displayName || 'Usuário',
+                    texto: '', ts: Date.now(), type: 'treasure',
+                    keyCode: key, keyGame: game.name,
+                    keyPlatform: game.platform || 'Steam',
+                    sorteioId: 'store-purchase', opened: false
+                });
+                
+                await push(ref(db, 'chat'), {
+                    uid: 'bot', nome: 'LootoBot 🤖',
+                    texto: `🛒 <strong>${userData.username || 'Alguém'}</strong> comprou <strong>${game.name}</strong> na loja! 🎮`,
+                    ts: Date.now(), type: 'system'
+                });
+                
+                toast('✅ Compra aprovada! Key entregue no chat! 🎮', 'success');
+            } else {
+                await set(purchaseRef, {
+                    type: 'game', itemId: gameId, itemName: game.name,
+                    platform: game.platform, price: game.price,
+                    purchasedAt: Date.now(), status: 'pending'
+                });
+                
+                toast('⏳ Compra realizada! Aguarde a confirmação do administrador. A key chegará no chat em breve! 📦', 'success');
+            }
+            
+            renderHeader();
+            renderGames();
+        } catch (error) {
+            console.error("Erro na compra:", error);
+            toast('Erro ao processar compra! Tente novamente.', 'error');
+        }
+    };
+
+    // ═══ COMPRAR XP ═══
+    window.buyXP = async function(packId) {
+        if (!currentUser) { toast('Faça login para comprar!', 'error'); return; }
+        
+        const pack = xpList.find(p => p.id === packId);
+        if (!pack) { toast('Pacote não encontrado!', 'error'); return; }
+        
+        const userMoney = userData.dinheiro || 0;
+        if (userMoney < (pack.price || 0)) { toast('💰 Saldo insuficiente!', 'error'); return; }
+        
+        if (!confirm(`Comprar ${pack.name} por ${pack.price} LootMoney?`)) return;
+        
+        try {
+            const newMoney = userMoney - pack.price;
+            const currentXP = userData.pontos || 0;
+            const newXP = currentXP + (pack.xp || 0);
+            
+            await update(ref(db, 'usuarios/' + currentUser.uid), { 
+                dinheiro: newMoney,
+                pontos: newXP
+            });
+            userData.dinheiro = newMoney;
+            userData.pontos = newXP;
+            
+            const purchaseRef = push(ref(db, `purchases/${currentUser.uid}`));
+            await set(purchaseRef, {
+                type: 'xp', itemId: packId, itemName: pack.name,
+                xp: pack.xp, price: pack.price,
+                purchasedAt: Date.now(), status: 'delivered'
+            });
+            
+            toast(`✅ +${pack.xp} XP adicionado!`, 'success');
+            renderHeader();
+        } catch (error) {
+            console.error("Erro na compra de XP:", error);
+            toast('Erro ao processar compra!', 'error');
+        }
+    };
+
+    // ═══ COMPRAR COSMÉTICO ═══
+    window.buyCosmetico = async function(itemId) {
+        if (!currentUser) { toast('Faça login para comprar!', 'error'); return; }
+        
+        const item = cosmeticosList.find(c => c.id === itemId);
+        if (!item) { toast('Cosmético não encontrado!', 'error'); return; }
+        
+        if (userInventory.has(item.url || item.id)) {
+            toast('Você já possui este item!', 'error');
+            return;
+        }
+        
+        const userMoney = userData.dinheiro || 0;
+        if (userMoney < (item.preco || 0)) { toast('💰 Saldo insuficiente!', 'error'); return; }
+        
+        if (!confirm(`Comprar ${item.nome} por ${item.preco} LootMoney?`)) return;
+        
+        try {
+            const newMoney = userMoney - item.preco;
+            
+            await update(ref(db, 'usuarios/' + currentUser.uid), { dinheiro: newMoney });
+            userData.dinheiro = newMoney;
+            
+            const inventarioRef = push(ref(db, `usuarios/${currentUser.uid}/inventario`));
+            await set(inventarioRef, {
+                id: inventarioRef.key,
+                nome: item.nome,
+                tipo: item.tipo,
+                url: item.url,
+                raridade: item.raridade,
+                compradoEm: Date.now()
+            });
+            
+            userInventory.add(item.url || item.id);
+            
+            const purchaseRef = push(ref(db, `purchases/${currentUser.uid}`));
+            await set(purchaseRef, {
+                type: 'cosmetico', itemId: itemId, itemName: item.nome,
+                price: item.preco, purchasedAt: Date.now(), status: 'delivered'
+            });
+            
+            toast(`✅ ${item.nome} adicionado ao inventário! 🎒`, 'success');
+            renderHeader();
+            renderCosmeticos();
+        } catch (error) {
+            console.error("Erro na compra de cosmético:", error);
+            toast('Erro ao processar compra!', 'error');
+        }
+    };
+
+    // Modal functions
+    function renderModalGames() {
+        const platform = document.getElementById('modal-platform-filter')?.value || 'all';
+        const sortType = document.getElementById('modal-sort-filter')?.value || 'default';
+        
+        const filtered = filterAndSortItems(gamesList, '', platform, sortType);
+        
+        const container = document.getElementById('modal-products');
+        if (filtered.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-2);">Nenhum jogo encontrado</div>';
+            return;
+        }
+        
+        container.innerHTML = filtered.map(game => {
+            const stock = game.stock || 0;
+            const price = game.price || 0;
+            const discount = game.discount || 0;
+            
+            return `
+            <div class="product-card">
+                ${discount > 0 ? `<div class="product-badge discount">-${discount}%</div>` : ''}
+                <div class="product-image">${renderProductImage(game)}</div>
+                <div class="product-info">
+                    <div class="product-title">${game.name}</div>
+                    <div class="product-platform">${game.platform === 'steam' ? '🎮 Steam' : game.platform === 'xbox' ? '🟢 Xbox' : game.platform === 'epic' ? '🎮 Epic' : '🎮 PSN'}</div>
+                    <div class="product-price">💰 ${price} LootMoney</div>
+                    <div class="product-stock in-stock">📦 ${stock} em estoque</div>
+                    <button class="buy-btn" onclick="window.buyGame('${game.id}'); window.closeModal();" ${stock <= 0 ? 'disabled' : ''}>
+                        ${stock > 0 ? '🛒 Comprar' : 'Esgotado'}
+                    </button>
+                </div>
+            </div>`;
+        }).join('');
+    }
+
+    function renderModalXP() {
+        const container = document.getElementById('modal-products');
+        if (xpList.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-2);">Nenhum pacote disponível</div>';
+            return;
+        }
+        
+        container.innerHTML = xpList.map(pack => `
+            <div class="product-card">
+                ${pack.discount ? `<div class="product-badge discount">-${pack.discount}%</div>` : ''}
+                <div class="product-image">${renderProductImage(pack)}</div>
+                <div class="product-info">
+                    <div class="product-title">${pack.name}</div>
+                    <div class="product-platform">+${pack.xp || 0} XP</div>
+                    <div class="product-price">💰 ${pack.price || 0} LootMoney</div>
+                    <button class="buy-btn" onclick="window.buyXP('${pack.id}'); window.closeModal();">🛒 Comprar</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    function renderModalCosmeticos() {
+        const container = document.getElementById('modal-products');
+        if (cosmeticosList.length === 0) {
+            container.innerHTML = '<div style="text-align:center; padding:2rem; color:var(--text-2);">Nenhum cosmético disponível</div>';
+            return;
+        }
+        
+        // Filtro de ordenação no modal
+        const sortType = document.getElementById('modal-sort-filter')?.value || 'default';
+        let filtered = [...cosmeticosList];
+        
+        if (sortType === 'price_asc') {
+            filtered.sort((a, b) => (a.preco || 0) - (b.preco || 0));
+        } else if (sortType === 'price_desc') {
+            filtered.sort((a, b) => (b.preco || 0) - (a.preco || 0));
+        }
+        
+        container.innerHTML = filtered.map(item => {
+            const owned = userInventory.has(item.url || item.id);
+            const rarityClass = `rarity-${item.raridade || 'comum'}`;
+            const isFundoPerfil = item.tipo === 'fundo_perfil';
+            const precoReal = item.precoReal || 0;
+            
+            return `
+            <div class="product-card">
+                <div class="product-badge ${rarityClass}">${item.raridade ? item.raridade.charAt(0).toUpperCase() + item.raridade.slice(1) : 'Comum'}</div>
+                <div class="product-image" style="${isFundoPerfil ? 'position:relative;' : ''}">${renderProductImage(item, isFundoPerfil)}</div>
+                <div class="product-info">
+                    <div class="product-title">${item.nome}</div>
+                    <div class="product-platform">${item.tipo === 'wallpaper' ? '🖼️ Wallpaper' : item.tipo === 'fundo_perfil' ? '🌌 Fundo de Perfil' : item.tipo === 'moldura' ? '🖼️ Moldura' : '✨ Efeito'}</div>
+                    <div class="product-price">💰 ${item.preco || 0} LootMoney</div>
+                    ${precoReal > 0 ? `<div class="product-price-real">💵 R$ ${precoReal.toFixed(2)}</div>` : ''}
+                    <button class="buy-btn ${owned ? 'owned' : ''}" onclick="window.buyCosmetico('${item.id}'); window.closeModal();" ${owned ? 'disabled' : ''}>
+                        ${owned ? '✅ Adquirido' : '🛒 Comprar'}
+                    </button>
+                </div>
+            </div>
+            `;
+        }).join('');
+    }
+
+    window.openModal = function(type) {
+        const modal = document.getElementById('products-modal');
+        const modalTitle = document.getElementById('modal-title');
+        const filtersDiv = document.getElementById('modal-filters');
+        const platformFilter = document.getElementById('modal-platform-filter');
+        const sortFilter = document.getElementById('modal-sort-filter');
+        
+        if (type === 'games') {
+            modalTitle.textContent = '🎮 Todos os Jogos';
+            filtersDiv.style.display = 'flex';
+            if (platformFilter) platformFilter.style.display = 'inline-block';
+            renderModalGames();
+        } else if (type === 'xp') {
+            modalTitle.textContent = '⭐ Pacotes de XP';
+            filtersDiv.style.display = 'none';
+            renderModalXP();
+        } else if (type === 'cosmeticos') {
+            modalTitle.textContent = '🎨 Todos os Cosméticos';
+            filtersDiv.style.display = 'flex';
+            if (platformFilter) platformFilter.style.display = 'none';
+            renderModalCosmeticos();
+        }
+        
+        modal.classList.add('active');
+    };
+
+    window.closeModal = function() {
+        document.getElementById('products-modal').classList.remove('active');
+    };
+
+    document.getElementById('products-modal').addEventListener('click', function(e) {
+        if (e.target === this) window.closeModal();
+    });
+
+    // Inicialização
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user;
+            userData = await getUserData(user.uid);
+            if (!userData.dinheiro) userData.dinheiro = 0;
+            if (!userData.pontos) userData.pontos = 0;
+            userInventory = await getUserInventory(user.uid);
+        } else {
+            currentUser = null;
+            userData = {};
+            userInventory = new Set();
+        }
+        
+        await verificarModoEntrega();
+        renderHeader();
+        
+        // Listener para jogos
+        onValue(ref(db, 'store/games'), (snap) => {
+            gamesList = [];
+            if (snap.exists()) {
+                const data = snap.val();
+                gamesList = Object.entries(data)
+                    .filter(([_, val]) => val.active !== false)
+                    .map(([id, val]) => {
+                        const { key, ...safeData } = val;
+                        return { id, ...safeData };
+                    });
+            }
+            renderGames();
+            if (document.getElementById('products-modal').classList.contains('active') && 
+                document.getElementById('modal-title').textContent.includes('Jogos')) {
+                renderModalGames();
+            }
+        });
+        
+        // Listener para XP
+        onValue(ref(db, 'store/xp'), (snap) => {
+            xpList = [];
+            if (snap.exists()) {
+                xpList = Object.entries(snap.val())
+                    .filter(([_, val]) => val.active !== false)
+                    .map(([id, val]) => ({ id, ...val }));
+            }
+            renderXP();
+            if (document.getElementById('products-modal').classList.contains('active') && 
+                document.getElementById('modal-title').textContent.includes('XP')) {
+                renderModalXP();
+            }
+        });
+
+        // Listener para Cosméticos
+        onValue(ref(db, 'store/cosmeticos'), (snap) => {
+            cosmeticosList = [];
+            if (snap.exists()) {
+                cosmeticosList = Object.entries(snap.val())
+                    .filter(([_, val]) => val.active !== false)
+                    .map(([id, val]) => ({ id, ...val }));
+            }
+            renderCosmeticos();
+            if (document.getElementById('products-modal').classList.contains('active') && 
+                document.getElementById('modal-title').textContent.includes('Cosméticos')) {
+                renderModalCosmeticos();
+            }
+        });
+        
+        // Event listeners para filtros
+        document.getElementById('search-input').addEventListener('input', renderGames);
+        document.getElementById('platform-filter').addEventListener('change', renderGames);
+        document.getElementById('sort-filter').addEventListener('change', renderGames);
+        document.getElementById('modal-platform-filter').addEventListener('change', renderModalGames);
+        document.getElementById('modal-sort-filter').addEventListener('change', function() {
+            if (document.getElementById('modal-title').textContent.includes('Jogos')) {
+                renderModalGames();
+            } else if (document.getElementById('modal-title').textContent.includes('Cosméticos')) {
+                renderModalCosmeticos();
+            }
+        });
+    });
+    </script>
+    <script type="module" src="presence.js"></script>
+</body>
+</html>

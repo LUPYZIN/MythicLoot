@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Ferramentas Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --bg-card: #151a26;
+            --text: #f3f4f6;
+            --text-2: #9ca3af;
+            --primary: #6366f1;
+            --green: #10b981;
+            --red: #ef4444;
+            --gold: #fbbf24;
+            --orange: #f59e0b;
+            --pink: #ec4899;
+            --border: rgba(255, 255, 255, 0.06);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+        
+        header {
+            background: rgba(11, 14, 20, 0.95);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(16px);
+            padding: .9rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .5rem;
+        }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text); text-decoration: none; }
+        .logo em { color: var(--red); font-style: normal; }
+        .btn-header { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: .4rem .8rem; border-radius: 6px; font-size: .8rem; cursor: pointer; transition: .3s; text-decoration: none; }
+        .btn-header:hover { border-color: var(--red); color: var(--red); }
+        
+        .main-layout { max-width: 1600px; margin: 0 auto; padding: 1.5rem 2rem; display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; }
+        
+        .sidebar { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1rem; position: sticky; top: 80px; height: fit-content; }
+        .sidebar-btn { background: transparent; border: none; color: var(--text-2); padding: .7rem 1rem; border-radius: 8px; font-size: .85rem; cursor: pointer; transition: .3s; text-align: left; display: flex; align-items: center; gap: .5rem; width: 100%; text-decoration: none; }
+        .sidebar-btn:hover { background: rgba(255, 255, 255, .03); color: var(--text); }
+        .sidebar-btn.active { background: rgba(99, 102, 241, .12); color: var(--primary); font-weight: 600; }
+        
+        .panel { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1.5rem; }
+        .panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+        
+        input { background: rgba(11, 14, 20, .6); border: 1px solid var(--border); padding: .5rem .7rem; border-radius: 6px; color: var(--text); font-size: .82rem; outline: none; width: 100%; }
+        input:focus { border-color: var(--primary); }
+        
+        .btn { padding: .5rem 1rem; border-radius: 6px; font-size: .8rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .15rem; }
+        .btn.primary { background: var(--primary); color: #fff; }
+        .btn.red { background: var(--red); color: #fff; }
+        .btn.green { background: var(--green); color: #fff; }
+        .btn.gold { background: var(--gold); color: #000; }
+        .btn.orange { background: var(--orange); color: #000; }
+        
+        .field { margin-bottom: .8rem; }
+        .field label { font-size: .75rem; color: var(--text-2); display: block; margin-bottom: .2rem; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+        
+        hr { border-color: var(--border); margin: 1rem 0; }
+        
+        .toast { position: fixed; top: 1.5rem; right: 1.5rem; background: var(--bg-card); border: 1px solid var(--red); padding: .8rem 1.2rem; border-radius: 12px; font-size: .85rem; z-index: 999; transform: translateX(140%); transition: .3s; max-width: 320px; }
+        .toast.show { transform: translateX(0); }
+        .toast.ok { border-color: var(--green); }
+        
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; padding: 1rem; }
+            .sidebar { display: flex; flex-wrap: wrap; gap: .3rem; position: static; }
+            .sidebar-btn { width: auto; font-size: .7rem; padding: .4rem .6rem; }
+            .field-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    
+    <header>
+        <a href="/looto.html" class="logo"><em>🛡️</em> Looto Admin</a>
+        <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+        <div>
+            <a href="/looto.html" class="btn-header">🏠 Site</a>
+            <button class="btn-header" onclick="logout()" style="margin-left:.5rem;">🚪 Sair</button>
+        </div>
+    </header>
+    
+    <div class="main-layout">
+        <aside class="sidebar">
+            <a href="admin.html" class="sidebar-btn">📊 Dashboard</a>
+            <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+            <a href="abots.html" class="sidebar-btn">🤖 Bots</a>
+            <a href="asorteios.html" class="sidebar-btn">🎁 Sorteios</a>
+            <a href="alogsorteios.html" class="sidebar-btn">📋 Log Sorteios</a>
+            <a href="achat.html" class="sidebar-btn">💬 Chat</a>
+            <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+            <a href="aloja.html" class="sidebar-btn">🛒 Loja</a>
+            <a href="admins.html" class="sidebar-btn">🔑 Admins</a>
+            <a href="aferramentas.html" class="sidebar-btn active">🔧 Ferramentas</a>
+        </aside>
+        
+        <div class="panel">
+            <div class="panel-title">🔧 Ferramentas Avançadas</div>
+            
+            <h4 style="font-family:'Space Grotesk',sans-serif;margin-bottom:.5rem;">🪙 Distribuição em Massa</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1rem;">
+                <button class="btn gold" onclick="distribuirPontos()">🪙 +100 XP Todos</button>
+                <button class="btn gold" onclick="removerPontos()">➖ -100 XP Todos</button>
+                <button class="btn orange" onclick="distribuirMoney()">💰 +50 Money Todos</button>
+                <button class="btn orange" onclick="removerMoney()">➖ -50 Money Todos</button>
+                <button class="btn red" onclick="resetarTodosPontos()">🔄 Zerar XP/Money</button>
+            </div>
+            
+            <hr>
+            
+            <h4 style="font-family:'Space Grotesk',sans-serif;margin-bottom:.5rem;">👤 Usuário Específico</h4>
+            <div class="field-row">
+                <div class="field"><label>UID do Usuário</label><input type="text" id="tool-uid" placeholder="u1BGSDSXdJSXnpUESiSbgYLXNkv1"></div>
+            </div>
+            <div style="display:flex;flex-wrap:wrap;gap:.3rem;margin-bottom:1rem;">
+                <button class="btn primary" onclick="editarUsuario()">✏️ Editar</button>
+                <button class="btn green" onclick="promoverUsuarioTool()">⬆️ Subir Nível</button>
+                <button class="btn orange" onclick="rebaixarUsuarioTool()">⬇️ Descer Nível</button>
+                <button class="btn gold" onclick="darPontosUsuario()">🪙 +XP</button>
+                <button class="btn gold" onclick="tirarPontosUsuario()">➖ -XP</button>
+                <button class="btn orange" onclick="darMoneyUsuario()">💰 +Money</button>
+                <button class="btn orange" onclick="tirarMoneyUsuario()">➖ -Money</button>
+                <button class="btn red" onclick="banirUsuario()">🚫 Banir</button>
+            </div>
+            
+            <hr>
+            
+            <h4 style="font-family:'Space Grotesk',sans-serif;margin-bottom:.5rem;">💣 Limpeza</h4>
+            <div style="display:flex;flex-wrap:wrap;gap:.3rem;">
+                <button class="btn red" onclick="limparFeedCompleto()">🗑️ Limpar Feed</button>
+                <button class="btn red" onclick="limparSorteiosExpirados()">🎁 Limpar Expirados</button>
+                <button class="btn red" onclick="limparTudo()">⚠️ Limpar Tudo</button>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, get, update, remove, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+        authDomain: "looto-f46e5.firebaseapp.com",
+        databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+        projectId: "looto-f46e5",
+        storageBucket: "looto-f46e5.firebasestorage.app",
+        messagingSenderId: "295066400995",
+        appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    
+    const BATCH_SIZE = 50; // processar usuários em lotes de 50
+    
+    function toast(msg, ok = false) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (ok ? ' ok' : '');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+    
+    window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+    
+    async function checkAdmin(user) {
+        if (!user) return false;
+        if (user.email === 'startubez.com@gmail.com') return true;
+        const snap = await get(ref(db, 'admins'));
+        if (!snap.exists()) return false;
+        const admins = snap.val();
+        for (let key of Object.keys(admins)) { const a = admins[key]; if (a.uid === user.uid || a.email === user.email) return true; }
+        return false;
+    }
+    
+    // ═══ PROCESSAR USUÁRIOS EM LOTES ═══
+    async function processarUsuariosEmLotes(callback, toastMsg) {
+        const snap = await get(ref(db, 'usuarios'));
+        if (!snap.exists()) { toast('Nenhum usuário encontrado!'); return; }
+        const usuarios = [];
+        snap.forEach(c => usuarios.push({ key: c.key, ...c.val() }));
+        
+        let processados = 0;
+        for (let i = 0; i < usuarios.length; i += BATCH_SIZE) {
+            const batch = usuarios.slice(i, i + BATCH_SIZE);
+            const promises = batch.map(u => callback(u));
+            await Promise.all(promises);
+            processados += batch.length;
+        }
+        toast(toastMsg || `✅ ${processados} usuários processados!`, true);
+    }
+    
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const isAdmin = await checkAdmin(user);
+        if (!isAdmin) {
+            document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;flex-direction:column;gap:1rem;padding:2rem;"><h1 style="font-family:'Space Grotesk',sans-serif;font-size:3rem;color:#ef4444;">🚫 Acesso Negado</h1><p style="color:#9ca3af;">Você não tem permissão.</p><a href="/looto.html" style="background:#6366f1;color:#fff;padding:.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;">Ir para o Site</a></div>`;
+            setTimeout(() => window.location.href = '/looto.html', 3000);
+            return;
+        }
+        document.getElementById('admin-info').textContent = `👑 ${user.email}`;
+    });
+    
+    // ═══ DISTRIBUIÇÃO EM MASSA (OTIMIZADO COM LOTES) ═══
+    window.distribuirPontos = async () => {
+        if (!confirm('Adicionar 100 XP para TODOS os usuários?')) return;
+        await processarUsuariosEmLotes(
+            (u) => update(ref(db, 'usuarios/' + u.key), { pontos: (u.pontos || 0) + 100 }),
+            '🎁 +100 XP para todos!'
+        );
+    };
+    
+    window.removerPontos = async () => {
+        if (!confirm('⚠️ Remover 100 XP de TODOS os usuários?')) return;
+        await processarUsuariosEmLotes(
+            (u) => update(ref(db, 'usuarios/' + u.key), { pontos: Math.max(0, (u.pontos || 0) - 100) }),
+            '➖ -100 XP de todos!'
+        );
+    };
+    
+    window.distribuirMoney = async () => {
+        if (!confirm('Adicionar 50 Money para TODOS os usuários?')) return;
+        await processarUsuariosEmLotes(
+            (u) => update(ref(db, 'usuarios/' + u.key), { dinheiro: (u.dinheiro || 0) + 50 }),
+            '💰 +50 Money para todos!'
+        );
+    };
+    
+    window.removerMoney = async () => {
+        if (!confirm('⚠️ Remover 50 Money de TODOS os usuários?')) return;
+        await processarUsuariosEmLotes(
+            (u) => update(ref(db, 'usuarios/' + u.key), { dinheiro: Math.max(0, (u.dinheiro || 0) - 50) }),
+            '➖ -50 Money de todos!'
+        );
+    };
+    
+    window.resetarTodosPontos = async () => {
+        if (!confirm('⚠️⚠️ ZERAR XP e Money de TODOS os usuários? Esta ação não pode ser desfeita!')) return;
+        await processarUsuariosEmLotes(
+            (u) => update(ref(db, 'usuarios/' + u.key), { pontos: 0, dinheiro: 0 }),
+            '🔄 XP e Money zerados para todos!'
+        );
+    };
+    
+    // ═══ USUÁRIO ESPECÍFICO ═══
+    const getUid = () => document.getElementById('tool-uid').value.trim();
+    
+    window.editarUsuario = async () => {
+        const uid = getUid(); if (!uid) { toast('Digite UID!'); return; }
+        const snap = await get(ref(db, 'usuarios/' + uid));
+        if (!snap.exists()) { toast('❌ Usuário não encontrado!'); return; }
+        const d = snap.val();
+        const nv = prompt('Nível (0-99):', d.nivelConta || 0);
+        const xp = prompt('XP:', d.pontos || 0);
+        const money = prompt('Money:', d.dinheiro || 0);
+        if (nv !== null) await update(ref(db, 'usuarios/' + uid), { nivelConta: Math.min(99, Math.max(0, parseInt(nv) || 0)), pontos: parseInt(xp) || 0, dinheiro: parseInt(money) || 0 });
+        toast('✅ Usuário atualizado!', true);
+    };
+    
+    window.promoverUsuarioTool = async () => {
+        const uid = getUid(); if (!uid) return;
+        const snap = await get(ref(db, 'usuarios/' + uid));
+        if (!snap.exists()) { toast('❌ Não encontrado!'); return; }
+        const d = snap.val();
+        await update(ref(db, 'usuarios/' + uid), { nivelConta: Math.min(99, (d.nivelConta || 0) + 1), pontos: (d.pontos || 0) + 200 });
+        toast('⬆️ Nível aumentado!', true);
+    };
+    
+    window.rebaixarUsuarioTool = async () => {
+        const uid = getUid(); if (!uid) return;
+        const snap = await get(ref(db, 'usuarios/' + uid));
+        if (!snap.exists()) { toast('❌ Não encontrado!'); return; }
+        const d = snap.val();
+        await update(ref(db, 'usuarios/' + uid), { nivelConta: Math.max(0, (d.nivelConta || 0) - 1) });
+        toast('⬇️ Nível reduzido!', true);
+    };
+    
+    window.darPontosUsuario = async () => {
+        const uid = getUid(); if (!uid) return;
+        const snap = await get(ref(db, 'usuarios/' + uid));
+        if (!snap.exists()) { toast('❌ Não encontrado!'); return; }
+        const xp = parseInt(prompt('Quanto XP?', 100)) || 0;
+        await update(ref(db, 'usuarios/' + uid), { pontos: (snap.val().pontos || 0) + xp });
+        toast(`🪙 +${xp} XP!`, true);
+    };
+    
+    window.tirarPontosUsuario = async () => {
+        const uid = getUid(); if (!uid) return;
+        const snap = await get(ref(db, 'usuarios/' + uid));
+        if (!snap.exists()) { toast('❌ Não encontrado!'); return; }
+        const xp = parseInt(prompt('Quanto XP remover?', 100)) || 0;
+        await update(ref(db, 'usuarios/' + uid), { pontos: Math.max(0, (snap.val().pontos || 0) - xp) });
+        toast(`➖ -${xp} XP!`, true);
+    };
+    
+    window.darMoneyUsuario = async () => {
+        const uid = getUid(); if (!uid) return;
+        const snap = await get(ref(db, 'usuarios/' + uid));
+        if (!snap.exists()) { toast('❌ Não encontrado!'); return; }
+        const m = parseInt(prompt('Quanto Money?', 50)) || 0;
+        await update(ref(db, 'usuarios/' + uid), { dinheiro: (snap.val().dinheiro || 0) + m });
+        toast(`💰 +${m} Money!`, true);
+    };
+    
+    window.tirarMoneyUsuario = async () => {
+        const uid = getUid(); if (!uid) return;
+        const snap = await get(ref(db, 'usuarios/' + uid));
+        if (!snap.exists()) { toast('❌ Não encontrado!'); return; }
+        const m = parseInt(prompt('Quanto Money remover?', 50)) || 0;
+        await update(ref(db, 'usuarios/' + uid), { dinheiro: Math.max(0, (snap.val().dinheiro || 0) - m) });
+        toast(`➖ -${m} Money!`, true);
+    };
+    
+    window.banirUsuario = async () => {
+        const uid = getUid();
+        if (!uid || !confirm(`⚠️ Banir permanentemente o usuário ${uid.slice(0, 12)}...?`)) return;
+        await remove(ref(db, 'usuarios/' + uid));
+        toast('🚫 Usuário banido!', true);
+    };
+    
+    // ═══ LIMPEZA (OTIMIZADO) ═══
+    window.limparFeedCompleto = async () => {
+        if (!confirm('🗑️ Limpar todo o feed?')) return;
+        await remove(ref(db, 'feed'));
+        toast('✅ Feed limpo!', true);
+    };
+    
+    window.limparSorteiosExpirados = async () => {
+        if (!confirm('🎁 Remover todos os sorteios expirados?')) return;
+        const snap = await get(query(ref(db, 'sorteios'), orderByChild('expiraEm'), limitToLast(200)));
+        let c = 0;
+        if (snap.exists()) {
+            const now = Date.now();
+            const promises = [];
+            snap.forEach(x => {
+                if (x.val().expiraEm && x.val().expiraEm < now) {
+                    promises.push(remove(ref(db, 'sorteios/' + x.key)).then(() => c++));
+                }
+            });
+            await Promise.all(promises);
+        }
+        toast(`🗑️ ${c} sorteios expirados removidos!`, true);
+    };
+    
+    window.limparTudo = async () => {
+        if (!confirm('⚠️⚠️⚠️ REMOVER TODO O FEED E SORTEIOS? Esta ação não pode ser desfeita!')) return;
+        await Promise.all([remove(ref(db, 'feed')), remove(ref(db, 'sorteios'))]);
+        toast('💀 Tudo limpo!', true);
+    };
+    </script>
+</body>
+</html>

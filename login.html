@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Autenticação</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --bg-principal: #0b0e14;
+            --bg-card: rgba(21, 26, 38, 0.8);
+            --texto-principal: #f3f4f6;
+            --texto-secundario: #9ca3af;
+            --cor-primaria: #6366f1;
+            --cor-primaria-hover: #4f46e5;
+            --cor-erro: #ef4444;
+            --cor-sucesso: #10b981;
+            --cor-gold: #fbbf24;
+            --cor-diamond: #38bdf8;
+            --cor-pink: #ec4899;
+            --borda-suave: rgba(255, 255, 255, 0.06);
+            --transicao: all 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-principal);
+            color: var(--texto-principal);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* ═══ ANIMAÇÃO DE FUNDO ═══ */
+        .particles-container {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .particle {
+            position: absolute;
+            border-radius: 50%;
+            animation: floatUp linear infinite;
+            opacity: 0;
+        }
+        
+        @keyframes floatUp {
+            0% { transform: translateY(100vh) translateX(0) scale(0); opacity: 0; }
+            10% { opacity: 0.6; }
+            90% { opacity: 0.6; }
+            100% { transform: translateY(-10vh) translateX(60px) scale(1.5); opacity: 0; }
+        }
+        
+        .bg-glow {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(180px);
+            opacity: 0.12;
+            z-index: 0;
+            animation: floatGlow 10s infinite alternate ease-in-out;
+        }
+        
+        .bg-glow.g1 {
+            width: 400px; height: 400px;
+            top: -100px; left: -100px;
+            background: var(--cor-primaria);
+        }
+        
+        .bg-glow.g2 {
+            width: 400px; height: 400px;
+            bottom: -100px; right: -100px;
+            background: var(--cor-gold);
+            animation-delay: -5s;
+            animation-duration: 12s;
+        }
+        
+        .bg-glow.g3 {
+            width: 300px; height: 300px;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--cor-diamond);
+            animation-delay: -3s;
+            animation-duration: 8s;
+        }
+        
+        @keyframes floatGlow {
+            0% { transform: translate(0, 0) scale(1); }
+            33% { transform: translate(40px, -30px) scale(1.15); }
+            66% { transform: translate(-20px, 20px) scale(0.9); }
+            100% { transform: translate(30px, 10px) scale(1.1); }
+        }
+
+        .stars-container {
+            position: fixed;
+            inset: 0;
+            z-index: 0;
+            pointer-events: none;
+        }
+        
+        .star {
+            position: absolute;
+            width: 2px;
+            height: 2px;
+            background: white;
+            border-radius: 50%;
+            animation: twinkle 3s infinite;
+        }
+        
+        @keyframes twinkle {
+            0%, 100% { opacity: 0.2; transform: scale(1); }
+            50% { opacity: 0.8; transform: scale(1.5); }
+        }
+
+        /* ═══ CONTAINER CENTRALIZADO ═══ */
+        .auth-wrapper {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            width: 100%;
+            padding: 1rem;
+            z-index: 1;
+        }
+
+        .auth-container {
+            background: var(--bg-card);
+            border: 1px solid var(--borda-suave);
+            border-radius: 24px;
+            width: 100%;
+            max-width: 450px;
+            padding: 2.5rem;
+            backdrop-filter: blur(20px);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5), 0 0 60px rgba(99, 102, 241, 0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .auth-container::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, var(--cor-primaria), var(--cor-gold), var(--cor-diamond), var(--cor-primaria));
+            background-size: 300% 100%;
+            animation: shimmer 3s linear infinite;
+        }
+        
+        @keyframes shimmer {
+            0% { background-position: 300% 0; }
+            100% { background-position: -300% 0; }
+        }
+
+        .auth-header {
+            text-align: center;
+            margin-bottom: 2rem;
+            margin-top: 0.5rem;
+        }
+
+        .auth-logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--cor-primaria);
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+        
+        .auth-logo svg {
+            width: 28px;
+            height: 28px;
+            stroke: var(--cor-primaria);
+            fill: none;
+            stroke-width: 2;
+        }
+
+        .auth-header h2 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .auth-header p {
+            color: var(--texto-secundario);
+            font-size: 0.9rem;
+        }
+
+        .auth-form {
+            display: flex;
+            flex-direction: column;
+            gap: 1.25rem;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .input-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            position: relative;
+        }
+
+        .input-group label {
+            font-size: 0.85rem;
+            color: var(--texto-secundario);
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        
+        .input-group label .input-icon {
+            width: 18px;
+            height: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        
+        .input-group label .input-icon svg {
+            width: 100%;
+            height: 100%;
+            stroke: currentColor;
+            fill: none;
+            stroke-width: 2;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .input-group input {
+            background: rgba(11, 14, 20, 0.6);
+            border: 1px solid var(--borda-suave);
+            padding: 0.85rem 1rem;
+            border-radius: 12px;
+            color: var(--texto-principal);
+            font-size: 0.95rem;
+            outline: none;
+            transition: var(--transicao);
+        }
+
+        .input-group input:focus {
+            border-color: var(--cor-primaria);
+            box-shadow: 0 0 15px rgba(99, 102, 241, 0.2);
+        }
+        
+        .input-group input::placeholder {
+            color: rgba(255, 255, 255, 0.2);
+        }
+
+        .forgot-link {
+            align-self: flex-end;
+            font-size: 0.8rem;
+            color: var(--texto-secundario);
+            text-decoration: none;
+            transition: var(--transicao);
+            cursor: pointer;
+        }
+
+        .forgot-link:hover {
+            color: var(--cor-primaria);
+        }
+
+        .btn-submit {
+            background: var(--cor-primaria);
+            color: white;
+            border: none;
+            padding: 1rem;
+            border-radius: 12px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            font-family: 'Space Grotesk', sans-serif;
+            transition: var(--transicao);
+            margin-top: 0.5rem;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 0;
+            height: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.2);
+            transform: translate(-50%, -50%);
+            transition: width 0.6s, height 0.6s;
+        }
+
+        .btn-submit:hover {
+            background: var(--cor-primaria-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(99, 102, 241, 0.4);
+        }
+        
+        .btn-submit:active::before {
+            width: 300px;
+            height: 300px;
+        }
+        
+        .btn-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .divider {
+            display: flex;
+            align-items: center;
+            text-align: center;
+            margin: 1.5rem 0;
+            color: var(--texto-secundario);
+            font-size: 0.8rem;
+        }
+
+        .divider::before, .divider::after {
+            content: '';
+            flex: 1;
+            border-bottom: 1px solid var(--borda-suave);
+        }
+
+        .divider:not(:empty)::before { margin-right: .5em; }
+        .divider:not(:empty)::after { margin-left: .5em; }
+
+        .btn-google {
+            background: #fff;
+            color: #111520;
+            border: none;
+            padding: 0.85rem;
+            border-radius: 12px;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.75rem;
+            transition: var(--transicao);
+        }
+
+        .btn-google:hover {
+            background: #e4e4e7;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-google svg {
+            width: 18px;
+            height: 18px;
+        }
+
+        .switch-text {
+            text-align: center;
+            font-size: 0.9rem;
+            color: var(--texto-secundario);
+            margin-top: 1.5rem;
+        }
+
+        .switch-text span {
+            color: var(--cor-primaria);
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transicao);
+        }
+        
+        .switch-text span:hover {
+            color: var(--cor-primaria-hover);
+            text-decoration: underline;
+        }
+
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--bg-card);
+            border: 1px solid var(--cor-erro);
+            padding: 1rem 1.5rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            z-index: 100;
+            transform: translateX(120%);
+            transition: var(--transicao);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            backdrop-filter: blur(10px);
+            max-width: 350px;
+        }
+
+        .toast.show { transform: translateX(0); }
+        .toast.success { border-color: var(--cor-sucesso); }
+        
+        .spinner {
+            display: inline-block;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(255,255,255,0.3);
+            border-top-color: #fff;
+            border-radius: 50%;
+            animation: spin 0.6s linear infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 500px) {
+            .auth-container {
+                padding: 1.5rem;
+                border-radius: 20px;
+            }
+            .auth-header h2 {
+                font-size: 1.5rem;
+            }
+            .toast {
+                top: 1rem;
+                right: 1rem;
+                left: 1rem;
+                max-width: none;
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animação de fundo -->
+    <div class="particles-container" id="particles"></div>
+    <div class="stars-container" id="stars"></div>
+    <div class="bg-glow g1"></div>
+    <div class="bg-glow g2"></div>
+    <div class="bg-glow g3"></div>
+
+    <div id="toast" class="toast">Mensagem de status</div>
+
+    <!-- WRAPPER CENTRALIZADO -->
+    <div class="auth-wrapper">
+        <div class="auth-container">
+            
+            <!-- TELA DE LOGIN -->
+            <div id="login-container" class="auth-block">
+                <div class="auth-header">
+                    <div class="auth-logo">
+                        <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        Looto
+                    </div>
+                    <h2>Bem-vindo de volta</h2>
+                    <p>Entre para continuar sua jornada</p>
+                </div>
+
+                <form id="login-form" class="auth-form">
+                    <div class="input-group">
+                        <label>
+                            <span class="input-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+                            E-mail
+                        </label>
+                        <input type="text" id="login-identity" required placeholder="seu@email.com">
+                    </div>
+                    <div class="input-group">
+                        <label>
+                            <span class="input-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                            Senha
+                        </label>
+                        <input type="password" id="login-password" required placeholder="••••••••">
+                    </div>
+                    <a id="btn-forgot" class="forgot-link">Esqueceu sua senha?</a>
+                    
+                    <button type="submit" class="btn-submit" id="btn-login-submit">Entrar na Conta</button>
+                    
+                    <div class="divider">ou entre com</div>
+                    
+                    <button type="button" id="btn-google" class="btn-google">
+                        <svg viewBox="0 0 24 24">
+                            <path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.866-3.577-7.866-8s3.536-8 7.866-8c2.46 0 4.105 1.025 5.047 1.926l3.227-3.227C18.216 1.414 15.48 0 12.24 0 5.513 0 0 5.513 0 12.24s5.513 12.24 12.24 12.24c7.018 0 11.683-4.898 11.683-11.892 0-.802-.083-1.414-.188-1.803H12.24z"/>
+                        </svg>
+                        Google
+                    </button>
+
+                    <p class="switch-text">Não tem uma conta? <span onclick="toggleAuth('register')">Cadastre-se</span></p>
+                </form>
+            </div>
+
+            <!-- TELA DE REGISTRO -->
+            <div id="register-container" class="auth-block" style="display: none;">
+                <div class="auth-header">
+                    <div class="auth-logo">
+                        <svg width="28" height="28" viewBox="0 0 24 24"><path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/></svg>
+                        Looto
+                    </div>
+                    <h2>Criar Conta</h2>
+                    <p>Junte-se à comunidade Looto</p>
+                </div>
+
+                <form id="register-form" class="auth-form">
+                    <div class="input-group">
+                        <label>
+                            <span class="input-icon"><svg viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg></span>
+                            Nome de Usuário
+                        </label>
+                        <input type="text" id="reg-username" required placeholder="ex: Player_One">
+                    </div>
+                    <div class="input-group">
+                        <label>
+                            <span class="input-icon"><svg viewBox="0 0 24 24"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg></span>
+                            E-mail
+                        </label>
+                        <input type="email" id="reg-email" required placeholder="seu@email.com">
+                    </div>
+                    <div class="input-group">
+                        <label>
+                            <span class="input-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                            Senha
+                        </label>
+                        <input type="password" id="reg-password" required placeholder="Mínimo 6 caracteres">
+                    </div>
+                    <div class="input-group">
+                        <label>
+                            <span class="input-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg></span>
+                            Confirmar Senha
+                        </label>
+                        <input type="password" id="reg-confirm-password" required placeholder="Confirme sua senha">
+                    </div>
+                    
+                    <button type="submit" class="btn-submit" id="btn-register-submit">Criar Conta</button>
+
+                    <p class="switch-text">Já possui conta? <span onclick="toggleAuth('login')">Fazer Login</span></p>
+                </form>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        function createParticles() {
+            const container = document.getElementById('particles');
+            const colors = ['#6366f1', '#a855f7', '#ec4899', '#fbbf24', '#10b981', '#38bdf8'];
+            for (let i = 0; i < 30; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = Math.random() * 100 + '%';
+                particle.style.top = Math.random() * 100 + '%';
+                particle.style.width = (2 + Math.random() * 4) + 'px';
+                particle.style.height = particle.style.width;
+                particle.style.background = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.animationDelay = Math.random() * 8 + 's';
+                particle.style.animationDuration = (6 + Math.random() * 10) + 's';
+                particle.style.boxShadow = '0 0 ' + (4 + Math.random() * 6) + 'px ' + particle.style.background;
+                container.appendChild(particle);
+            }
+        }
+        
+        function createStars() {
+            const container = document.getElementById('stars');
+            for (let i = 0; i < 60; i++) {
+                const star = document.createElement('div');
+                star.className = 'star';
+                star.style.left = Math.random() * 100 + '%';
+                star.style.top = Math.random() * 100 + '%';
+                star.style.animationDelay = Math.random() * 3 + 's';
+                star.style.animationDuration = (2 + Math.random() * 4) + 's';
+                container.appendChild(star);
+            }
+        }
+        
+        createParticles();
+        createStars();
+
+        function toggleAuth(mode) {
+            const loginBlock = document.getElementById('login-container');
+            const registerBlock = document.getElementById('register-container');
+            if (mode === 'register') {
+                loginBlock.style.display = 'none';
+                registerBlock.style.display = 'block';
+            } else {
+                registerBlock.style.display = 'none';
+                loginBlock.style.display = 'block';
+            }
+        }
+        
+        if (window.location.search.includes('tab=register')) {
+            toggleAuth('register');
+        }
+    </script>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAnalytics } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-analytics.js";
+        import { 
+            getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, 
+            updateProfile, sendPasswordResetEmail, GoogleAuthProvider, signInWithPopup
+        } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+            authDomain: "looto-f46e5.firebaseapp.com",
+            databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+            projectId: "looto-f46e5",
+            storageBucket: "looto-f46e5.firebasestorage.app",
+            messagingSenderId: "295066400995",
+            appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6",
+            measurementId: "G-KP9RDFZ41M"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        getAnalytics(app);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+        const googleProvider = new GoogleAuthProvider();
+
+        const toast = document.getElementById('toast');
+        function showMessage(text, isSuccess = false) {
+            toast.innerText = text;
+            toast.classList.toggle('success', isSuccess);
+            toast.classList.add('show');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        function parseAuthError(error) {
+            const map = {
+                'auth/invalid-email': 'Formato de e-mail inválido.',
+                'auth/user-not-found': 'E-mail não encontrado.',
+                'auth/wrong-password': 'Senha incorreta.',
+                'auth/invalid-credential': 'Credenciais inválidas.',
+                'auth/email-already-in-use': 'Este e-mail já está cadastrado.',
+                'auth/weak-password': 'Senha muito fraca (mínimo 6 caracteres).',
+                'auth/popup-closed-by-user': 'Login do Google cancelado.',
+                'auth/network-request-failed': 'Erro de conexão.'
+            };
+            return map[error.code] || error.message || 'Erro desconhecido.';
+        }
+        
+        async function criarPerfilNoDatabase(user, username) {
+            try {
+                const userRef = ref(db, 'usuarios/' + user.uid);
+                const snap = await get(userRef);
+                if (!snap.exists()) {
+                    await set(userRef, {
+                        username: username || user.displayName || 'Usuário',
+                        email: user.email || '',
+                        fotoUrl: user.photoURL || '',
+                        gifUrl: '', usandoGif: false,
+                        nivelConta: 0, pontos: 0, dinheiro: 0,
+                        sorteiosCriados: 0, sorteiosParticipados: 0,
+                        criadoEm: Date.now()
+                    });
+                }
+            } catch(e) { console.warn('Erro ao criar perfil:', e); }
+        }
+
+        document.getElementById('register-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const username = document.getElementById('reg-username').value.trim();
+            const email = document.getElementById('reg-email').value.trim();
+            const password = document.getElementById('reg-password').value;
+            const confirmPassword = document.getElementById('reg-confirm-password').value;
+            const btn = document.getElementById('btn-register-submit');
+            if (password !== confirmPassword) return showMessage("As senhas não coincidem!");
+            if (password.length < 6) return showMessage("A senha deve ter no mínimo 6 caracteres.");
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Criando conta...';
+            try {
+                const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+                await updateProfile(userCredential.user, { displayName: username });
+                await criarPerfilNoDatabase(userCredential.user, username);
+                showMessage("Conta criada! Bem-vindo ao Looto! 🎉", true);
+                setTimeout(() => window.location.href = 'looto.html', 1500);
+            } catch (error) {
+                showMessage(parseAuthError(error));
+                btn.disabled = false; btn.innerHTML = 'Criar Conta';
+            }
+        });
+
+        document.getElementById('login-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const identity = document.getElementById('login-identity').value.trim();
+            const password = document.getElementById('login-password').value;
+            const btn = document.getElementById('btn-login-submit');
+            if (!identity.includes('@')) return showMessage("Use seu e-mail completo para fazer login.");
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Entrando...';
+            try {
+                const userCredential = await signInWithEmailAndPassword(auth, identity, password);
+                await criarPerfilNoDatabase(userCredential.user, userCredential.user.displayName);
+                showMessage("Login efetuado! Redirecionando...", true);
+                setTimeout(() => window.location.href = 'looto.html', 1200);
+            } catch (error) {
+                showMessage(parseAuthError(error));
+                btn.disabled = false; btn.innerHTML = 'Entrar na Conta';
+            }
+        });
+
+        document.getElementById('btn-google').addEventListener('click', async () => {
+            const btn = document.getElementById('btn-google');
+            btn.disabled = true; btn.innerHTML = '<span class="spinner"></span> Conectando...';
+            try {
+                const result = await signInWithPopup(auth, googleProvider);
+                await criarPerfilNoDatabase(result.user, result.user.displayName);
+                showMessage("Conectado via Google!", true);
+                setTimeout(() => window.location.href = 'looto.html', 1200);
+            } catch (error) {
+                showMessage(parseAuthError(error));
+                btn.disabled = false;
+                btn.innerHTML = `<svg viewBox="0 0 24 24"><path fill="#EA4335" d="M12.24 10.285V14.4h6.887c-.275 1.565-1.88 4.604-6.887 4.604-4.33 0-7.866-3.577-7.866-8s3.536-8 7.866-8c2.46 0 4.105 1.025 5.047 1.926l3.227-3.227C18.216 1.414 15.48 0 12.24 0 5.513 0 0 5.513 0 12.24s5.513 12.24 12.24 12.24c7.018 0 11.683-4.898 11.683-11.892 0-.802-.083-1.414-.188-1.803H12.24z"/></svg> Google`;
+            }
+        });
+
+        document.getElementById('btn-forgot').addEventListener('click', async (e) => {
+            e.preventDefault();
+            const identity = document.getElementById('login-identity').value.trim();
+            if (!identity || !identity.includes('@')) return showMessage("Digite seu e-mail no campo acima.");
+            try {
+                await sendPasswordResetEmail(auth, identity);
+                showMessage("Link enviado para seu e-mail! 📧", true);
+            } catch (error) { showMessage(parseAuthError(error)); }
+        });
+    </script>
+    <script type="module" src="presence.js"></script>
+</body>
+</html>

@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Chat</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14; --bg-sidebar: #0f131c; --bg-chat: #0b0e14;
+            --bg-header: #111720; --bg-input: #111720; --text: #f3f4f6; --text-2: #9ca3af;
+            --primary: #6366f1; --primary-h: #4f46e5; --green: #10b981; --gold: #fbbf24;
+            --border: rgba(255,255,255,0.06); --border-light: rgba(255,255,255,0.04);
+            --msg-mine: #6366f1; --msg-other: #1a1f2e; --hover: rgba(255,255,255,0.03);
+            --transition: all 0.2s cubic-bezier(0.4,0,0.2,1);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+        body { background:var(--bg); color:var(--text); height:100vh; overflow:hidden; display:flex; }
+
+        .sidebar { width:320px; background:var(--bg-sidebar); border-right:1px solid var(--border); display:flex; flex-direction:column; flex-shrink:0; z-index:50; }
+        .sidebar-header { padding:1rem 1.1rem; background:var(--bg-header); display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); }
+        .sidebar-logo { font-family:'Space Grotesk',sans-serif; font-size:1.1rem; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:0.5rem; }
+        .sidebar-logo .logo-icon { color:var(--primary); }
+        .sidebar-actions { display:flex; gap:0.35rem; }
+        .icon-btn { width:34px; height:34px; border-radius:8px; background:rgba(255,255,255,0.03); border:1px solid var(--border-light); color:var(--text-2); cursor:pointer; transition:var(--transition); display:flex; align-items:center; justify-content:center; text-decoration:none; }
+        .icon-btn:hover { background:rgba(255,255,255,0.06); color:var(--text); }
+        .icon-btn svg { width:16px; height:16px; stroke:currentColor; fill:none; stroke-width:2; stroke-linecap:round; stroke-linejoin:round; }
+
+        .contacts-list { flex:1; overflow-y:auto; }
+        .contacts-list::-webkit-scrollbar { width:3px; }
+        .contacts-list::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.05); border-radius:99px; }
+        .contacts-section-title { font-size:0.65rem; color:var(--text-2); text-transform:uppercase; letter-spacing:0.08em; padding:0.7rem 1rem 0.3rem; font-weight:600; }
+        .contact-item { display:flex; align-items:center; gap:0.6rem; padding:0.6rem 1rem; cursor:pointer; transition:var(--transition); border-left:2px solid transparent; }
+        .contact-item:hover { background:var(--hover); }
+        .contact-item.active { background:rgba(99,102,241,0.08); border-left-color:var(--primary); }
+        .contact-avatar { width:40px; height:40px; border-radius:12px; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.9rem; font-weight:700; position:relative; overflow:hidden; }
+        .contact-avatar img { width:100%; height:100%; object-fit:cover; border-radius:12px; position:absolute; inset:0; }
+        .contact-status { width:8px; height:8px; border-radius:50%; position:absolute; bottom:-1px; right:-1px; border:2px solid var(--bg-sidebar); }
+        .contact-status.online { background:var(--green); }
+        .contact-info { flex:1; min-width:0; }
+        .contact-name { font-size:0.82rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .contact-lastmsg { font-size:0.7rem; color:var(--text-2); margin-top:0.1rem; }
+
+        .chat-main { flex:1; display:flex; flex-direction:column; background:var(--bg-chat); min-width:0; }
+        .chat-header { padding:0.7rem 1.5rem; background:var(--bg-header); border-bottom:1px solid var(--border); display:flex; align-items:center; gap:0.7rem; flex-shrink:0; }
+        .chat-header-avatar { width:40px; height:40px; border-radius:12px; background:#6366f1; display:flex; align-items:center; justify-content:center; font-size:0.9rem; }
+        .chat-header-name { font-size:0.9rem; font-weight:600; }
+        .chat-header-status { font-size:0.7rem; color:var(--text-2); }
+
+        .messages-container { flex:1; overflow-y:auto; padding:1rem 1.5rem; display:flex; flex-direction:column; gap:0.15rem; }
+        .messages-container::-webkit-scrollbar { width:3px; }
+        .messages-container::-webkit-scrollbar-thumb { background:rgba(255,255,255,0.04); border-radius:99px; }
+
+        .msg { display:flex; gap:0.5rem; max-width:72%; animation:msgIn 0.25s ease; }
+        @keyframes msgIn { from{opacity:0;transform:translateY(8px)} to{opacity:1;transform:translateY(0)} }
+        .msg.in { align-self:flex-start; }
+        .msg.out { align-self:flex-end; flex-direction:row-reverse; }
+
+        .msg-avatar { width:36px; height:36px; border-radius:50%; flex-shrink:0; display:flex; align-items:center; justify-content:center; font-size:0.8rem; font-weight:700; position:relative; cursor:pointer; transition:var(--transition); overflow:hidden; text-decoration:none; color:#fff; background-size:cover; background-position:center; }
+        .msg-avatar:hover { transform:scale(1.1); border:2px solid var(--primary); }
+        .msg-avatar img { width:100%; height:100%; object-fit:cover; border-radius:50%; position:absolute; inset:0; z-index:1; }
+        .msg-avatar .level-badge { position:absolute; bottom:-3px; right:-3px; width:16px; height:16px; border-radius:50%; font-size:0.5rem; font-weight:700; display:flex; align-items:center; justify-content:center; border:2px solid var(--bg); color:#fff; z-index:2; }
+        .msg-content { display:flex; flex-direction:column; gap:0.1rem; min-width:0; }
+        .msg-header { display:flex; flex-direction:column; gap:0.15rem; }
+        .msg-name-row { display:flex; align-items:center; gap:0.4rem; flex-wrap:wrap; }
+        .msg-name { font-size:0.75rem; font-weight:600; cursor:pointer; }
+        .msg-name:hover { color:var(--primary); text-decoration:underline; }
+        .msg-nivel { font-size:0.6rem; padding:0.05rem 0.35rem; border-radius:99px; font-weight:600; }
+        .premium-star { color:var(--gold); font-size:0.7rem; margin-left:0.1rem; }
+        .msg-lvl-bar { height:3px; border-radius:99px; background:rgba(255,255,255,0.08); overflow:hidden; width:100%; max-width:120px; }
+        .msg-lvl-fill { height:100%; border-radius:99px; transition:width 0.4s ease; }
+        .msg-bubble { padding:0.55rem 0.8rem; border-radius:16px; font-size:0.82rem; line-height:1.45; word-break:break-word; margin-top:0.2rem; }
+        .msg.out .msg-bubble { background:var(--msg-mine); color:#fff; border-bottom-right-radius:4px; }
+        .msg.in .msg-bubble { background:var(--msg-other); border-bottom-left-radius:4px; }
+        .msg-time { font-size:0.6rem; color:var(--text-2); margin-top:0.1rem; }
+        .msg.out .msg-time { color:rgba(255,255,255,0.5); text-align:right; }
+
+        .system-msg { text-align:center; font-size:0.7rem; color:var(--text-2); padding:0.3rem; opacity:0.8; }
+
+        .input-area { padding:0.7rem 1.5rem; background:var(--bg-input); border-top:1px solid var(--border); display:flex; gap:0.5rem; align-items:center; flex-shrink:0; }
+        .input-area input { flex:1; background:rgba(255,255,255,0.03); border:1px solid var(--border-light); padding:0.65rem 1rem; border-radius:24px; color:var(--text); font-size:0.84rem; outline:none; transition:var(--transition); }
+        .input-area input:focus { border-color:var(--primary); background:rgba(255,255,255,0.04); }
+        .send-btn { width:42px; height:42px; border-radius:50%; background:var(--primary); border:none; color:#fff; cursor:pointer; transition:var(--transition); flex-shrink:0; display:flex; align-items:center; justify-content:center; }
+        .send-btn:hover { background:var(--primary-h); transform:scale(1.05); }
+        .send-btn svg { width:18px; height:18px; stroke:currentColor; fill:none; stroke-width:2.5; stroke-linecap:round; stroke-linejoin:round; }
+
+        .commands-help { padding:0.4rem 1rem; background:rgba(255,255,255,0.02); border-bottom:1px solid var(--border); font-size:0.65rem; color:var(--text-2); display:flex; gap:1rem; flex-wrap:wrap; }
+        .commands-help span { cursor:pointer; }
+        .commands-help span:hover { color:var(--primary); }
+
+        @media (max-width:768px) {
+            .sidebar { position:absolute; inset:0; width:100%; display:none; }
+            .sidebar.visible { display:flex; }
+            .messages-container { padding:0.8rem 0.8rem; }
+            .msg { max-width:85%; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="sidebar" id="sidebar">
+    <div class="sidebar-header">
+        <a href="looto.html" class="sidebar-logo">
+            <span class="logo-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg></span>
+            Chat Looto
+        </a>
+        <div class="sidebar-actions">
+            <a href="looto.html" class="icon-btn" title="Voltar"><svg viewBox="0 0 24 24"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg></a>
+            <button class="icon-btn" onclick="document.getElementById('sidebar').classList.toggle('visible')" title="Contatos"><svg viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg></button>
+        </div>
+    </div>
+    <div class="contacts-list" id="contacts-list"></div>
+</div>
+
+<div class="chat-main" id="chat-main">
+    <div class="chat-header">
+        <div class="chat-header-avatar">🌍</div>
+        <div class="chat-header-info">
+            <div class="chat-header-name">Chat Global</div>
+            <div class="chat-header-status">conversa pública</div>
+        </div>
+    </div>
+    <div class="commands-help" id="commands-help">
+        <span onclick="document.getElementById('msg-input').value='/nivel'">⭐ /nivel</span>
+        <span onclick="document.getElementById('msg-input').value='/rank'">🏆 /rank</span>
+        <span onclick="document.getElementById('msg-input').value='/premium'">💎 /premium</span>
+        <span onclick="document.getElementById('msg-input').value='/xp'">✨ /xp</span>
+        <span onclick="document.getElementById('msg-input').value='/money'">💰 /money</span>
+        <span onclick="document.getElementById('msg-input').value='/perfil'">👤 /perfil</span>
+    </div>
+    <div class="messages-container" id="messages-container"></div>
+    <div class="input-area">
+        <input type="text" id="msg-input" placeholder="Digite sua mensagem ou comando (/nivel, /rank...)" maxlength="500" onkeydown="if(event.key==='Enter')sendMsg()">
+        <button class="send-btn" id="send-btn" onclick="sendMsg()" title="Enviar"><svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22,2 15,22 11,13 2,9"/></svg></button>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { getDatabase, ref, push, set, get, update, remove, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+    authDomain: "looto-f46e5.firebaseapp.com",
+    databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+    projectId: "looto-f46e5",
+    storageBucket: "looto-f46e5.firebasestorage.app",
+    messagingSenderId: "295066400995",
+    appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6",
+    measurementId: "G-KP9RDFZ41M"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+// ════════════════ 100 NÍVEIS ════════════════
+function getNivelByXP(xp) {
+    const ranks = [
+        { min:0, max:4, nome:'Bronze', icon:'🥉', cor:'#cd7f32' },
+        { min:5, max:9, nome:'Ferro', icon:'⚙️', cor:'#8b8b8b' },
+        { min:10, max:14, nome:'Prata', icon:'🪙', cor:'#9ca3af' },
+        { min:15, max:19, nome:'Ouro', icon:'🥇', cor:'#f59e0b' },
+        { min:20, max:24, nome:'Platina', icon:'🪨', cor:'#a855f7' },
+        { min:25, max:29, nome:'Esmeralda', icon:'💚', cor:'#10b981' },
+        { min:30, max:34, nome:'Rubi', icon:'❤️', cor:'#ef4444' },
+        { min:35, max:39, nome:'Safira', icon:'💙', cor:'#3b82f6' },
+        { min:40, max:44, nome:'Épico', icon:'👑', cor:'#fbbf24' },
+        { min:45, max:49, nome:'Lendário', icon:'🌟', cor:'#ff8c00' },
+        { min:50, max:54, nome:'Mítico', icon:'🔮', cor:'#ec4899' },
+        { min:55, max:59, nome:'Celestial', icon:'🌌', cor:'#6366f1' },
+        { min:60, max:64, nome:'Transcendente', icon:'⚡', cor:'#d946ef' },
+        { min:65, max:69, nome:'Divino', icon:'🕊️', cor:'#ffffff' },
+        { min:70, max:74, nome:'Supremo', icon:'💎', cor:'#38bdf8' },
+        { min:75, max:79, nome:'Imortal', icon:'🔥', cor:'#f97316' },
+        { min:80, max:84, nome:'Cósmico', icon:'🌠', cor:'#14b8a6' },
+        { min:85, max:89, nome:'Abissal', icon:'🌊', cor:'#0ea5e9' },
+        { min:90, max:94, nome:'Eterno', icon:'⏳', cor:'#eab308' },
+        { min:95, max:99, nome:'Looto Master', icon:'🏆', cor:'#22c55e' }
+    ];
+    for(let i = ranks.length - 1; i >= 0; i--) {
+        const r = ranks[i];
+        for(let j = r.max; j >= r.min; j--) {
+            if(xp >= Math.floor(100 * Math.pow(1.15, j))) return { nivel: j, ...r };
+        }
+    }
+    return { nivel:0, nome:'Bronze', icon:'🥉', cor:'#cd7f32' };
+}
+
+function getNivelProgresso(xp) {
+    for(let i = 0; i < 100; i++) {
+        const atual = Math.floor(100 * Math.pow(1.15, i));
+        const proximo = Math.floor(100 * Math.pow(1.15, i+1));
+        if(xp >= atual && xp < proximo) {
+            return { nivel: i, xpAtual: xp - atual, xpProximo: proximo - atual };
+        }
+    }
+    return { nivel: 99, xpAtual: 0, xpProximo: 1 };
+}
+
+let currentUser = null;
+let userData = {};
+const userCache = {};
+
+function timeFmt(ts) {
+    const d = new Date(ts);
+    return d.getHours().toString().padStart(2,'0')+':'+d.getMinutes().toString().padStart(2,'0');
+}
+
+function scrollDown() {
+    const c = document.getElementById('messages-container');
+    setTimeout(() => c.scrollTop = c.scrollHeight, 80);
+}
+
+function filtrarTexto(txt) {
+    return txt.replace(/https?:\/\/[^\s]+/g, '[🔗 link]').replace(/<\/?[^>]+(>|$)/g, '');
+}
+
+async function getUserData(uid) {
+    if (userCache[uid]) return userCache[uid];
+    try { const snap = await get(ref(db, 'usuarios/' + uid)); const d = snap.val() || {}; userCache[uid] = d; return d; }
+    catch(e) { return {}; }
+}
+
+// ════════════════ FUNÇÃO PARA OBTER FOTO/GIF CORRETA ════════════════
+function getFotoUrl(data) {
+    const usandoGif = data.usandoGif || data.usandoGifAvatar || false;
+    const gifUrl = data.gifUrl || data.gifAvatarUrl || '';
+    const fotoUrl = data.fotoUrl || '';
+    return usandoGif && gifUrl ? gifUrl : (fotoUrl || '');
+}
+
+// ════════════════ ENVIAR MENSAGEM (COM COMANDOS) ════════════════
+window.sendMsg = async function() {
+    const input = document.getElementById('msg-input');
+    let txt = filtrarTexto(input.value.trim());
+    if (!txt || !currentUser) return;
+    input.value = '';
+    
+    const pontos = userData.pontos || 0;
+    const money = userData.dinheiro || 0;
+    const premium = userData.premium || false;
+    const nd = getNivelByXP(pontos);
+    const prog = getNivelProgresso(pontos);
+    const pct = Math.min(100, Math.round((prog.xpAtual / (prog.xpProximo || 1)) * 100));
+
+    // ═══ COMANDOS LEVES (não gravam no chat, apenas mostram uma mensagem especial) ═══
+    let comandoEspecial = '';
+    const lower = txt.toLowerCase().trim();
+    if (lower.startsWith('/nivel') || lower.startsWith('/level')) {
+        comandoEspecial = `📊 Meu nível: <strong>${nd.nome}</strong> (Nv. ${nd.nivel+1}) — ${prog.xpAtual}/${prog.xpProximo} XP (${pct}%)`;
+        txt = comandoEspecial; // envia como mensagem normal
+    } else if (lower.startsWith('/rank')) {
+        const frases = {
+            'Bronze': '🥉 Começando a jornada!',
+            'Ferro': '⚙️ Forjando meu caminho!',
+            'Prata': '🪙 Brilhando na multidão!',
+            'Ouro': '🥇 Quase um vencedor!',
+            'Platina': '🪨 Sólido como rocha!',
+            'Esmeralda': '💚 Raro e valioso!',
+            'Rubi': '❤️ Ardente de paixão!',
+            'Safira': '💙 Profundo como o mar!',
+            'Épico': '👑 A realeza chegou!',
+            'Lendário': '🌟 Lendas nunca morrem!',
+            'Mítico': '🔮 Além da compreensão!',
+            'Celestial': '🌌 Vindo das estrelas!',
+            'Transcendente': '⚡ Poder incomparável!',
+            'Divino': '🕊️ Abençoado pelos deuses!',
+            'Supremo': '💎 A joia mais rara!',
+            'Imortal': '🔥 Inabalável e eterno!',
+            'Cósmico': '🌠 Galáxias me reverenciam!',
+            'Abissal': '🌊 Das profundezas eu ascendo!',
+            'Eterno': '⏳ O tempo me pertence!',
+            'Looto Master': '🏆 A LENDA SUPREMA!'
+        };
+        const frase = frases[nd.nome] || '🎮 Jogador dedicado!';
+        comandoEspecial = `🏆 <strong>${nd.nome}</strong> (Nv. ${nd.nivel+1}): <em>"${frase}"</em>`;
+        txt = comandoEspecial;
+    } else if (lower.startsWith('/premium')) {
+        if (premium) {
+            comandoEspecial = `💎 <strong>SIM!</strong> Sou assinante <strong>Premium</strong> da Looto! ⭐ Benefícios exclusivos ativos!`;
+        } else {
+            comandoEspecial = `❌ Ainda não sou assinante. Quer virar Premium? Confira na <a href="loja.html">Loja</a>!`;
+        }
+        txt = comandoEspecial;
+    } else if (lower.startsWith('/xp')) {
+        comandoEspecial = `✨ Tenho <strong>${pontos.toLocaleString()}</strong> XP acumulados!`;
+        txt = comandoEspecial;
+    } else if (lower.startsWith('/money') || lower.startsWith('/moedas')) {
+        comandoEspecial = `💰 Tenho <strong>${money.toLocaleString()}</strong> LootoCoins!`;
+        txt = comandoEspecial;
+    } else if (lower.startsWith('/perfil')) {
+        comandoEspecial = `👤 Meu perfil: <a href="conta.html" target="_blank">clique aqui</a>`;
+        txt = comandoEspecial;
+    }
+
+    // Enviar a mensagem (comando ou texto normal)
+    await push(ref(db, 'chat'), {
+        uid: currentUser.uid,
+        nome: userData.username || currentUser.displayName || 'Usuário',
+        texto: txt,
+        ts: Date.now(),
+        type: 'user',
+        pontos: pontos,
+        dinheiro: money,
+        premium: premium,
+        nivelConta: nd.nivel,
+        nivelNome: nd.nome,
+        nivelCor: nd.cor,
+        nivelIcon: nd.icon,
+        fotoUrl: getFotoUrl(userData),
+        molduraUrl: userData.molduraEquipada || ''
+    });
+
+    // Atualizar presença
+    await set(ref(db, 'presenca/' + currentUser.uid), {
+        nome: userData.username || currentUser.displayName || 'Usuário',
+        ts: Date.now(),
+        pontos: pontos,
+        nivelConta: nd.nivel,
+        nivelNome: nd.nome,
+        nivelCor: nd.cor,
+        fotoUrl: getFotoUrl(userData),
+        molduraUrl: userData.molduraEquipada || ''
+    });
+};
+
+// ════════════════ RENDER MENSAGENS ════════════════
+async function renderMessages() {
+    const container = document.getElementById('messages-container');
+    container.innerHTML = '<div style="text-align:center;color:var(--text-2);padding:2rem;">Carregando...</div>';
+
+    const snap = await get(query(ref(db, 'chat'), orderByChild('ts'), limitToLast(100)));
+    const msgs = [];
+    if (snap.exists()) {
+        snap.forEach(c => {
+            const m = c.val();
+            if (m.type === 'user') msgs.push({ id: c.key, ...m });
+        });
+    }
+    msgs.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+
+    if (msgs.length === 0) {
+        container.innerHTML = '<div style="text-align:center;color:var(--text-2);padding:3rem;">✨ Nenhuma mensagem. Seja o primeiro!</div>';
+        return;
+    }
+
+    const htmlParts = [];
+    for (const m of msgs) {
+        const isMine = m.uid === currentUser?.uid;
+        let nivelNome, nivelCor, nivelNum, foto, molduraUrl, pontos, premium;
+
+        if(isMine) {
+            const nd = getNivelByXP(userData.pontos || 0);
+            nivelNome = nd.nome; nivelCor = nd.cor; nivelNum = nd.nivel;
+            foto = getFotoUrl(userData);
+            molduraUrl = userData.molduraEquipada || '';
+            pontos = userData.pontos || 0;
+            premium = userData.premium || false;
+        } else {
+            pontos = m.pontos || 0;
+            premium = m.premium || false;
+            if(m.nivelNome && m.nivelCor) {
+                nivelNome = m.nivelNome; nivelCor = m.nivelCor; nivelNum = m.nivelConta || 0;
+            } else {
+                const nd = getNivelByXP(pontos);
+                nivelNome = nd.nome; nivelCor = nd.cor; nivelNum = nd.nivel;
+            }
+            foto = m.fotoUrl || '';
+            molduraUrl = m.molduraUrl || '';
+            if(!foto || !molduraUrl) {
+                const senderData = await getUserData(m.uid);
+                if(!foto) foto = getFotoUrl(senderData);
+                if(!molduraUrl) molduraUrl = senderData.molduraEquipada || '';
+            }
+        }
+
+        const nome = m.nome || 'Usuário';
+        const prog = getNivelProgresso(pontos);
+        const pct = Math.min(100, Math.round((prog.xpAtual / (prog.xpProximo || 1)) * 100));
+        const premiumBadge = premium ? '<span class="premium-star" title="Assinante Premium">⭐</span>' : '';
+
+        htmlParts.push(`
+        <div class="msg ${isMine?'out':'in'}">
+            <a href="conta.html?uid=${m.uid}" class="msg-avatar" style="background:${nivelCor};${molduraUrl?`background-image:url('${molduraUrl}');background-size:cover;`:''}" title="Ver perfil de ${nome}">
+                ${foto?`<img src="${foto}" alt="av" style="z-index:1;">`:nome[0].toUpperCase()}
+                <span class="level-badge" style="background:${nivelCor};">${nivelNum+1}</span>
+            </a>
+            <div class="msg-content">
+                <div class="msg-header">
+                    <div class="msg-name-row">
+                        <a href="conta.html?uid=${m.uid}" class="msg-name" style="color:${nivelCor};">${nome}${premiumBadge}</a>
+                        <span class="msg-nivel" style="background:${nivelCor}20;color:${nivelCor};">${nivelNome}</span>
+                    </div>
+                    <div class="msg-lvl-bar">
+                        <div class="msg-lvl-fill" style="width:${pct}%;background:${nivelCor};"></div>
+                    </div>
+                </div>
+                <div class="msg-bubble">${m.texto||''}</div>
+                <div class="msg-time">${timeFmt(m.ts)}</div>
+            </div>
+        </div>`);
+    }
+    container.innerHTML = htmlParts.join('');
+    scrollDown();
+}
+
+// ════════════════ CONTATOS ONLINE ════════════════
+async function loadContacts() {
+    const list = document.getElementById('contacts-list');
+    let html = '<div class="contacts-section-title">Online</div>';
+    const snap = await get(ref(db, 'presenca'));
+    let temOnline = false;
+    if (snap.exists()) {
+        const now = Date.now();
+        snap.forEach(c => {
+            const u = c.val();
+            if (now - u.ts < 120000 && c.key !== currentUser?.uid) {
+                temOnline = true;
+                let nivelNome, nivelCor;
+                if(u.nivelNome && u.nivelCor) {
+                    nivelNome = u.nivelNome; nivelCor = u.nivelCor;
+                } else {
+                    const nd = getNivelByXP(u.pontos || 0);
+                    nivelNome = nd.nome; nivelCor = nd.cor;
+                }
+                const prog = getNivelProgresso(u.pontos || 0);
+                const pct = Math.min(100, Math.round((prog.xpAtual / (prog.xpProximo || 1)) * 100));
+                html += `
+                <div class="contact-item">
+                    <div class="contact-avatar" style="background:${nivelCor};${u.molduraUrl?`background-image:url('${u.molduraUrl}');background-size:cover;`:''}">
+                        <div class="contact-status online"></div>
+                        ${u.fotoUrl ? `<img src="${u.fotoUrl}" alt="av">` : (u.nome||'?')[0].toUpperCase()}
+                    </div>
+                    <div class="contact-info">
+                        <div class="contact-name">${u.nome||'Usuário'}</div>
+                        <div style="height:3px;border-radius:99px;background:rgba(255,255,255,0.08);overflow:hidden;margin-top:0.2rem;max-width:80px;">
+                            <div style="height:100%;width:${pct}%;background:${nivelCor};border-radius:99px;"></div>
+                        </div>
+                    </div>
+                </div>`;
+            }
+        });
+    }
+    if (!temOnline) html += '<div style="padding:1rem;text-align:center;color:var(--text-2);font-size:0.75rem;">Ninguém online no momento</div>';
+    list.innerHTML = html;
+}
+
+// ════════════════ LIMPEZA AUTOMÁTICA ════════════════
+async function limpezaAutomatica() {
+    try {
+        const now = Date.now();
+        const snap = await get(query(ref(db, 'chat'), orderByChild('ts'), limitToLast(200)));
+        if (!snap.exists()) return;
+        const ps = [];
+        snap.forEach(child => {
+            const m = child.val();
+            if (m.type === 'user' && now - (m.ts || 0) > 600000) {
+                ps.push(remove(ref(db, 'chat/' + child.key)));
+            }
+        });
+        if (ps.length > 0) await Promise.all(ps);
+    } catch(e) {}
+}
+
+// ════════════════ LISTENERS ════════════════
+onValue(query(ref(db, 'chat'), orderByChild('ts'), limitToLast(100)), () => {
+    renderMessages();
+    loadContacts();
+});
+
+setInterval(async () => {
+    const snap = await get(ref(db, 'presenca'));
+    const now = Date.now();
+    if (snap.exists()) snap.forEach(async c => { if (now - c.val().ts > 120000) await remove(ref(db, 'presenca/' + c.key)); });
+    loadContacts();
+}, 5000);
+
+// ════════════════ AUTH ════════════════
+onAuthStateChanged(auth, async (user) => {
+    if (!user) { window.location.href = 'login.html'; return; }
+    currentUser = user;
+    const snap = await get(ref(db, 'usuarios/' + user.uid));
+    userData = snap.val() || {};
+    if(!userData.pontos) userData.pontos = 0;
+    if(!userData.dinheiro) userData.dinheiro = 0;
+    
+    const pontos = userData.pontos || 0;
+    const nd = getNivelByXP(pontos);
+    if(userData.nivelConta !== nd.nivel) {
+        userData.nivelConta = nd.nivel;
+        await update(ref(db, 'usuarios/' + user.uid), { nivelConta: nd.nivel }).catch(()=>{});
+    }
+    
+    await set(ref(db, 'presenca/' + user.uid), {
+        nome: userData.username || user.displayName || 'Usuário',
+        ts: Date.now(),
+        pontos: pontos,
+        nivelConta: nd.nivel,
+        nivelNome: nd.nome,
+        nivelCor: nd.cor,
+        fotoUrl: getFotoUrl(userData),
+        molduraUrl: userData.molduraEquipada || ''
+    });
+    loadContacts();
+    renderMessages();
+});
+
+setInterval(limpezaAutomatica, 15000);
+limpezaAutomatica();
+</script>
+<script type="module" src="presence.js"></script>
+</body>
+</html>

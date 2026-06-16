@@ -1,0 +1,749 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Bots Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        /* ═══════════════ ESTILOS COMPLETOS (mantidos) ═══════════════ */
+        :root { --bg: #0b0e14; --bg-card: #151a26; --text: #f3f4f6; --text-2: #9ca3af; --primary: #6366f1; --green: #10b981; --red: #ef4444; --gold: #fbbf24; --orange: #f59e0b; --pink: #ec4899; --border: rgba(255, 255, 255, 0.06); }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter', sans-serif; }
+        body { background:var(--bg); color:var(--text); min-height:100vh; }
+        header { background:rgba(11,14,20,0.95); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; backdrop-filter:blur(16px); padding:.9rem 2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; }
+        .logo { font-family:'Space Grotesk', sans-serif; font-size:1.3rem; font-weight:700; color:var(--text); text-decoration:none; }
+        .logo em { color:var(--red); font-style:normal; }
+        .btn-header { background:transparent; border:1px solid var(--border); color:var(--text-2); padding:.4rem .8rem; border-radius:6px; font-size:.8rem; cursor:pointer; transition:.3s; text-decoration:none; }
+        .btn-header:hover { border-color:var(--red); color:var(--red); }
+        .main-layout { max-width:1600px; margin:0 auto; padding:1.5rem 2rem; display:grid; grid-template-columns:220px 1fr; gap:1.5rem; }
+        .sidebar { background:var(--bg-card); border-radius:14px; border:1px solid var(--border); padding:1rem; position:sticky; top:80px; height:fit-content; }
+        .sidebar-btn { background:transparent; border:none; color:var(--text-2); padding:.7rem 1rem; border-radius:8px; font-size:.85rem; cursor:pointer; transition:.3s; text-align:left; display:flex; align-items:center; gap:.5rem; width:100%; text-decoration:none; }
+        .sidebar-btn:hover { background:rgba(255,255,255,.03); color:var(--text); }
+        .sidebar-btn.active { background:rgba(99,102,241,.12); color:var(--primary); font-weight:600; }
+        .panel { background:var(--bg-card); border-radius:14px; border:1px solid var(--border); padding:1.5rem; margin-bottom:1.5rem; }
+        .panel-title { font-family:'Space Grotesk', sans-serif; font-size:1.2rem; font-weight:700; margin-bottom:1rem; display:flex; align-items:center; gap:.5rem; }
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+        .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1.5rem; margin-bottom:1.5rem; }
+        .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1.5rem; }
+        .stat-mini { background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:12px; padding:1rem; text-align:center; }
+        .stat-mini .val { font-family:'Space Grotesk', sans-serif; font-size:2rem; font-weight:700; }
+        .stat-mini .lbl { font-size:.75rem; color:var(--text-2); margin-top:.2rem; }
+        .scroll-table { max-height:500px; overflow-y:auto; border:1px solid var(--border); border-radius:8px; }
+        .scroll-table::-webkit-scrollbar { width:4px; } .scroll-table::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:99px; }
+        .scroll-bank { max-height:250px; overflow-y:auto; } .scroll-bank::-webkit-scrollbar { width:3px; } .scroll-bank::-webkit-scrollbar-thumb { background:rgba(255,255,255,.08); border-radius:99px; }
+        table { width:100%; border-collapse:collapse; font-size:.8rem; }
+        th { text-align:left; padding:.6rem; color:var(--text-2); font-size:.7rem; text-transform:uppercase; border-bottom:1px solid var(--border); position:sticky; top:0; background:var(--bg-card); z-index:1; }
+        td { padding:.55rem .6rem; border-bottom:1px solid rgba(255,255,255,.04); }
+        input, select, textarea { background:rgba(11,14,20,.6); border:1px solid var(--border); padding:.5rem .7rem; border-radius:6px; color:var(--text); font-size:.82rem; outline:none; width:100%; }
+        input:focus, select:focus, textarea:focus { border-color:var(--primary); }
+        .btn { padding:.5rem 1rem; border-radius:6px; font-size:.8rem; font-weight:600; cursor:pointer; border:none; transition:.3s; margin:.15rem; }
+        .btn:disabled { opacity:0.5; cursor:not-allowed; }
+        .btn.primary { background:var(--primary); color:#fff; } .btn.red { background:var(--red); color:#fff; } .btn.green { background:var(--green); color:#fff; } .btn.gold { background:var(--gold); color:#000; } .btn.orange { background:var(--orange); color:#000; } .btn.pink { background:var(--pink); color:#fff; }
+        .btn-sm { padding:.3rem .6rem; border-radius:4px; font-size:.7rem; font-weight:600; cursor:pointer; border:none; transition:.3s; margin:.1rem; }
+        .btn-sm:disabled { opacity:0.5; cursor:not-allowed; }
+        .btn-sm.primary { background:var(--primary); color:#fff; } .btn-sm.red { background:var(--red); color:#fff; } .btn-sm.green { background:var(--green); color:#fff; } .btn-sm.gold { background:var(--gold); color:#000; } .btn-sm.orange { background:var(--orange); color:#000; } .btn-sm.pink { background:var(--pink); color:#fff; }
+        .badge { padding:.15rem .5rem; border-radius:99px; font-size:.7rem; font-weight:600; display:inline-block; }
+        .badge-green { background:rgba(16,185,129,.15); color:var(--green); } .badge-gold { background:rgba(251,191,36,.15); color:var(--gold); } .badge-blue { background:rgba(99,102,241,.15); color:var(--primary); } .badge-red { background:rgba(239,68,68,.15); color:var(--red); } .badge-pink { background:rgba(236,72,153,.15); color:var(--pink); } .badge-orange { background:rgba(245,158,11,.15); color:var(--orange); }
+        .field { margin-bottom:.8rem; } .field label { font-size:.75rem; color:var(--text-2); display:block; margin-bottom:.2rem; }
+        .field-row { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; } .field-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.75rem; }
+        .bank-key-item { background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:8px; padding:.6rem; margin-bottom:.4rem; display:flex; gap:.5rem; align-items:center; font-size:.78rem; flex-wrap:wrap; }
+        .bank-key-item .game { flex:2; min-width:100px; } .bank-key-item .key-code { flex:2; font-family:monospace; font-size:.7rem; color:var(--gold); min-width:80px; } .bank-key-item .platform { flex:1; font-size:.7rem; }
+        .wallpaper-preview-box { width:100%; height:80px; border-radius:8px; background-size:cover; background-position:center; margin-top:.3rem; border:1px solid var(--border); display:none; }
+        .console-log { background:#000; color:#0f0; font-family:monospace; font-size:.7rem; padding:.5rem; border-radius:8px; max-height:200px; overflow-y:auto; margin-top:.5rem; white-space:pre-wrap; }
+        .console-log::-webkit-scrollbar { width:3px; } .console-log::-webkit-scrollbar-thumb { background:rgba(0,255,0,.3); border-radius:99px; }
+        hr { border-color:var(--border); margin:1rem 0; }
+        .toast { position:fixed; top:1.5rem; right:1.5rem; background:var(--bg-card); border:1px solid var(--red); padding:.8rem 1.2rem; border-radius:12px; font-size:.85rem; z-index:999; transform:translateX(140%); transition:.3s; max-width:320px; }
+        .toast.show { transform:translateX(0); } .toast.ok { border-color:var(--green); }
+        @media (max-width:768px) { .main-layout { grid-template-columns:1fr; padding:1rem; } .sidebar { display:flex; flex-wrap:wrap; gap:.3rem; position:static; } .sidebar-btn { width:auto; font-size:.7rem; padding:.4rem .6rem; } .grid-2, .grid-3 { grid-template-columns:1fr; } .stats-row { grid-template-columns:1fr 1fr; } }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    
+    <header>
+        <a href="looto.html" class="logo"><em>🛡️</em> Looto Admin</a>
+        <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+        <div>
+            <a href="looto.html" class="btn-header">🏠 Site</a>
+            <button class="btn-header" onclick="logout()" style="margin-left:.5rem;">🚪 Sair</button>
+        </div>
+    </header>
+    
+    <div class="main-layout">
+        <aside class="sidebar">
+            <a href="admin.html" class="sidebar-btn">📊 Dashboard</a>
+            <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+            <a href="abots.html" class="sidebar-btn active">🤖 Bots</a>
+            <a href="asorteios.html" class="sidebar-btn">🎁 Sorteios</a>
+            <a href="alogsorteios.html" class="sidebar-btn">📋 Log Sorteios</a>
+            <a href="achat.html" class="sidebar-btn">💬 Chat</a>
+            <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+            <a href="aloja.html" class="sidebar-btn">🛒 Loja</a>
+            <a href="admins.html" class="sidebar-btn">🔑 Admins</a>
+            <a href="aassinantes.html" class="sidebar-btn">⭐ Assinantes</a>
+            <a href="aferramentas.html" class="sidebar-btn">🔧 Ferramentas</a>
+        </aside>
+        
+        <div>
+            <!-- Stats -->
+            <div class="stats-row" id="bot-stats"></div>
+            
+            <!-- Banco de Keys + Criar Bot -->
+            <div class="grid-2">
+                <!-- Banco de Keys -->
+                <div class="panel">
+                    <div class="panel-title">🔑 Banco de Keys</div>
+                    <div class="field-row">
+                        <div class="field"><label>Nome do Jogo</label><input type="text" id="bank-game" placeholder="Ex: Hollow Knight"></div>
+                        <div class="field"><label>Plataforma</label><select id="bank-platform"><option value="Steam">Steam</option><option value="Epic Games">Epic Games</option><option value="GOG">GOG</option><option value="Battle.net">Battle.net</option><option value="Origin">Origin</option><option value="Outro">Outro</option></select></div>
+                    </div>
+                    <div class="field"><label>🔑 Key</label><input type="text" id="bank-key" placeholder="XXXXX-XXXXX-XXXXX"></div>
+                    <div class="field"><label>🖼️ Wallpaper URL</label><input type="text" id="bank-wallpaper" placeholder="https://...imagem.jpg" oninput="previewWallpaper()"></div>
+                    <div class="wallpaper-preview-box" id="wallpaper-preview"></div>
+                    <button class="btn primary" id="btn-add-key" onclick="addBankKey()" style="width:100%;margin-top:.5rem;">➕ Adicionar ao Banco</button>
+                    <button class="btn pink" id="btn-bulk-key" onclick="addBulkKeys()" style="width:100%;margin-top:.3rem;">💥 +5 Keys em Massa</button>
+                    <hr>
+                    <div class="scroll-bank" id="bank-keys-list"><p style="font-size:.75rem;color:var(--text-2);text-align:center;padding:1rem;">Nenhuma key</p></div>
+                    <button class="btn red" id="btn-clear-bank" onclick="clearBankKeys()" style="width:100%;margin-top:.5rem;">🗑️ Limpar Banco</button>
+                </div>
+                
+                <!-- Criar Bot -->
+                <div class="panel">
+                    <div class="panel-title">➕ Criar Bot</div>
+                    <div class="field"><label>Nome do Bot</label><input type="text" id="bot-nome" placeholder="Ex: SorteioBot_01"></div>
+                    <div class="field-row-3">
+                        <div class="field"><label>Nível (0-99)</label><input type="number" id="bot-nivel" value="10" min="0" max="99"></div>
+                        <div class="field"><label>XP</label><input type="number" id="bot-xp" value="500"></div>
+                        <div class="field"><label>Money</label><input type="number" id="bot-money" value="200"></div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field"><label>Intervalo (seg)</label><input type="number" id="bot-intervalo" value="15" min="5"></div>
+                        <div class="field"><label>Visibilidade</label><select id="bot-visibilidade"><option value="publico">🌍 Público</option><option value="privado">🔒 Privado</option></select></div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field"><label>Comportamento</label><select id="bot-comp"><option value="completo">🔄 Completo</option><option value="participar">🎟️ Participar</option><option value="criar">🎁 Criar</option><option value="chat">💬 Chat</option><option value="aleatorio">🎲 Aleatório</option></select></div>
+                        <div class="field"><label>Personalidade</label><select id="bot-personalidade"><option value="normal">😊 Normal</option><option value="animado">🔥 Animado</option><option value="misterioso">🕵️ Misterioso</option><option value="competitivo">🏆 Competitivo</option><option value="troll">👺 Troll</option></select></div>
+                    </div>
+                    <div class="field"><label>Foto URL</label><input type="text" id="bot-foto" placeholder="https://...avatar.png"></div>
+                    <div class="field"><label>Biografia</label><input type="text" id="bot-bio" placeholder="Ex: 🤖 Amante de jogos indie!"></div>
+                    <button class="btn primary" id="btn-criar-bot" onclick="criarBot()" style="width:100%;">🤖 Criar Bot</button>
+                    <button class="btn pink" id="btn-criar-bots" onclick="criarMultiplosBots()" style="width:100%;margin-top:.3rem;">💥 +3 Bots em Massa</button>
+                </div>
+            </div>
+            
+            <!-- Ações + Global + Status -->
+            <div class="grid-3">
+                <div class="panel">
+                    <div class="panel-title">⚙️ Ações em Massa</div>
+                    <button class="btn gold" id="btn-ativar-todos" onclick="ativarTodosBots()" style="width:100%;margin-bottom:.4rem;">▶️ Ativar Todos</button>
+                    <button class="btn orange" id="btn-pausar-todos" onclick="pausarTodosBots()" style="width:100%;margin-bottom:.4rem;">⏸️ Pausar Todos</button>
+                    <button class="btn red" id="btn-deletar-todos" onclick="deletarTodosBots()" style="width:100%;margin-bottom:.4rem;">🗑️ Deletar Todos</button>
+                    <button class="btn green" id="btn-key-delivery" onclick="executarKeyDelivery()" style="width:100%;margin-bottom:.4rem;">🔄 Forçar Key Delivery</button>
+                    <button class="btn pink" id="btn-forcar-acoes" onclick="forcarAcoesAgora()" style="width:100%;">⚡ Forçar Ações Agora</button>
+                </div>
+                <div class="panel">
+                    <div class="panel-title">📢 Mensagem Global</div>
+                    <div class="field"><label>Título</label><input type="text" id="global-titulo" placeholder="Ex: ⚡ Evento Especial!"></div>
+                    <div class="field"><label>Mensagem</label><textarea id="global-texto" placeholder="Digite a mensagem..." rows="3"></textarea></div>
+                    <button class="btn pink" id="btn-enviar-global" onclick="enviarGlobal()" style="width:100%;">📢 Enviar para o Chat</button>
+                </div>
+                <div class="panel">
+                    <div class="panel-title">⏰ Status dos Sistemas</div>
+                    <div style="font-size:.78rem;display:flex;flex-direction:column;gap:.4rem;margin-bottom:.8rem;">
+                        <div style="display:flex;justify-content:space-between;"><span>🤖 Ações dos Bots:</span><span class="badge badge-green" id="status-bots">15s</span></div>
+                        <div style="display:flex;justify-content:space-between;"><span>🔑 Key Delivery:</span><span class="badge badge-blue" id="status-keys">manual</span></div>
+                        <div style="display:flex;justify-content:space-between;"><span>🗑️ Limpeza Chat/Feed:</span><span class="badge badge-orange" id="status-limpeza">60s</span></div>
+                        <div style="display:flex;justify-content:space-between;"><span>💰 Keys Livres:</span><strong id="bank-count">0</strong></div>
+                    </div>
+                    <div class="console-log" id="console-log"></div>
+                </div>
+            </div>
+            
+            <!-- Tabela de Bots -->
+            <div class="panel">
+                <div class="panel-title">📋 Todos os Bots <span id="count-bots" style="font-size:.7rem;color:var(--text-2);"></span></div>
+                <div class="scroll-table">
+                    <table>
+                        <thead><tr><th>Bot</th><th>Nv</th><th>XP</th><th>💰</th><th>Visib.</th><th>Comp.</th><th>Personalidade</th><th>Criou</th><th>Part.</th><th>St</th><th>Ações</th></tr></thead>
+                        <tbody id="table-bots"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+        // ═══════════════ CONFIGURAÇÃO INICIAL ═══════════════
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, push, set, get, update, remove, query, orderByChild, limitToLast, runTransaction } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+            authDomain: "looto-f46e5.firebaseapp.com",
+            databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+            projectId: "looto-f46e5",
+            storageBucket: "looto-f46e5.firebasestorage.app",
+            messagingSenderId: "295066400995",
+            appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        // ═══════════════ VARIÁVEIS GLOBAIS ═══════════════
+        let currentUser = null;
+        const CORES_NIVEL = ['#cd7f32', '#8b8b8b', '#9ca3af', '#f59e0b', '#a855f7', '#10b981', '#ef4444', '#3b82f6', '#fbbf24', '#ff8c00', '#ec4899', '#6366f1', '#d946ef', '#e0e0e0', '#38bdf8', '#f97316', '#14b8a6', '#0ea5e9', '#eab308', '#22c55e'];
+        const NOMES_BOTS = ['GameMaster','LootHunter','KeySeeker','PixelWarrior','CyberGamer','NeonPlayer','ShadowBot','CrystalFan','EpicGamer','TurboPlayer','BitWarrior','DataMage','CodePhantom','PixelQueen','NeonDragon'];
+        const WALLPAPERS_DEFAULT = ['https://cdn.akamai.steamstatic.com/steam/apps/367520/header.jpg','https://cdn.akamai.steamstatic.com/steam/apps/504230/header.jpg','https://cdn.akamai.steamstatic.com/steam/apps/413150/header.jpg','https://cdn.akamai.steamstatic.com/steam/apps/105600/header.jpg','https://cdn.akamai.steamstatic.com/steam/apps/1145360/header.jpg'];
+        const FRASES = {
+            normal: ['Boa sorte! 🍀','Participando! 🎮','Vamos lá! 👍'],
+            animado: ['VAMOOOO! 🔥🔥','QUE SORTEIO INCRÍVEL! 🎉🎉'],
+            misterioso: ['... 🕵️','Algo bom está por vir... 🔮'],
+            competitivo: ['Eu vou ganhar! 🏆','Ninguém me vence! 💪'],
+            troll: ['Será que vai chover keys? 🌧️','Plot twist: eu já ganhei! 😂']
+        };
+
+        // ═══════════════ CACHE DO BANCO DE KEYS ═══════════════
+        let bankCache = [], bankCacheTime = 0;
+        async function carregarBankCache() {
+            const now = Date.now();
+            if (bankCache.length && (now - bankCacheTime) < 30000) return bankCache;
+            const snap = await get(ref(db, 'bankKeys'));
+            bankCache = snap.exists() ? Object.entries(snap.val()).map(([id, v]) => ({ id, ...v })) : [];
+            bankCacheTime = now;
+            return bankCache;
+        }
+        function invalidateBank() { bankCacheTime = 0; }
+
+        async function pegarKey() {
+            const keys = await carregarBankCache();
+            const livre = keys.filter(k => !k.usada);
+            if (!livre.length) return null;
+            const k = livre[Math.floor(Math.random() * livre.length)];
+            await update(ref(db, `bankKeys/${k.id}`), { usada: true, usadaEm: Date.now() });
+            invalidateBank();
+            return k;
+        }
+
+        // ═══════════════ FUNÇÕES UTILITÁRIAS ═══════════════
+        const logs = [];
+        function addLog(msg) {
+            const time = new Date().toLocaleTimeString();
+            logs.push(`[${time}] ${msg}`);
+            if (logs.length > 30) logs.shift();
+            document.getElementById('console-log').innerHTML = logs.join('\n');
+        }
+
+        function toast(msg, ok = false) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast show' + (ok ? ' ok' : '');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        // Desabilita/reativa botões temporariamente
+        function disableButton(id, ms = 2000) {
+            const btn = document.getElementById(id);
+            if (!btn) return;
+            btn.disabled = true;
+            setTimeout(() => { btn.disabled = false; }, ms);
+        }
+
+        window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+
+        async function checkAdmin(user) {
+            if (!user) return false;
+            if (user.email === 'startubez.com@gmail.com') return true;
+            const snap = await get(ref(db, 'admins'));
+            if (!snap.exists()) return false;
+            return Object.values(snap.val()).some(a => a.uid === user.uid || a.email === user.email);
+        }
+
+        // ═══════════════ BANCO DE KEYS ═══════════════
+        window.previewWallpaper = () => {
+            const url = document.getElementById('bank-wallpaper').value.trim();
+            const box = document.getElementById('wallpaper-preview');
+            box.style.display = url ? 'block' : 'none';
+            if (url) box.style.backgroundImage = `url('${url}')`;
+        };
+
+        window.addBankKey = async () => {
+            const game = document.getElementById('bank-game').value.trim();
+            const key = document.getElementById('bank-key').value.trim();
+            const platform = document.getElementById('bank-platform').value;
+            const wallpaper = document.getElementById('bank-wallpaper').value.trim() || WALLPAPERS_DEFAULT[Math.floor(Math.random() * WALLPAPERS_DEFAULT.length)];
+            if (!game || !key) { toast('Preencha jogo e key!'); return; }
+            disableButton('btn-add-key');
+            await push(ref(db, 'bankKeys'), { game, key, platform, wallpaper, usada: false, addedAt: Date.now() });
+            toast('✅ Key adicionada!', true);
+            addLog('🔑 Key: ' + game);
+            document.getElementById('bank-game').value = '';
+            document.getElementById('bank-key').value = '';
+            document.getElementById('bank-wallpaper').value = '';
+            document.getElementById('wallpaper-preview').style.display = 'none';
+            invalidateBank(); carregarBank(); stats();
+        };
+
+        window.addBulkKeys = async () => {
+            const jogos = ['Hollow Knight','Celeste','Stardew Valley','Terraria','Hades'];
+            disableButton('btn-bulk-key');
+            for (let i = 0; i < 5; i++) {
+                await push(ref(db, 'bankKeys'), {
+                    game: jogos[i],
+                    key: 'BULK-' + Math.random().toString(36).slice(2,8).toUpperCase(),
+                    platform: 'Steam',
+                    wallpaper: WALLPAPERS_DEFAULT[i] || WALLPAPERS_DEFAULT[0],
+                    usada: false,
+                    addedAt: Date.now()
+                });
+            }
+            toast('✅ 5 keys adicionadas!', true);
+            addLog('💥 5 keys em massa');
+            invalidateBank(); carregarBank(); stats();
+        };
+
+        async function carregarBank() {
+            const keys = await carregarBankCache();
+            const container = document.getElementById('bank-keys-list');
+            if (!keys.length) {
+                container.innerHTML = '<p style="font-size:.75rem;color:var(--text-2);text-align:center;padding:1rem;">Vazio</p>';
+                return;
+            }
+            keys.sort((a, b) => (b.addedAt || 0) - (a.addedAt || 0));
+            container.innerHTML = keys.map(k => `
+                <div class="bank-key-item" style="opacity:${k.usada ? '0.4' : '1'}">
+                    <span class="game">🎮 ${k.game}</span>
+                    <span class="key-code">${k.usada ? '••••••••••' : k.key}</span>
+                    <span class="platform">${k.platform}</span>
+                    <span>${k.usada ? '<span class="badge badge-red">Usada</span>' : '<span class="badge badge-green">Livre</span>'}</span>
+                    <button class="btn-sm red" onclick="delBankKey('${k.id}')">🗑️</button>
+                </div>`).join('');
+        }
+
+        window.delBankKey = async (id) => {
+            await remove(ref(db, `bankKeys/${id}`));
+            addLog('🗑️ Key removida');
+            invalidateBank(); carregarBank(); stats();
+        };
+
+        window.clearBankKeys = async () => {
+            if (!confirm('Limpar TODAS as keys?')) return;
+            disableButton('btn-clear-bank');
+            await remove(ref(db, 'bankKeys'));
+            addLog('🗑️ Banco limpo');
+            invalidateBank(); carregarBank(); stats();
+        };
+
+        // ═══════════════ GERENCIAMENTO DE BOTS ═══════════════
+        window.criarBot = async () => {
+            const nome = document.getElementById('bot-nome').value.trim() || NOMES_BOTS[Math.floor(Math.random() * NOMES_BOTS.length)] + '_' + Math.random().toString(36).slice(2,5);
+            const nivel = parseInt(document.getElementById('bot-nivel').value) || 10;
+            const xp = parseInt(document.getElementById('bot-xp').value) || 500;
+            const money = parseInt(document.getElementById('bot-money').value) || 200;
+            const visibilidade = document.getElementById('bot-visibilidade').value;
+            const comportamento = document.getElementById('bot-comp').value;
+            const personalidade = document.getElementById('bot-personalidade').value;
+            const intervalo = parseInt(document.getElementById('bot-intervalo').value) || 15;
+            const fotoUrl = document.getElementById('bot-foto').value.trim();
+            const biografia = document.getElementById('bot-bio').value.trim() || '🤖 Bot automatizado';
+
+            disableButton('btn-criar-bot');
+            const refBot = push(ref(db, 'bots'));
+            const botId = refBot.key;
+            const dados = { nome, username: nome, nivelConta: nivel, pontos: xp, dinheiro: money, comportamento, personalidade, visibilidade, intervalo, fotoUrl, biografia, ativo: true, isBot: true, sorteiosCriados: 0, sorteiosParticipados: 0, criadoEm: Date.now(), uid: botId };
+            await set(refBot, dados);
+            await set(ref(db, `usuarios/${botId}`), dados);
+            await push(ref(db, 'chat'), { uid: 'bot', nome: 'LootoBot 🤖', texto: `🤖 <strong>${nome}</strong> entrou na Looto!`, ts: Date.now(), type: 'system' });
+            await push(ref(db, 'feed'), { html: `🤖 <strong>${nome}</strong> entrou na Looto!`, ts: Date.now() });
+            toast(`✅ Bot "${nome}" criado!`, true);
+            addLog(`🤖 Bot criado: ${nome}`);
+            document.getElementById('bot-nome').value = '';
+            document.getElementById('bot-bio').value = '';
+            carregarBots(); stats();
+        };
+
+        window.criarMultiplosBots = async () => {
+            const comps = ['participar','criar','chat','completo','aleatorio'];
+            const personalidades = ['normal','animado','misterioso','competitivo','troll'];
+            disableButton('btn-criar-bots');
+            let criados = 0;
+            const promises = [];
+            for (let i = 0; i < 3; i++) {
+                const nome = NOMES_BOTS[Math.floor(Math.random() * NOMES_BOTS.length)] + '_' + Math.random().toString(36).slice(2,5);
+                const nivel = Math.floor(Math.random() * 50);
+                const refBot = push(ref(db, 'bots'));
+                const botId = refBot.key;
+                const dados = {
+                    nome, username: nome, nivelConta: nivel,
+                    pontos: Math.floor(Math.random() * 800) + 100,
+                    dinheiro: Math.floor(Math.random() * 500) + 50,
+                    comportamento: comps[Math.floor(Math.random() * comps.length)],
+                    personalidade: personalidades[Math.floor(Math.random() * personalidades.length)],
+                    visibilidade: Math.random() > 0.3 ? 'publico' : 'privado',
+                    intervalo: Math.floor(Math.random() * 30) + 10,
+                    fotoUrl: '', biografia: '🤖 Bot em massa',
+                    ativo: true, isBot: true,
+                    sorteiosCriados: 0, sorteiosParticipados: 0,
+                    criadoEm: Date.now(), uid: botId
+                };
+                promises.push((async () => {
+                    await set(refBot, dados);
+                    await set(ref(db, `usuarios/${botId}`), dados);
+                    await push(ref(db, 'feed'), { html: `🤖 <strong>${nome}</strong> entrou na Looto!`, ts: Date.now() });
+                    criados++;
+                })());
+            }
+            await Promise.all(promises);
+            toast(`✅ ${criados} bots criados!`, true);
+            addLog(`💥 ${criados} bots em massa`);
+            carregarBots(); stats();
+        };
+
+        async function carregarBots() {
+            const snap = await get(ref(db, 'bots'));
+            const tbody = document.getElementById('table-bots');
+            tbody.innerHTML = '';
+            if (!snap.exists()) {
+                tbody.innerHTML = '<tr><td colspan="11" style="text-align:center;padding:2rem;">Nenhum bot</td></tr>';
+                document.getElementById('count-bots').textContent = '(0)';
+                return;
+            }
+            const bots = Object.entries(snap.val()).map(([id, v]) => ({ id, ...v })).sort((a, b) => (b.criadoEm || 0) - (a.criadoEm || 0));
+            document.getElementById('count-bots').textContent = `(${bots.length})`;
+            const iconeComp = { participar:'🎟️', criar:'🎁', chat:'💬', completo:'🔄', aleatorio:'🎲' };
+            const iconePers = { normal:'😊', animado:'🔥', misterioso:'🕵️', competitivo:'🏆', troll:'👺' };
+            tbody.innerHTML = bots.map(b => {
+                const nivel = b.nivelConta || 0;
+                const cor = CORES_NIVEL[nivel % CORES_NIVEL.length] || '#cd7f32';
+                return `<tr>
+                    <td><div style="display:flex;align-items:center;gap:.4rem;"><div style="width:28px;height:28px;border-radius:50%;background:${cor};display:flex;align-items:center;justify-content:center;font-size:.6rem;color:#fff;overflow:hidden;">${b.fotoUrl ? `<img src="${b.fotoUrl}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.textContent='🤖'">` : '🤖'}</div><strong>${b.nome}</strong></div></td>
+                    <td><span class="badge" style="background:${cor}20;color:${cor};">Nv ${nivel}</span></td>
+                    <td>${b.pontos||0}</td><td>${b.dinheiro||0}</td>
+                    <td><span class="badge ${b.visibilidade==='privado'?'badge-orange':'badge-green'}">${b.visibilidade==='privado'?'🔒':'🌍'}</span></td>
+                    <td><span class="badge badge-blue">${iconeComp[b.comportamento]||'?'}</span></td>
+                    <td>${iconePers[b.personalidade]||'😊'} ${b.personalidade||'normal'}</td>
+                    <td>${b.sorteiosCriados||0}</td><td>${b.sorteiosParticipados||0}</td>
+                    <td>${b.ativo!==false?'🟢':'🔴'}</td>
+                    <td style="white-space:nowrap;">
+                        <button class="btn-sm ${b.ativo!==false?'orange':'green'}" onclick="toggleBot('${b.id}',${b.ativo!==false})">${b.ativo!==false?'⏸️':'▶️'}</button>
+                        <button class="btn-sm primary" onclick="editBot('${b.id}')">✏️</button>
+                        <button class="btn-sm red" onclick="delBot('${b.id}')">🗑️</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        }
+
+        window.toggleBot = async (id, ativo) => {
+            await update(ref(db, `bots/${id}`), { ativo: !ativo });
+            carregarBots();
+        };
+
+        window.editBot = async (id) => {
+            const snap = await get(ref(db, `bots/${id}`));
+            if (!snap.exists()) return;
+            const b = snap.val();
+            const nome = prompt('Nome:', b.nome); if (nome === null) return;
+            const nivel = prompt('Nível:', b.nivelConta);
+            const xp = prompt('XP:', b.pontos);
+            const money = prompt('Money:', b.dinheiro);
+            const inter = prompt('Intervalo:', b.intervalo);
+            const comp = prompt('Comportamento:', b.comportamento);
+            const vis = prompt('Visibilidade (publico/privado):', b.visibilidade||'publico');
+            const pers = prompt('Personalidade:', b.personalidade||'normal');
+            await update(ref(db, `bots/${id}`), {
+                nome, username: nome,
+                nivelConta: parseInt(nivel)||0,
+                pontos: parseInt(xp)||0,
+                dinheiro: parseInt(money)||0,
+                intervalo: parseInt(inter)||15,
+                comportamento: comp||'aleatorio',
+                visibilidade: vis||'publico',
+                personalidade: pers||'normal'
+            });
+            await update(ref(db, `usuarios/${id}`), {
+                username: nome,
+                nivelConta: parseInt(nivel)||0,
+                pontos: parseInt(xp)||0,
+                dinheiro: parseInt(money)||0
+            });
+            carregarBots();
+            addLog('✏️ Bot editado: ' + nome);
+        };
+
+        window.delBot = async (id) => {
+            if (!confirm('Deletar bot?')) return;
+            await remove(ref(db, `bots/${id}`));
+            await remove(ref(db, `usuarios/${id}`));
+            carregarBots(); stats();
+            addLog('🗑️ Bot deletado');
+        };
+
+        // ═══════════════ AÇÕES EM MASSA ═══════════════
+        window.ativarTodosBots = async () => {
+            const snap = await get(ref(db, 'bots'));
+            if (!snap.exists()) return;
+            const ups = [];
+            snap.forEach(x => ups.push(update(ref(db, `bots/${x.key}`), { ativo: true })));
+            await Promise.all(ups);
+            carregarBots();
+            addLog('▶️ Todos ativados');
+        };
+
+        window.pausarTodosBots = async () => {
+            const snap = await get(ref(db, 'bots'));
+            if (!snap.exists()) return;
+            const ups = [];
+            snap.forEach(x => ups.push(update(ref(db, `bots/${x.key}`), { ativo: false })));
+            await Promise.all(ups);
+            carregarBots();
+            addLog('⏸️ Todos pausados');
+        };
+
+        window.deletarTodosBots = async () => {
+            if (!confirm('⚠️ DELETAR TODOS OS BOTS? Isso não pode ser desfeito.')) return;
+            const snap = await get(ref(db, 'bots'));
+            if (!snap.exists()) return;
+            const ops = [];
+            snap.forEach(x => {
+                ops.push(remove(ref(db, `bots/${x.key}`)));
+                ops.push(remove(ref(db, `usuarios/${x.key}`)));
+            });
+            await Promise.all(ops);
+            carregarBots(); stats();
+            addLog('🗑️ Todos deletados');
+        };
+
+        window.enviarGlobal = async () => {
+            const titulo = document.getElementById('global-titulo').value.trim();
+            const texto = document.getElementById('global-texto').value.trim();
+            if (!texto) { toast('Digite a mensagem!'); return; }
+            disableButton('btn-enviar-global');
+            await push(ref(db, 'chat'), {
+                uid: 'bot',
+                nome: 'LootoBot 🤖',
+                texto,
+                titulo: titulo || '📢',
+                ts: Date.now(),
+                type: 'global_bot'
+            });
+            toast('📢 Mensagem enviada!', true);
+            addLog('📢 Global: ' + texto.slice(0,40));
+            document.getElementById('global-texto').value = '';
+            document.getElementById('global-titulo').value = '';
+        };
+
+        // ═══════════════ SISTEMAS AUTOMÁTICOS ═══════════════
+        window.executarKeyDelivery = async () => {
+            addLog('🔑 Forçando key delivery...');
+            disableButton('btn-key-delivery');
+            try {
+                const snap = await get(query(ref(db, 'sorteios'), orderByChild('expiraEm'), limitToLast(50)));
+                if (!snap.exists()) { addLog('Nenhum sorteio encontrado.'); return; }
+                const now = Date.now();
+                let processados = 0;
+                snap.forEach(child => {
+                    const d = child.val();
+                    if (d.expiraEm && d.expiraEm < now && d.ativo && !d.keyEntregue) {
+                        runTransaction(ref(db, `sorteios/${child.key}`), current => {
+                            if (!current || current.keyEntregue || !current.ativo || current.expiraEm > now) return;
+                            const ids = Object.keys(current.participantes || {});
+                            if (ids.length < 10) {
+                                current.keyEntregue = true; current.ativo = false;
+                                current.encerradoEm = now; current.status = 'cancelado';
+                            } else {
+                                const v = ids[Math.floor(Math.random() * ids.length)];
+                                current.keyEntregue = true; current.ativo = false;
+                                current.encerradoEm = now;
+                                current.vencedorId = v;
+                                current.vencedorNome = current.participantes[v]?.nome || 'Anônimo';
+                            }
+                            return current;
+                        }).catch(e => addLog('Erro transação: ' + e.message));
+                        processados++;
+                    }
+                });
+                setTimeout(() => addLog(`✅ ${processados} sorteios processados`), 1000);
+                toast('✅ Key delivery concluído', true);
+            } catch (e) {
+                addLog('❌ Erro: ' + e.message);
+                if (e.message.includes('Index not defined')) addLog('⚠️ Adicione ".indexOn": "expiraEm" nas regras!');
+            }
+        };
+
+        async function runBots() {
+            try {
+                const snapBots = await get(ref(db, 'bots'));
+                if (!snapBots.exists()) return;
+                const bots = [];
+                snapBots.forEach(x => { const b = x.val(); if (b.ativo !== false) bots.push({ id: x.key, ...b }); });
+                if (!bots.length) return;
+
+                addLog(`🔄 Executando ${bots.length} bots...`);
+
+                // Busca sorteios ativos (com tratamento de índice)
+                let sorteiosAtivos = [];
+                try {
+                    const snapSorteios = await get(query(ref(db, 'sorteios'), orderByChild('expiraEm'), limitToLast(30)));
+                    if (snapSorteios.exists()) {
+                        const now = Date.now();
+                        snapSorteios.forEach(x => {
+                            const d = x.val();
+                            if (d.ativo && d.expiraEm && d.expiraEm > now) sorteiosAtivos.push({ id: x.key, ...d });
+                        });
+                    }
+                } catch (e) {
+                    addLog('❌ Erro ao buscar sorteios: ' + e.message);
+                    if (e.message.includes('Index not defined')) addLog('⚠️ Adicione ".indexOn": "expiraEm" nas regras!');
+                    return;
+                }
+
+                for (const bot of bots) {
+                    try {
+                        const comp = bot.comportamento;
+                        const frases = FRASES[bot.personalidade] || FRASES.normal;
+                        const updates = [];
+
+                        // Participar
+                        if (comp === 'participar' || comp === 'completo' || (comp === 'aleatorio' && Math.random() > 0.5)) {
+                            if (sorteiosAtivos.length && Math.random() > 0.3) {
+                                const sorteio = sorteiosAtivos[Math.floor(Math.random() * sorteiosAtivos.length)];
+                                const parts = sorteio.participantes || {};
+                                if (!parts[bot.id] && Object.keys(parts).length < (sorteio.maxParticipantes || 100)) {
+                                    parts[bot.id] = { uid: bot.id, nome: bot.nome, entradoEm: Date.now() };
+                                    updates.push(update(ref(db, `sorteios/${sorteio.id}`), { participantes: parts }));
+                                    updates.push(update(ref(db, `bots/${bot.id}`), { sorteiosParticipados: (bot.sorteiosParticipados || 0) + 1 }));
+                                    updates.push(push(ref(db, 'feed'), { html: `🤖 <strong>${bot.nome}</strong> entrou no sorteio de <strong>${sorteio.nomeJogo || sorteio.titulo}</strong>!`, ts: Date.now() }));
+                                    addLog(`🎟️ ${bot.nome} entrou em ${sorteio.nomeJogo}`);
+                                }
+                            }
+                        }
+
+                        // Criar sorteio (público, 50 vagas, 2 min)
+                        if (comp === 'criar' || comp === 'completo' || (comp === 'aleatorio' && Math.random() > 0.7)) {
+                            if (Math.random() > 0.5) {
+                                const keyData = await pegarKey();
+                                if (keyData) {
+                                    const nivel = bot.nivelConta || 0;
+                                    const refSorteio = push(ref(db, 'sorteios'));
+                                    updates.push(set(refSorteio, {
+                                        titulo: 'Sorteio de ' + keyData.game,
+                                        nomeJogo: keyData.game,
+                                        key: keyData.key,
+                                        tipo: 'publico',
+                                        maxParticipantes: 50,
+                                        plataforma: keyData.platform,
+                                        descricao: '🤖 Sorteio automático do bot ' + bot.nome,
+                                        wallpaper: keyData.wallpaper || '',
+                                        criadoPor: bot.id,
+                                        criadoPorNome: bot.nome,
+                                        criadorNivel: nivel,
+                                        criadoEm: Date.now(),
+                                        expiraEm: Date.now() + 120000, // 2 minutos
+                                        ativo: true,
+                                        participantes: {}
+                                    }));
+                                    updates.push(update(ref(db, `bots/${bot.id}`), { sorteiosCriados: (bot.sorteiosCriados || 0) + 1 }));
+                                    updates.push(push(ref(db, 'feed'), { html: `🤖 <strong>${bot.nome}</strong> criou sorteio de <strong>${keyData.game}</strong>!`, ts: Date.now() }));
+                                    addLog(`🎁 ${bot.nome} criou sorteio de ${keyData.game}`);
+                                } else {
+                                    addLog(`⚠️ ${bot.nome} não criou: sem keys disponíveis`);
+                                }
+                            }
+                        }
+
+                        // Chat
+                        if (comp === 'chat' || comp === 'completo' || (comp === 'aleatorio' && Math.random() > 0.4)) {
+                            const frase = frases[Math.floor(Math.random() * frases.length)];
+                            updates.push(push(ref(db, 'chat'), { uid: bot.id, nome: bot.nome, texto: frase, ts: Date.now(), type: 'user' }));
+                        }
+
+                        if (updates.length) await Promise.all(updates);
+                    } catch (e) {
+                        addLog(`❌ Erro bot ${bot.nome}: ${e.message}`);
+                    }
+                }
+            } catch (e) {
+                addLog('❌ Erro geral runBots: ' + e.message);
+            }
+        }
+
+        window.forcarAcoesAgora = async () => {
+            disableButton('btn-forcar-acoes');
+            await runBots();
+            toast('⚡ Ações forçadas!', true);
+        };
+
+        async function stats() {
+            const [snapBots, keys] = await Promise.all([get(ref(db, 'bots')), carregarBankCache()]);
+            const totalBots = snapBots.exists() ? Object.keys(snapBots.val()).length : 0;
+            const botsAtivos = snapBots.exists() ? Object.values(snapBots.val()).filter(x => x.ativo !== false).length : 0;
+            const keysLivres = keys.filter(k => !k.usada).length;
+            const totalKeys = keys.length;
+            document.getElementById('bot-stats').innerHTML = `
+                <div class="stat-mini"><div class="val" style="color:#6366f1;">${totalBots}</div><div class="lbl">Total Bots</div></div>
+                <div class="stat-mini"><div class="val" style="color:#10b981;">${botsAtivos}</div><div class="lbl">Ativos</div></div>
+                <div class="stat-mini"><div class="val" style="color:#fbbf24;">${keysLivres}</div><div class="lbl">Keys Livres</div></div>
+                <div class="stat-mini"><div class="val" style="color:#ec4899;">${totalKeys}</div><div class="lbl">Total Keys</div></div>`;
+            document.getElementById('bank-count').textContent = keysLivres;
+        }
+
+        // Limpeza periódica do chat/feed (mantendo tesouros)
+        function iniciarLimpeza() {
+            setInterval(async () => {
+                const now = Date.now();
+                try {
+                    const snapChat = await get(query(ref(db, 'chat'), orderByChild('ts'), limitToLast(200)));
+                    if (snapChat.exists()) {
+                        const removes = [];
+                        snapChat.forEach(x => {
+                            const m = x.val();
+                            if ((m.type === 'user' || m.type === 'system') && now - (m.ts || 0) > 600000) {
+                                removes.push(remove(ref(db, `chat/${x.key}`)));
+                            }
+                        });
+                        if (removes.length) await Promise.all(removes);
+                    }
+                    const snapFeed = await get(query(ref(db, 'feed'), orderByChild('ts'), limitToLast(100)));
+                    if (snapFeed.exists()) {
+                        const removes = [];
+                        snapFeed.forEach(x => {
+                            if (now - (x.val().ts || 0) > 600000) removes.push(remove(ref(db, `feed/${x.key}`)));
+                        });
+                        if (removes.length) await Promise.all(removes);
+                    }
+                } catch (e) { /* silencioso */ }
+            }, 60000);
+        }
+
+        // ═══════════════ INICIALIZAÇÃO ═══════════════
+        function iniciarSistemas() {
+            addLog('🚀 Sistemas iniciados');
+            setInterval(runBots, 15000);
+            runBots();
+            setInterval(stats, 30000);
+            setInterval(carregarBank, 30000);
+            iniciarLimpeza();
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) {
+                window.location.href = 'login.html';
+                return;
+            }
+            const admin = await checkAdmin(user);
+            if (!admin) {
+                document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;flex-direction:column;gap:1rem;padding:2rem;"><h1 style="font-family:'Space Grotesk',sans-serif;font-size:3rem;color:#ef4444;">🚫 Acesso Negado</h1><p style="color:#9ca3af;">Você não tem permissão.</p><a href="looto.html" style="background:#6366f1;color:#fff;padding:.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;">Ir para o Site</a></div>`;
+                return;
+            }
+            currentUser = user;
+            document.getElementById('admin-info').textContent = '👑 ' + user.email;
+            addLog('✅ Admin logado');
+            await Promise.all([carregarBank(), carregarBots(), stats()]);
+            iniciarSistemas();
+        });
+    </script>
+</body>
+</html>

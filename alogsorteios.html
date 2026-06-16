@@ -1,0 +1,508 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Log Sorteios Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --bg-card: #151a26;
+            --text: #f3f4f6;
+            --text-2: #9ca3af;
+            --primary: #6366f1;
+            --green: #10b981;
+            --red: #ef4444;
+            --gold: #fbbf24;
+            --orange: #f59e0b;
+            --pink: #ec4899;
+            --diamond: #38bdf8;
+            --border: rgba(255, 255, 255, 0.06);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+        
+        header {
+            background: rgba(11, 14, 20, 0.95);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(16px);
+            padding: .9rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .5rem;
+        }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text); text-decoration: none; }
+        .logo em { color: var(--red); font-style: normal; }
+        .btn-header { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: .4rem .8rem; border-radius: 6px; font-size: .8rem; cursor: pointer; transition: .3s; text-decoration: none; }
+        .btn-header:hover { border-color: var(--red); color: var(--red); }
+        
+        .main-layout { max-width: 1600px; margin: 0 auto; padding: 1.5rem 2rem; display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; }
+        
+        .sidebar { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1rem; position: sticky; top: 80px; height: fit-content; }
+        .sidebar-btn { background: transparent; border: none; color: var(--text-2); padding: .7rem 1rem; border-radius: 8px; font-size: .85rem; cursor: pointer; transition: .3s; text-align: left; display: flex; align-items: center; gap: .5rem; width: 100%; text-decoration: none; }
+        .sidebar-btn:hover { background: rgba(255, 255, 255, .03); color: var(--text); }
+        .sidebar-btn.active { background: rgba(99, 102, 241, .12); color: var(--primary); font-weight: 600; }
+        
+        .panel { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1.5rem; }
+        .panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+        
+        .stats-row { display: grid; grid-template-columns: repeat(5, 1fr); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-mini { background: rgba(255, 255, 255, .02); border: 1px solid var(--border); border-radius: 12px; padding: 1rem; text-align: center; }
+        .stat-mini .val { font-family: 'Space Grotesk', sans-serif; font-size: 1.8rem; font-weight: 700; }
+        .stat-mini .lbl { font-size: .7rem; color: var(--text-2); margin-top: .2rem; }
+        
+        .search-box { margin-bottom: .8rem; }
+        .search-box input { width: 100%; background: rgba(11,14,20,.6); border: 1px solid var(--border); padding: .5rem .7rem; border-radius: 6px; color: var(--text); font-size: .82rem; outline: none; }
+        
+        .filter-btns { display: flex; gap: .4rem; margin-bottom: .8rem; flex-wrap: wrap; }
+        
+        .table-container { border: 1px solid var(--border); border-radius: 8px; }
+        .table-wrapper { max-height: 600px; overflow-y: auto; }
+        .table-wrapper::-webkit-scrollbar { width: 4px; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: .78rem; }
+        th { text-align: left; padding: .6rem; color: var(--text-2); font-size: .65rem; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--bg-card); position: sticky; top: 0; z-index: 1; white-space: nowrap; }
+        td { padding: .5rem .55rem; border-bottom: 1px solid rgba(255, 255, 255, .04); }
+        
+        .btn { padding: .5rem 1rem; border-radius: 6px; font-size: .8rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .15rem; }
+        .btn.primary { background: var(--primary); color: #fff; }
+        .btn.red { background: var(--red); color: #fff; }
+        .btn.green { background: var(--green); color: #fff; }
+        .btn.orange { background: var(--orange); color: #000; }
+        
+        .btn-sm { padding: .3rem .6rem; border-radius: 4px; font-size: .68rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .1rem; }
+        .btn-sm.primary { background: var(--primary); color: #fff; }
+        .btn-sm.red { background: var(--red); color: #fff; }
+        .btn-sm.green { background: var(--green); color: #fff; }
+        .btn-sm.gold { background: var(--gold); color: #000; }
+        .btn-sm.orange { background: var(--orange); color: #000; }
+        .btn-sm.pink { background: var(--pink); color: #fff; }
+        
+        .badge { padding: .12rem .45rem; border-radius: 99px; font-size: .65rem; font-weight: 600; display: inline-block; white-space: nowrap; }
+        .badge-green { background: rgba(16, 185, 129, .15); color: var(--green); }
+        .badge-red { background: rgba(239, 68, 68, .15); color: var(--red); }
+        .badge-gold { background: rgba(251, 191, 36, .15); color: var(--gold); }
+        .badge-blue { background: rgba(99, 102, 241, .15); color: var(--primary); }
+        .badge-orange { background: rgba(245, 158, 11, .15); color: var(--orange); }
+        .badge-pink { background: rgba(236, 72, 153, .15); color: var(--pink); }
+        .badge-diamond { background: rgba(56, 189, 248, .15); color: var(--diamond); }
+        
+        .count-badge { background: rgba(99, 102, 241, .15); color: var(--primary); padding: .1rem .5rem; border-radius: 99px; font-size: .7rem; margin-left: .3rem; }
+        
+        .toast { position: fixed; top: 1.5rem; right: 1.5rem; background: var(--bg-card); border: 1px solid var(--red); padding: .8rem 1.2rem; border-radius: 12px; font-size: .85rem; z-index: 999; transform: translateX(140%); transition: .3s; max-width: 320px; }
+        .toast.show { transform: translateX(0); }
+        .toast.ok { border-color: var(--green); }
+        
+        hr { border-color: var(--border); margin: 1rem 0; }
+        
+        .origem-tag { font-size: .6rem; padding: .1rem .35rem; border-radius: 99px; font-weight: 600; }
+        .origem-tag.grande { background: rgba(251,191,36,.15); color: var(--gold); }
+        .origem-tag.normal { background: rgba(99,102,241,.15); color: var(--primary); }
+        .origem-tag.loja { background: rgba(236,72,153,.15); color: var(--pink); }
+        
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; padding: 1rem; }
+            .sidebar { display: flex; flex-wrap: wrap; gap: .3rem; position: static; }
+            .sidebar-btn { width: auto; font-size: .7rem; padding: .4rem .6rem; }
+            .stats-row { grid-template-columns: 1fr 1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    
+    <header>
+        <a href="looto.html" class="logo"><em>🛡️</em> Looto Admin</a>
+        <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+        <div>
+            <a href="looto.html" class="btn-header">🏠 Site</a>
+            <button class="btn-header" onclick="logout()" style="margin-left:.5rem;">🚪 Sair</button>
+        </div>
+    </header>
+    
+    <div class="main-layout">
+        <aside class="sidebar">
+            <a href="admin.html" class="sidebar-btn">📊 Dashboard</a>
+            <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+            <a href="abots.html" class="sidebar-btn">🤖 Bots</a>
+            <a href="asorteios.html" class="sidebar-btn">🎁 Sorteios</a>
+            <a href="alogsorteios.html" class="sidebar-btn active">📋 Log Sorteios</a>
+            <a href="achat.html" class="sidebar-btn">💬 Chat</a>
+            <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+            <a href="aloja.html" class="sidebar-btn">🛒 Loja</a>
+            <a href="admins.html" class="sidebar-btn">🔑 Admins</a>
+            <a href="aferramentas.html" class="sidebar-btn">🔧 Ferramentas</a>
+        </aside>
+        
+        <div>
+            <div class="panel">
+                <div class="panel-title">📋 Log Completo de Sorteios <span class="count-badge" id="count-log">0</span></div>
+                <p style="font-size:.75rem;color:var(--text-2);margin-bottom:1rem;">Histórico completo de todos os sorteios, baús e compras da loja.</p>
+                
+                <!-- Stats -->
+                <div class="stats-row" id="log-stats"></div>
+                
+                <!-- Ações -->
+                <div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+                    <button class="btn red" onclick="limparLogAntigo()">🗑️ Limpar +1 dia</button>
+                    <button class="btn red" onclick="limparLogCompleto()">🗑️ Limpar Tudo</button>
+                    <button class="btn orange" onclick="apagarBaúsExpirados()">📦 Baús Expirados</button>
+                    <button class="btn primary" onclick="forcarRecarregar()">🔄 Recarregar Logs</button>
+                </div>
+                
+                <!-- Filtros rápidos -->
+                <div class="filter-btns">
+                    <button class="btn-sm primary" onclick="filtrarPorTipo('todos')" id="filtro-todos">📋 Todos</button>
+                    <button class="btn-sm gold" onclick="filtrarPorTipo('grande-sorteio')" id="filtro-grande">🏆 Grande Sorteio</button>
+                    <button class="btn-sm" style="background:rgba(99,102,241,.15);color:var(--primary);" onclick="filtrarPorTipo('sorteio-normal')" id="filtro-normal">🎁 Sorteios Normais</button>
+                    <button class="btn-sm pink" onclick="filtrarPorTipo('store')" id="filtro-loja">🛒 Loja</button>
+                </div>
+                
+                <!-- Busca -->
+                <div class="search-box">
+                    <input type="text" id="search-log" placeholder="🔍 Buscar por jogo, criador, vencedor, key..." oninput="filtrarLog()">
+                </div>
+                
+                <!-- Tabela -->
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Origem</th>
+                                    <th>Data</th>
+                                    <th>Jogo / Sorteio</th>
+                                    <th>Key / Recompensa</th>
+                                    <th>Criador</th>
+                                    <th>Vencedor</th>
+                                    <th>Plataforma</th>
+                                    <th>Part.</th>
+                                    <th>Status</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-log"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div style="text-align:center;padding:.5rem;font-size:.7rem;color:var(--text-2);" id="log-info"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, get, remove, query, orderByChild, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+        authDomain: "looto-f46e5.firebaseapp.com",
+        databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+        projectId: "looto-f46e5",
+        storageBucket: "looto-f46e5.firebasestorage.app",
+        messagingSenderId: "295066400995",
+        appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    
+    const LIMITE_LOGS = 500;
+    let allLogs = [];
+    let filtroTipo = 'todos';
+    let unsubscribeLogs = null;
+    let unsubscribeChat = null;
+    
+    function toast(msg, ok = false) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (ok ? ' ok' : '');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+    
+    window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+    
+    async function checkAdmin(user) {
+        if (!user) return false;
+        if (user.email === 'startubez.com@gmail.com') return true;
+        const snap = await get(ref(db, 'admins'));
+        if (!snap.exists()) return false;
+        const admins = snap.val();
+        for (let key of Object.keys(admins)) { const a = admins[key]; if (a.uid === user.uid || a.email === user.email) return true; }
+        return false;
+    }
+    
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const isAdmin = await checkAdmin(user);
+        if (!isAdmin) {
+            document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;flex-direction:column;gap:1rem;padding:2rem;"><h1 style="font-family:'Space Grotesk',sans-serif;font-size:3rem;color:#ef4444;">🚫 Acesso Negado</h1><p style="color:#9ca3af;">Você não tem permissão.</p><a href="looto.html" style="background:#6366f1;color:#fff;padding:.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;">Ir para o Site</a></div>`;
+            setTimeout(() => window.location.href = 'looto.html', 3000);
+            return;
+        }
+        document.getElementById('admin-info').textContent = `👑 ${user.email}`;
+        carregarLogs();
+    });
+    
+    // ═══ CARREGAR LOGS EM TEMPO REAL ═══
+    function carregarLogs() {
+        // Desinscrever listeners antigos
+        if (unsubscribeLogs) unsubscribeLogs();
+        if (unsubscribeChat) unsubscribeChat();
+        
+        // Listener para logSorteios
+        const logsQuery = query(ref(db, 'logSorteios'), orderByChild('data'), limitToLast(LIMITE_LOGS));
+        unsubscribeLogs = onValue(logsQuery, (snap) => {
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    const existingIndex = allLogs.findIndex(l => l.id === child.key && l.source === 'logSorteios');
+                    const logData = { id: child.key, source: 'logSorteios', origem: 'sorteio-normal', ...child.val() };
+                    
+                    // Adicionar título do sorteio se existir
+                    if (logData.jogo && !logData.titulo) logData.titulo = logData.jogo;
+                    
+                    if (existingIndex === -1) {
+                        allLogs.push(logData);
+                    } else {
+                        allLogs[existingIndex] = logData;
+                    }
+                });
+            }
+            reorganizarLogs();
+        });
+        
+        // Listener para chat (baús)
+        const chatQuery = query(ref(db, 'chat'), orderByChild('ts'), limitToLast(LIMITE_LOGS));
+        unsubscribeChat = onValue(chatQuery, (snap) => {
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    const msg = child.val();
+                    if (msg.type !== 'treasure') return;
+                    
+                    let origem = 'sorteio-normal';
+                    if (msg.sorteioId === 'grande-sorteio') origem = 'grande-sorteio';
+                    else if (msg.sorteioId === 'store-purchase') origem = 'store';
+                    
+                    const existingIndex = allLogs.findIndex(l => l.id === child.key && l.source === 'chat');
+                    const logData = {
+                        id: child.key, source: 'chat', origem,
+                        data: msg.ts || Date.now(),
+                        titulo: msg.keyGame || 'Jogo',
+                        jogo: msg.keyGame || 'Jogo',
+                        key: msg.keyCode || 'XXXXX',
+                        criador: 'Sistema', criadorId: '',
+                        vencedor: msg.openedByName || msg.nome || '—',
+                        vencedorId: msg.openedBy || msg.uid || '',
+                        plataforma: msg.keyPlatform || 'Steam',
+                        totalParticipantes: 0, totalArrecadado: 0,
+                        status: msg.opened ? 'Baú Aberto' : 'Baú Fechado',
+                        opened: msg.opened || false,
+                        openedAt: msg.openedAt || 0,
+                        sorteioId: msg.sorteioId || ''
+                    };
+                    
+                    if (existingIndex === -1) {
+                        allLogs.push(logData);
+                    } else {
+                        allLogs[existingIndex] = logData;
+                    }
+                });
+            }
+            reorganizarLogs();
+        });
+    }
+    
+    function reorganizarLogs() {
+        allLogs.sort((a, b) => (b.data || 0) - (a.data || 0));
+        document.getElementById('count-log').textContent = allLogs.length;
+        atualizarStats();
+        atualizarBotoesFiltro();
+        filtrarLog();
+    }
+    
+    window.forcarRecarregar = function() {
+        allLogs = [];
+        carregarLogs();
+        toast('🔄 Logs recarregados!', true);
+    };
+    
+    function atualizarStats() {
+        const total = allLogs.length;
+        const grandeSorteio = allLogs.filter(l => l.origem === 'grande-sorteio').length;
+        const sorteiosNormais = allLogs.filter(l => l.origem === 'sorteio-normal').length;
+        const loja = allLogs.filter(l => l.origem === 'store').length;
+        const abertos = allLogs.filter(l => l.status === 'Baú Aberto' || l.status === 'Entregue').length;
+        
+        document.getElementById('log-stats').innerHTML = `
+            <div class="stat-mini"><div class="val" style="color:#6366f1;">${total}</div><div class="lbl">Total</div></div>
+            <div class="stat-mini"><div class="val" style="color:#fbbf24;">${grandeSorteio}</div><div class="lbl">🏆 Grande</div></div>
+            <div class="stat-mini"><div class="val" style="color:#6366f1;">${sorteiosNormais}</div><div class="lbl">🎁 Normais</div></div>
+            <div class="stat-mini"><div class="val" style="color:#ec4899;">${loja}</div><div class="lbl">🛒 Loja</div></div>
+            <div class="stat-mini"><div class="val" style="color:#10b981;">${abertos}</div><div class="lbl">Abertos</div></div>`;
+    }
+    
+    function atualizarBotoesFiltro() {
+        document.querySelectorAll('.filter-btns .btn-sm').forEach(b => b.style.opacity = '0.7');
+        let btnId = 'filtro-todos';
+        if (filtroTipo === 'sorteio-normal') btnId = 'filtro-normal';
+        else if (filtroTipo === 'grande-sorteio') btnId = 'filtro-grande';
+        else if (filtroTipo === 'store') btnId = 'filtro-loja';
+        else btnId = 'filtro-todos';
+        const ativo = document.getElementById(btnId);
+        if (ativo) ativo.style.opacity = '1';
+    }
+    
+    window.filtrarPorTipo = function(tipo) {
+        filtroTipo = tipo;
+        document.getElementById('search-log').value = '';
+        atualizarBotoesFiltro();
+        filtrarLog();
+    };
+    
+    window.filtrarLog = function() {
+        const search = (document.getElementById('search-log')?.value || '').toLowerCase();
+        const tbody = document.getElementById('table-log');
+        const info = document.getElementById('log-info');
+        
+        let filtered = [...allLogs];
+        if (filtroTipo === 'grande-sorteio') filtered = filtered.filter(l => l.origem === 'grande-sorteio');
+        else if (filtroTipo === 'sorteio-normal') filtered = filtered.filter(l => l.origem === 'sorteio-normal');
+        else if (filtroTipo === 'store') filtered = filtered.filter(l => l.origem === 'store');
+        
+        if (search) {
+            filtered = filtered.filter(l => 
+                (l.titulo || l.jogo || '').toLowerCase().includes(search) ||
+                (l.criador || '').toLowerCase().includes(search) ||
+                (l.vencedor || '').toLowerCase().includes(search) ||
+                (l.key || '').toLowerCase().includes(search) ||
+                (l.plataforma || '').toLowerCase().includes(search)
+            );
+        }
+        
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="10" style="text-align:center;padding:2rem;">Nenhum log encontrado</td></tr>';
+            info.textContent = search ? `Nenhum resultado para "${search}"` : 'Nenhum log';
+            return;
+        }
+        
+        info.textContent = `Mostrando ${filtered.length} de ${allLogs.length} logs`;
+        
+        tbody.innerHTML = filtered.map(l => {
+            const dataStr = l.data ? new Date(l.data).toLocaleString('pt-BR') : '—';
+            const keyStr = (l.status === 'Baú Fechado' && l.source === 'chat') ? '🔒 Oculto' : (l.key || '—');
+            
+            let origemTag = '';
+            let origemCor = '';
+            if (l.origem === 'grande-sorteio') {
+                origemTag = '<span class="origem-tag grande">🏆 Grande Sorteio</span>';
+                origemCor = 'color:#fbbf24';
+            } else if (l.origem === 'store') {
+                origemTag = '<span class="origem-tag loja">🛒 Loja</span>';
+                origemCor = 'color:#ec4899';
+            } else {
+                origemTag = '<span class="origem-tag normal">🎁 Sorteio Normal</span>';
+                origemCor = 'color:#6366f1';
+            }
+            
+            const titulo = l.titulo || l.jogo || 'Sorteio';
+            const participantes = l.totalParticipantes || 0;
+            
+            let statusBadge = 'badge-green';
+            let statusTexto = l.status || '—';
+            if (l.status === 'Baú Fechado') statusBadge = 'badge-orange';
+            else if (l.status === 'Sem participantes') statusBadge = 'badge-red';
+            else if (l.status === 'Entregue') statusBadge = 'badge-green';
+            
+            return `
+            <tr style="${origemCor}">
+                <td>${origemTag}</td>
+                <td style="font-size:.68rem;">${dataStr}</td>
+                <td><strong>${titulo}</strong></td>
+                <td style="font-family:monospace;font-size:.62rem;color:var(--gold);max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${keyStr}">${keyStr}</td>
+                <td>${l.criador || 'Anônimo'}</td>
+                <td><strong>${l.vencedor || '—'}</strong></td>
+                <td>${l.plataforma || 'Steam'}</td>
+                <td>👥 ${participantes}</td>
+                <td><span class="badge ${statusBadge}">${statusTexto}</span></td>
+                <td><button class="btn-sm red" onclick="deletarLog('${l.source}','${l.id}')">🗑️</button></td>
+            </tr>`;
+        }).join('');
+    };
+    
+    window.deletarLog = async function(source, id) {
+        if (!confirm('Deletar este log permanentemente?')) return;
+        if (source === 'chat') await remove(ref(db, 'chat/' + id));
+        else await remove(ref(db, 'logSorteios/' + id));
+        toast('🗑️ Log removido!', true);
+        // Remove da lista local
+        const index = allLogs.findIndex(l => l.id === id && l.source === source);
+        if (index !== -1) allLogs.splice(index, 1);
+        reorganizarLogs();
+    };
+    
+    window.limparLogAntigo = async function() {
+        if (!confirm('🗑️ Remover logs com mais de 1 dia?')) return;
+        const umDiaAtras = Date.now() - 86400000;
+        let removidos = 0;
+        
+        const logsToRemove = allLogs.filter(l => (l.data || 0) < umDiaAtras);
+        for (const log of logsToRemove) {
+            try {
+                if (log.source === 'chat') await remove(ref(db, 'chat/' + log.id));
+                else await remove(ref(db, 'logSorteios/' + log.id));
+                removidos++;
+            } catch(e) { console.error(e); }
+        }
+        
+        allLogs = allLogs.filter(l => (l.data || 0) >= umDiaAtras);
+        reorganizarLogs();
+        toast(`🗑️ ${removidos} logs removidos!`, true);
+    };
+    
+    window.limparLogCompleto = async function() {
+        if (!confirm('⚠️ Apagar TODOS os logs? Esta ação é irreversível!')) return;
+        let removidos = 0;
+        
+        for (const log of allLogs) {
+            try {
+                if (log.source === 'chat') await remove(ref(db, 'chat/' + log.id));
+                else await remove(ref(db, 'logSorteios/' + log.id));
+                removidos++;
+            } catch(e) { console.error(e); }
+        }
+        
+        allLogs = [];
+        reorganizarLogs();
+        toast(`🗑️ ${removidos} logs removidos!`, true);
+    };
+    
+    window.apagarBaúsExpirados = async function() {
+        const agora = Date.now();
+        let removidos = 0;
+        
+        const bausToRemove = allLogs.filter(l => {
+            if (l.source !== 'chat') return false;
+            if (l.opened && l.openedAt && (agora - l.openedAt > 600000)) return true;
+            if (!l.opened && l.data && (agora - l.data > 86400000)) return true;
+            return false;
+        });
+        
+        for (const bau of bausToRemove) {
+            try {
+                await remove(ref(db, 'chat/' + bau.id));
+                removidos++;
+            } catch(e) { console.error(e); }
+        }
+        
+        allLogs = allLogs.filter(l => !bausToRemove.includes(l));
+        reorganizarLogs();
+        toast(`📦 ${removidos} baús expirados removidos!`, true);
+    };
+    </script>
+</body>
+</html>

@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Recompensas Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14; --bg-card: #151a26; --text: #f3f4f6; --text-2: #9ca3af;
+            --primary: #6366f1; --green: #10b981; --red: #ef4444; --gold: #fbbf24;
+            --orange: #f59e0b; --pink: #ec4899; --diamond: #38bdf8;
+            --border: rgba(255,255,255,0.06);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+        body { background:var(--bg); color:var(--text); min-height:100vh; }
+        
+        header { background:rgba(11,14,20,0.95); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; backdrop-filter:blur(16px); padding:.9rem 2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; }
+        .logo { font-family:'Space Grotesk',sans-serif; font-size:1.3rem; font-weight:700; color:var(--text); text-decoration:none; }
+        .logo em { color:var(--red); font-style:normal; }
+        .btn-header { background:transparent; border:1px solid var(--border); color:var(--text-2); padding:.4rem .8rem; border-radius:6px; font-size:.8rem; cursor:pointer; transition:.3s; text-decoration:none; }
+        .btn-header:hover { border-color:var(--red); color:var(--red); }
+        
+        .main-layout { max-width:1600px; margin:0 auto; padding:1.5rem 2rem; display:grid; grid-template-columns:220px 1fr; gap:1.5rem; }
+        .sidebar { background:var(--bg-card); border-radius:14px; border:1px solid var(--border); padding:1rem; position:sticky; top:80px; height:fit-content; }
+        .sidebar-btn { background:transparent; border:none; color:var(--text-2); padding:.7rem 1rem; border-radius:8px; font-size:.85rem; cursor:pointer; transition:.3s; text-align:left; display:flex; align-items:center; gap:.5rem; width:100%; text-decoration:none; }
+        .sidebar-btn:hover { background:rgba(255,255,255,.03); color:var(--text); }
+        .sidebar-btn.active { background:rgba(99,102,241,.12); color:var(--primary); font-weight:600; }
+        
+        .panel { background:var(--bg-card); border-radius:14px; border:1px solid var(--border); padding:1.5rem; margin-bottom:1.5rem; }
+        .panel-title { font-family:'Space Grotesk',sans-serif; font-size:1.2rem; font-weight:700; margin-bottom:1rem; display:flex; align-items:center; gap:.5rem; }
+        
+        input, select, textarea { background:rgba(11,14,20,.6); border:1px solid var(--border); padding:.5rem .7rem; border-radius:6px; color:var(--text); font-size:.82rem; outline:none; width:100%; }
+        input:focus, select:focus, textarea:focus { border-color:var(--primary); }
+        
+        .btn { padding:.5rem 1rem; border-radius:6px; font-size:.8rem; font-weight:600; cursor:pointer; border:none; transition:.3s; margin:.15rem; }
+        .btn.primary { background:var(--primary); color:#fff; }
+        .btn.red { background:var(--red); color:#fff; }
+        .btn.green { background:var(--green); color:#fff; }
+        .btn.gold { background:var(--gold); color:#000; }
+        .btn.pink { background:var(--pink); color:#fff; }
+        
+        .btn-sm { padding:.3rem .6rem; border-radius:4px; font-size:.7rem; font-weight:600; cursor:pointer; border:none; transition:.3s; margin:.1rem; }
+        .btn-sm.primary { background:var(--primary); color:#fff; }
+        .btn-sm.red { background:var(--red); color:#fff; }
+        .btn-sm.green { background:var(--green); color:#fff; }
+        .btn-sm.gold { background:var(--gold); color:#000; }
+        
+        .field { margin-bottom:.8rem; }
+        .field label { font-size:.75rem; color:var(--text-2); display:block; margin-bottom:.2rem; }
+        .field-row { display:grid; grid-template-columns:1fr 1fr; gap:.75rem; }
+        .field-row-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:.75rem; }
+        
+        .badge { padding:.15rem .5rem; border-radius:99px; font-size:.7rem; font-weight:600; display:inline-block; }
+        .badge-green { background:rgba(16,185,129,.15); color:var(--green); }
+        .badge-gold { background:rgba(251,191,36,.15); color:var(--gold); }
+        .badge-red { background:rgba(239,68,68,.15); color:var(--red); }
+        .badge-blue { background:rgba(99,102,241,.15); color:var(--primary); }
+        .badge-orange { background:rgba(245,158,11,.15); color:var(--orange); }
+        .badge-pink { background:rgba(236,72,153,.15); color:var(--pink); }
+        .badge-diamond { background:rgba(56,189,248,.15); color:var(--diamond); }
+        
+        .count-badge { background:rgba(99,102,241,.15); color:var(--primary); padding:.1rem .5rem; border-radius:99px; font-size:.7rem; margin-left:.3rem; }
+        
+        .card-config { background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:10px; padding:1rem; margin-bottom:.8rem; }
+        .card-config h5 { font-family:'Space Grotesk',sans-serif; font-size:.85rem; margin-bottom:.5rem; display:flex; align-items:center; gap:.4rem; }
+        
+        .table-container { border:1px solid var(--border); border-radius:8px; }
+        .table-wrapper { max-height:500px; overflow-y:auto; }
+        .table-wrapper::-webkit-scrollbar { width:4px; }
+        .table-wrapper::-webkit-scrollbar-thumb { background:rgba(255,255,255,.1); border-radius:99px; }
+        
+        table { width:100%; border-collapse:collapse; font-size:.8rem; }
+        th { text-align:left; padding:.6rem; color:var(--text-2); font-size:.7rem; text-transform:uppercase; border-bottom:1px solid var(--border); background:var(--bg-card); position:sticky; top:0; z-index:1; }
+        td { padding:.55rem .6rem; border-bottom:1px solid rgba(255,255,255,.04); }
+        
+        hr { border-color:var(--border); margin:1rem 0; }
+        
+        .toast { position:fixed; top:1.5rem; right:1.5rem; background:var(--bg-card); border:1px solid var(--red); padding:.8rem 1.2rem; border-radius:12px; font-size:.85rem; z-index:999; transform:translateX(140%); transition:.3s; max-width:320px; }
+        .toast.show { transform:translateX(0); }
+        .toast.ok { border-color:var(--green); }
+        
+        .preview-popup {
+            background:linear-gradient(135deg,#1a1d2e,#0f1220);
+            border:2px solid var(--gold);
+            border-radius:20px;
+            padding:2rem;
+            text-align:center;
+            max-width:400px;
+            margin:1rem auto;
+            box-shadow:0 20px 60px rgba(0,0,0,0.6);
+        }
+        .preview-popup .popup-icon { font-size:3rem; display:block; }
+        .preview-popup .popup-title { font-family:'Space Grotesk',sans-serif; font-size:1.3rem; font-weight:700; color:var(--gold); margin:.5rem 0; }
+        .preview-popup .popup-desc { font-size:.8rem; color:var(--text-2); margin-bottom:.8rem; }
+        .preview-popup .popup-reward { font-size:1rem; font-weight:700; color:var(--green); }
+        .preview-popup .popup-btn {
+            background:var(--primary); color:#fff; border:none;
+            padding:.7rem 2rem; border-radius:50px; font-size:.9rem;
+            font-weight:700; cursor:pointer; margin-top:.8rem;
+            font-family:'Space Grotesk',sans-serif;
+        }
+        
+        @media (max-width:768px) {
+            .main-layout { grid-template-columns:1fr; padding:1rem; }
+            .sidebar { display:flex; flex-wrap:wrap; gap:.3rem; position:static; }
+            .sidebar-btn { width:auto; font-size:.7rem; padding:.4rem .6rem; }
+            .field-row, .field-row-3 { grid-template-columns:1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    
+    <header>
+        <a href="/looto.html" class="logo"><em>🛡️</em> Looto Admin</a>
+        <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+        <div>
+            <a href="/looto.html" class="btn-header">🏠 Site</a>
+            <button class="btn-header" onclick="logout()" style="margin-left:.5rem;">🚪 Sair</button>
+        </div>
+    </header>
+    
+    <div class="main-layout">
+        <aside class="sidebar">
+            <a href="admin.html" class="sidebar-btn">📊 Dashboard</a>
+            <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+            <a href="abots.html" class="sidebar-btn">🤖 Bots</a>
+            <a href="asorteios.html" class="sidebar-btn">🎁 Sorteios</a>
+            <a href="alogsorteios.html" class="sidebar-btn">📋 Log Sorteios</a>
+            <a href="achat.html" class="sidebar-btn">💬 Chat</a>
+            <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+            <a href="aloja.html" class="sidebar-btn">🛒 Loja</a>
+            <a href="admins.html" class="sidebar-btn">🔑 Admins</a>
+            <a href="ainfluencer.html" class="sidebar-btn">🌟 Influencers</a>
+            <a href="arecompensas.html" class="sidebar-btn active">🎯 Recompensas</a>
+            <a href="aferramentas.html" class="sidebar-btn">🔧 Ferramentas</a>
+        </aside>
+        
+        <div>
+            <div class="panel">
+                <div class="panel-title">🎯 Sistema de Recompensas Diárias <span class="count-badge" id="count-recompensas">0</span></div>
+                <p style="font-size:.78rem;color:var(--text-2);margin-bottom:1rem;">
+                    Configure recompensas diárias que aparecem como popup no site. Cada usuário pode resgatar uma vez por dia.
+                </p>
+                
+                <!-- Adicionar Recompensa -->
+                <div class="card-config">
+                    <h5>➕ Adicionar/Nova Recompensa Diária</h5>
+                    <div class="field-row">
+                        <div class="field"><label>🏷️ Título *</label><input type="text" id="rec-titulo" placeholder="Ex: Recompensa do Dia 1" oninput="atualizarPreview()"></div>
+                        <div class="field"><label>📝 Descrição</label><input type="text" id="rec-descricao" placeholder="Ex: Resgate seu presente diário!" oninput="atualizarPreview()"></div>
+                    </div>
+                    <div class="field-row-3">
+                        <div class="field"><label>🎁 Tipo de Recompensa *</label><select id="rec-tipo" onchange="toggleTipoRecompensa(); atualizarPreview();">
+                            <option value="xp">⭐ XP</option>
+                            <option value="money">💰 Money</option>
+                            <option value="key">🔑 Key de Jogo</option>
+                            <option value="nivel">👑 Up de Nível</option>
+                            <option value="giftcard">🎁 Gift Card</option>
+                        </select></div>
+                        <div class="field"><label>🔢 Quantidade *</label><input type="number" id="rec-quantidade" value="100" min="1" oninput="atualizarPreview()"></div>
+                        <div class="field"><label>🖼️ Emoji/Ícone</label><input type="text" id="rec-icone" placeholder="🎁" maxlength="10" oninput="atualizarPreview()"></div>
+                    </div>
+                    <div id="rec-key-field" style="display:none;">
+                        <div class="field-row">
+                            <div class="field"><label>🔑 Key do Jogo *</label><input type="text" id="rec-key" placeholder="XXXXX-XXXXX-XXXXX"></div>
+                            <div class="field"><label>🎮 Nome do Jogo *</label><input type="text" id="rec-jogo" placeholder="Nome do jogo"></div>
+                        </div>
+                        <div class="field"><label>🖥️ Plataforma</label><select id="rec-plataforma"><option value="Steam">Steam</option><option value="Epic">Epic</option><option value="GOG">GOG</option><option value="Outro">Outro</option></select></div>
+                    </div>
+                    <div id="rec-giftcard-field" style="display:none;">
+                        <div class="field"><label>🎁 Código do Gift Card *</label><input type="text" id="rec-giftcard" placeholder="Código do gift card"></div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field"><label>📅 Dia (1-365) *</label><input type="number" id="rec-dia" value="1" min="1" max="365"></div>
+                        <div class="field"><label>🎨 Cor do Tema</label><select id="rec-cor" onchange="atualizarPreview()">
+                            <option value="gold">🟡 Dourado</option>
+                            <option value="primary">🔵 Azul</option>
+                            <option value="green">🟢 Verde</option>
+                            <option value="pink">🩷 Rosa</option>
+                            <option value="diamond">💎 Diamante</option>
+                        </select></div>
+                    </div>
+                    <div class="field"><label>Status</label><select id="rec-ativo"><option value="true">🟢 Ativo</option><option value="false">🔴 Inativo</option></select></div>
+                    <button class="btn primary" id="btn-salvar-rec" onclick="adicionarRecompensa()" style="width:100%;">➕ Adicionar Recompensa</button>
+                </div>
+                
+                <!-- Preview do Popup -->
+                <div class="card-config">
+                    <h5>👁️ Preview do Popup</h5>
+                    <div class="preview-popup" id="preview-popup">
+                        <span class="popup-icon" id="popup-icon">🎁</span>
+                        <div class="popup-title" id="popup-title">Recompensa Diária</div>
+                        <div class="popup-desc" id="popup-desc">Resgate seu presente diário!</div>
+                        <div class="popup-reward" id="popup-reward">⭐ +100 XP</div>
+                        <button class="popup-btn" id="popup-btn-preview">🎁 RESGATAR</button>
+                    </div>
+                </div>
+                
+                <hr>
+                
+                <!-- Lista de Recompensas -->
+                <h5 style="font-family:'Space Grotesk',sans-serif;margin-bottom:.5rem;">📋 Recompensas Cadastradas</h5>
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead>
+                                <tr><th>Dia</th><th>Título</th><th>Tipo</th><th>Qtd</th><th>Ícone</th><th>Cor</th><th>Status</th><th>Ações</th></tr>
+                            </thead>
+                            <tbody id="table-recompensas"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, push, set, get, update, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+        authDomain: "looto-f46e5.firebaseapp.com",
+        databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+        projectId: "looto-f46e5",
+        storageBucket: "looto-f46e5.firebasestorage.app",
+        messagingSenderId: "295066400995",
+        appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    
+    let allRecompensas = [];
+    let editandoId = null;
+    
+    function toast(msg, ok = false) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (ok ? ' ok' : '');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+    
+    window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+    
+    async function checkAdmin(user) {
+        if (!user) return false;
+        if (user.email === 'startubez.com@gmail.com') return true;
+        const snap = await get(ref(db, 'admins'));
+        if (!snap.exists()) return false;
+        const admins = snap.val();
+        for (let key of Object.keys(admins)) { const a = admins[key]; if (a.uid === user.uid || a.email === user.email) return true; }
+        return false;
+    }
+    
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const isAdmin = await checkAdmin(user);
+        if (!isAdmin) {
+            document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;flex-direction:column;gap:1rem;padding:2rem;"><h1 style="font-family:'Space Grotesk',sans-serif;font-size:3rem;color:#ef4444;">🚫 Acesso Negado</h1><p style="color:#9ca3af;">Você não tem permissão.</p><a href="/looto.html" style="background:#6366f1;color:#fff;padding:.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;">Ir para o Site</a></div>`;
+            setTimeout(() => window.location.href = '/looto.html', 3000);
+            return;
+        }
+        document.getElementById('admin-info').textContent = `👑 ${user.email}`;
+        carregarRecompensas();
+    });
+    
+    window.toggleTipoRecompensa = function() {
+        const tipo = document.getElementById('rec-tipo').value;
+        document.getElementById('rec-key-field').style.display = tipo === 'key' ? 'block' : 'none';
+        document.getElementById('rec-giftcard-field').style.display = tipo === 'giftcard' ? 'block' : 'none';
+    };
+    
+    window.atualizarPreview = function() {
+        const titulo = document.getElementById('rec-titulo').value || 'Recompensa Diária';
+        const desc = document.getElementById('rec-descricao').value || 'Resgate seu presente diário!';
+        const tipo = document.getElementById('rec-tipo').value;
+        const qtd = document.getElementById('rec-quantidade').value || '100';
+        const icone = document.getElementById('rec-icone').value || '🎁';
+        const cor = document.getElementById('rec-cor').value;
+        
+        const cores = { gold: '#fbbf24', primary: '#6366f1', green: '#10b981', pink: '#ec4899', diamond: '#38bdf8' };
+        const corHex = cores[cor] || '#fbbf24';
+        const tipoNome = { xp: '⭐ XP', money: '💰 Money', key: '🔑 Key', nivel: '👑 Nível', giftcard: '🎁 Gift Card' };
+        const qtdStr = tipo === 'nivel' ? `Nível +${qtd}` : tipo === 'key' ? 'Jogo' : `+${qtd} ${tipoNome[tipo]}`;
+        
+        document.getElementById('popup-icon').textContent = icone;
+        document.getElementById('popup-title').textContent = titulo;
+        document.getElementById('popup-title').style.color = corHex;
+        document.getElementById('popup-desc').textContent = desc;
+        document.getElementById('popup-reward').textContent = `${tipoNome[tipo]} ${qtdStr}`;
+        document.getElementById('popup-btn-preview').style.background = corHex;
+        document.getElementById('preview-popup').style.borderColor = corHex;
+    };
+    
+    async function carregarRecompensas() {
+        const snap = await get(ref(db, 'recompensasDiarias'));
+        allRecompensas = [];
+        if (snap.exists()) {
+            const data = snap.val();
+            allRecompensas = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+        }
+        allRecompensas.sort((a, b) => (a.dia || 0) - (b.dia || 0));
+        document.getElementById('count-recompensas').textContent = allRecompensas.length;
+        renderTabela();
+    }
+    
+    function renderTabela() {
+        const tbody = document.getElementById('table-recompensas');
+        const tipoNome = { xp: '⭐ XP', money: '💰 Money', key: '🔑 Key', nivel: '👑 Nível', giftcard: '🎁 Gift Card' };
+        const corNome = { gold: '🟡', primary: '🔵', green: '🟢', pink: '🩷', diamond: '💎' };
+        
+        if (allRecompensas.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;">Nenhuma recompensa cadastrada</td></tr>';
+            return;
+        }
+        
+        tbody.innerHTML = allRecompensas.map(r => `
+            <tr>
+                <td><span class="badge badge-gold">Dia ${r.dia || 1}</span></td>
+                <td><strong>${r.titulo || '—'}</strong></td>
+                <td>${tipoNome[r.tipo] || r.tipo}</td>
+                <td>${r.tipo === 'key' ? '🎮' : r.tipo === 'giftcard' ? '🎁' : (r.quantidade || 0)}</td>
+                <td style="font-size:1.2rem;">${r.icone || '🎁'}</td>
+                <td>${corNome[r.cor] || '🟡'} ${r.cor || 'gold'}</td>
+                <td><span class="badge ${r.ativo !== false ? 'badge-green' : 'badge-red'}">${r.ativo !== false ? 'Ativo' : 'Inativo'}</span></td>
+                <td>
+                    <button class="btn-sm primary" onclick="editarRecompensa('${r.id}')">✏️</button>
+                    <button class="btn-sm red" onclick="deletarRecompensa('${r.id}')">🗑️</button>
+                </td>
+            </tr>
+        `).join('');
+    }
+    
+    window.adicionarRecompensa = async function() {
+        const titulo = document.getElementById('rec-titulo').value.trim();
+        if (!titulo) { toast('⚠️ Preencha o título!'); return; }
+        
+        const tipo = document.getElementById('rec-tipo').value;
+        const data = {
+            titulo,
+            descricao: document.getElementById('rec-descricao').value.trim(),
+            tipo,
+            quantidade: parseInt(document.getElementById('rec-quantidade').value) || 100,
+            icone: document.getElementById('rec-icone').value || '🎁',
+            dia: parseInt(document.getElementById('rec-dia').value) || 1,
+            cor: document.getElementById('rec-cor').value,
+            ativo: document.getElementById('rec-ativo').value === 'true',
+            atualizadoEm: Date.now()
+        };
+        
+        if (tipo === 'key') {
+            data.key = document.getElementById('rec-key').value.trim();
+            data.jogo = document.getElementById('rec-jogo').value.trim();
+            data.plataforma = document.getElementById('rec-plataforma').value;
+            if (!data.key || !data.jogo) { toast('⚠️ Preencha key e nome do jogo!'); return; }
+        }
+        
+        if (tipo === 'giftcard') {
+            data.giftcard = document.getElementById('rec-giftcard').value.trim();
+            if (!data.giftcard) { toast('⚠️ Digite o código do gift card!'); return; }
+        }
+        
+        try {
+            if (editandoId) {
+                // Atualizar
+                await update(ref(db, 'recompensasDiarias/' + editandoId), data);
+                toast('✅ Recompensa atualizada!', true);
+                editandoId = null;
+                document.getElementById('btn-salvar-rec').textContent = '➕ Adicionar Recompensa';
+            } else {
+                // Criar nova
+                const novaRef = push(ref(db, 'recompensasDiarias'));
+                await set(novaRef, { ...data, criadoEm: Date.now() });
+                toast('✅ Recompensa adicionada!', true);
+            }
+            
+            // Limpa campos
+            limparFormulario();
+            carregarRecompensas();
+        } catch(e) {
+            console.error('❌ Erro:', e);
+            toast('❌ Erro: ' + e.message);
+        }
+    };
+    
+    function limparFormulario() {
+        document.getElementById('rec-titulo').value = '';
+        document.getElementById('rec-descricao').value = '';
+        document.getElementById('rec-quantidade').value = '100';
+        document.getElementById('rec-icone').value = '🎁';
+        document.getElementById('rec-key').value = '';
+        document.getElementById('rec-jogo').value = '';
+        document.getElementById('rec-giftcard').value = '';
+        document.getElementById('rec-dia').value = '1';
+        document.getElementById('rec-cor').value = 'gold';
+        document.getElementById('rec-ativo').value = 'true';
+        document.getElementById('rec-tipo').value = 'xp';
+        document.getElementById('rec-key-field').style.display = 'none';
+        document.getElementById('rec-giftcard-field').style.display = 'none';
+        editandoId = null;
+        document.getElementById('btn-salvar-rec').textContent = '➕ Adicionar Recompensa';
+        atualizarPreview();
+    }
+    
+    window.editarRecompensa = async function(id) {
+        const r = allRecompensas.find(x => x.id === id);
+        if (!r) return;
+        
+        editandoId = id;
+        
+        document.getElementById('rec-titulo').value = r.titulo || '';
+        document.getElementById('rec-descricao').value = r.descricao || '';
+        document.getElementById('rec-tipo').value = r.tipo || 'xp';
+        document.getElementById('rec-quantidade').value = r.quantidade || 100;
+        document.getElementById('rec-icone').value = r.icone || '🎁';
+        document.getElementById('rec-dia').value = r.dia || 1;
+        document.getElementById('rec-cor').value = r.cor || 'gold';
+        document.getElementById('rec-ativo').value = r.ativo !== false ? 'true' : 'false';
+        
+        if (r.tipo === 'key') {
+            document.getElementById('rec-key').value = r.key || '';
+            document.getElementById('rec-jogo').value = r.jogo || '';
+            document.getElementById('rec-plataforma').value = r.plataforma || 'Steam';
+        }
+        if (r.tipo === 'giftcard') {
+            document.getElementById('rec-giftcard').value = r.giftcard || '';
+        }
+        
+        toggleTipoRecompensa();
+        atualizarPreview();
+        document.getElementById('btn-salvar-rec').textContent = '💾 Atualizar Recompensa';
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    };
+    
+    window.deletarRecompensa = async function(id) {
+        if (!confirm('🗑️ Deletar esta recompensa permanentemente?')) return;
+        await remove(ref(db, 'recompensasDiarias/' + id));
+        carregarRecompensas();
+        toast('🗑️ Recompensa removida!', true);
+    };
+    
+    // Inicializa preview
+    atualizarPreview();
+    </script>
+</body>
+</html>

@@ -1,0 +1,337 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Chat Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --bg-card: #151a26;
+            --text: #f3f4f6;
+            --text-2: #9ca3af;
+            --primary: #6366f1;
+            --green: #10b981;
+            --red: #ef4444;
+            --gold: #fbbf24;
+            --orange: #f59e0b;
+            --pink: #ec4899;
+            --diamond: #38bdf8;
+            --border: rgba(255, 255, 255, 0.06);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+        
+        header {
+            background: rgba(11, 14, 20, 0.95);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(16px);
+            padding: .9rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .5rem;
+        }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text); text-decoration: none; }
+        .logo em { color: var(--red); font-style: normal; }
+        .btn-header { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: .4rem .8rem; border-radius: 6px; font-size: .8rem; cursor: pointer; transition: .3s; text-decoration: none; }
+        .btn-header:hover { border-color: var(--red); color: var(--red); }
+        
+        .main-layout { max-width: 1600px; margin: 0 auto; padding: 1.5rem 2rem; display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; }
+        
+        .sidebar { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1rem; position: sticky; top: 80px; height: fit-content; }
+        .sidebar-btn { background: transparent; border: none; color: var(--text-2); padding: .7rem 1rem; border-radius: 8px; font-size: .85rem; cursor: pointer; transition: .3s; text-align: left; display: flex; align-items: center; gap: .5rem; width: 100%; text-decoration: none; }
+        .sidebar-btn:hover { background: rgba(255, 255, 255, .03); color: var(--text); }
+        .sidebar-btn.active { background: rgba(99, 102, 241, .12); color: var(--primary); font-weight: 600; }
+        
+        .panel { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1.5rem; }
+        .panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+        
+        .search-box { margin-bottom: .8rem; }
+        .search-box input { width: 100%; }
+        
+        .table-container { border: 1px solid var(--border); border-radius: 8px; }
+        .table-wrapper { max-height: 600px; overflow-y: auto; }
+        .table-wrapper::-webkit-scrollbar { width: 4px; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+        th { text-align: left; padding: .6rem; color: var(--text-2); font-size: .7rem; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--bg-card); position: sticky; top: 0; z-index: 1; }
+        td { padding: .55rem .6rem; border-bottom: 1px solid rgba(255, 255, 255, .04); }
+        
+        .btn { padding: .5rem 1rem; border-radius: 6px; font-size: .8rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .15rem; }
+        .btn.red { background: var(--red); color: #fff; }
+        .btn.orange { background: var(--orange); color: #000; }
+        .btn.primary { background: var(--primary); color: #fff; }
+        
+        .btn-sm { padding: .3rem .6rem; border-radius: 4px; font-size: .7rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .1rem; }
+        .btn-sm.red { background: var(--red); color: #fff; }
+        .btn-sm.primary { background: var(--primary); color: #fff; }
+        
+        .badge { padding: .15rem .5rem; border-radius: 99px; font-size: .7rem; font-weight: 600; display: inline-block; }
+        .badge-green { background: rgba(16,185,129,.15); color: var(--green); }
+        .badge-gold { background: rgba(251,191,36,.15); color: var(--gold); }
+        .badge-blue { background: rgba(99,102,241,.15); color: var(--primary); }
+        .badge-pink { background: rgba(236,72,153,.15); color: var(--pink); }
+        .badge-diamond { background: rgba(56,189,248,.15); color: var(--diamond); }
+        .badge-red { background: rgba(239,68,68,.15); color: var(--red); }
+        
+        .toast { position: fixed; top: 1.5rem; right: 1.5rem; background: var(--bg-card); border: 1px solid var(--red); padding: .8rem 1.2rem; border-radius: 12px; font-size: .85rem; z-index: 999; transform: translateX(140%); transition: .3s; max-width: 320px; }
+        .toast.show { transform: translateX(0); }
+        .toast.ok { border-color: var(--green); }
+        
+        .inline-flex { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; margin-bottom: .8rem; }
+        
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; padding: 1rem; }
+            .sidebar { display: flex; flex-wrap: wrap; gap: .3rem; position: static; }
+            .sidebar-btn { width: auto; font-size: .7rem; padding: .4rem .6rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    
+    <header>
+        <a href="looto.html" class="logo"><em>🛡️</em> Looto Admin</a>
+        <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+        <div>
+            <a href="looto.html" class="btn-header">🏠 Site</a>
+            <button class="btn-header" onclick="logout()" style="margin-left:.5rem;">🚪 Sair</button>
+        </div>
+    </header>
+    
+    <div class="main-layout">
+        <aside class="sidebar">
+            <a href="admin.html" class="sidebar-btn">📊 Dashboard</a>
+            <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+            <a href="abots.html" class="sidebar-btn">🤖 Bots</a>
+            <a href="asorteios.html" class="sidebar-btn">🎁 Sorteios</a>
+            <a href="alogsorteios.html" class="sidebar-btn">📋 Log Sorteios</a>
+            <a href="achat.html" class="sidebar-btn active">💬 Chat</a>
+            <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+            <a href="aloja.html" class="sidebar-btn">🛒 Loja</a>
+            <a href="admins.html" class="sidebar-btn">🔑 Admins</a>
+            <a href="aassinantes.html" class="sidebar-btn">⭐ Assinantes</a>
+            <a href="aferramentas.html" class="sidebar-btn">🔧 Ferramentas</a>
+        </aside>
+        
+        <div class="panel">
+            <div class="panel-title">💬 Gerenciamento de Chat <span id="count-chat" style="font-size:.7rem;color:var(--text-2);"></span></div>
+            
+            <div class="inline-flex">
+                <input type="text" id="search-chat" placeholder="🔍 Buscar por mensagem ou usuário..." style="width:250px;" oninput="filtrarChat()">
+                <button class="btn red" onclick="limparChatCompleto()">🗑️ Limpar Tudo</button>
+                <button class="btn orange" onclick="limparBausAntigos()">📦 Limpar Baús Antigos</button>
+                <button class="btn primary" onclick="forcarLimpezaAutomatica()">⚡ Forçar Limpeza Auto</button>
+            </div>
+            
+            <div class="table-container">
+                <div class="table-wrapper">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Tipo</th>
+                                <th>Usuário</th>
+                                <th>Mensagem / Key</th>
+                                <th>Data</th>
+                                <th>Ações</th>
+                            </tr>
+                        </thead>
+                        <tbody id="table-chat"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, get, remove, query, orderByChild, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+        authDomain: "looto-f46e5.firebaseapp.com",
+        databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+        projectId: "looto-f46e5",
+        storageBucket: "looto-f46e5.firebasestorage.app",
+        messagingSenderId: "295066400995",
+        appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    
+    const LIMITE_MENSAGENS = 300;
+    const LIMITE_TEMPO_NORMAL = 10 * 60 * 1000;    // 10 minutos para mensagens comuns
+    const LIMITE_BAU_ABERTO = 10 * 60 * 1000;      // 10 minutos após aberto
+    const LIMITE_BAU_NAO_ABERTO = 24 * 60 * 60 * 1000; // 24 horas sem abrir
+    
+    let allMessages = [];
+    
+    function toast(msg, ok = false) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (ok ? ' ok' : '');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+    
+    window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+    
+    async function checkAdmin(user) {
+        if (!user) return false;
+        if (user.email === 'startubez.com@gmail.com') return true;
+        const snap = await get(ref(db, 'admins'));
+        if (!snap.exists()) return false;
+        const admins = snap.val();
+        for (let key of Object.keys(admins)) { const a = admins[key]; if (a.uid === user.uid || a.email === user.email) return true; }
+        return false;
+    }
+    
+    // ═══ RENDERIZAÇÃO ═══
+    function renderizarTabela(messages) {
+        const tbody = document.getElementById('table-chat');
+        document.getElementById('count-chat').textContent = `(${messages.length} mensagens)`;
+        if (messages.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:2rem;color:var(--text-2);">Nenhuma mensagem encontrada</td></tr>';
+            return;
+        }
+        const tipoNome = { treasure:'📦 Baú', global_bot:'📢 Global', system:'⚙️ Sistema' };
+        const tipoBadge = { treasure:'badge-gold', global_bot:'badge-pink', system:'badge-blue' };
+        tbody.innerHTML = messages.map(m => {
+            const tipo = tipoNome[m.type] || '💬 Chat';
+            const badge = tipoBadge[m.type] || 'badge-green';
+            const texto = m.type === 'treasure' ? `🔑 ${m.keyGame || 'Jogo'} (${m.keyPlatform || '?'})` : (m.texto || '(sem texto)');
+            return `
+            <tr>
+                <td><span class="badge ${badge}">${tipo}</span></td>
+                <td><strong>${m.nome || '—'}</strong></td>
+                <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${texto.replace(/"/g, '&quot;')}">${texto}</td>
+                <td style="font-size:.65rem;">${m.ts ? new Date(m.ts).toLocaleString('pt-BR') : '?'}</td>
+                <td><button class="btn-sm red" onclick="deletarMensagem('${m.id}')">🗑️</button></td>
+            </tr>`;
+        }).join('');
+    }
+    
+    window.filtrarChat = function() {
+        const search = (document.getElementById('search-chat')?.value || '').toLowerCase();
+        let filtered = allMessages;
+        if (search) {
+            filtered = allMessages.filter(m => 
+                (m.texto || '').toLowerCase().includes(search) ||
+                (m.nome || '').toLowerCase().includes(search) ||
+                (m.keyGame || '').toLowerCase().includes(search)
+            );
+        }
+        renderizarTabela(filtered);
+    };
+    
+    // ═══ CARREGAR CHAT EM TEMPO REAL ═══
+    function carregarChat() {
+        onValue(query(ref(db, 'chat'), orderByChild('ts'), limitToLast(LIMITE_MENSAGENS)), (snap) => {
+            allMessages = [];
+            if (snap.exists()) {
+                snap.forEach(child => {
+                    allMessages.push({ id: child.key, ...child.val() });
+                });
+            }
+            allMessages.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+            document.getElementById('search-chat').value = ''; // limpa busca ao recarregar
+            renderizarTabela(allMessages);
+        });
+    }
+    
+    // ═══ AÇÕES ═══
+    window.deletarMensagem = async (id) => {
+        await remove(ref(db, 'chat/' + id));
+        toast('🗑️ Mensagem removida!', true);
+    };
+    
+    window.limparChatCompleto = async () => {
+        if (!confirm('⚠️ Remover TODAS as mensagens visíveis (últimas ' + LIMITE_MENSAGENS + ')?')) return;
+        const snap = await get(query(ref(db, 'chat'), orderByChild('ts'), limitToLast(LIMITE_MENSAGENS)));
+        if (!snap.exists()) { toast('Chat já está vazio!', true); return; }
+        let removidos = 0;
+        const promises = [];
+        snap.forEach(child => { promises.push(remove(ref(db, 'chat/' + child.key))); removidos++; });
+        await Promise.all(promises);
+        toast(`🗑️ ${removidos} mensagens removidas!`, true);
+    };
+    
+    window.limparBausAntigos = async () => {
+        const snap = await get(query(ref(db, 'chat'), orderByChild('ts'), limitToLast(LIMITE_MENSAGENS)));
+        if (!snap.exists()) { toast('Nenhum baú encontrado!', true); return; }
+        const now = Date.now();
+        let limpos = 0;
+        const promises = [];
+        snap.forEach(child => {
+            const msg = child.val();
+            if (msg.type !== 'treasure') return;
+            if (msg.opened && msg.openedAt && (now - msg.openedAt) > LIMITE_BAU_ABERTO) {
+                promises.push(remove(ref(db, 'chat/' + child.key)));
+                limpos++;
+            } else if (!msg.opened && msg.ts && (now - msg.ts) > LIMITE_BAU_NAO_ABERTO) {
+                promises.push(remove(ref(db, 'chat/' + child.key)));
+                limpos++;
+            }
+        });
+        if (promises.length > 0) await Promise.all(promises);
+        toast(`📦 ${limpos} baús removidos!`, true);
+    };
+    
+    // ═══ LIMPEZA AUTOMÁTICA EM SEGUNDO PLANO ═══
+    async function executarLimpezaAutomatica() {
+        const snap = await get(query(ref(db, 'chat'), orderByChild('ts'), limitToLast(LIMITE_MENSAGENS)));
+        if (!snap.exists()) return;
+        const now = Date.now();
+        const promises = [];
+        snap.forEach(child => {
+            const msg = child.val();
+            if (msg.type === 'treasure') {
+                if (msg.opened && msg.openedAt && (now - msg.openedAt) > LIMITE_BAU_ABERTO) {
+                    promises.push(remove(ref(db, 'chat/' + child.key)));
+                } else if (!msg.opened && msg.ts && (now - msg.ts) > LIMITE_BAU_NAO_ABERTO) {
+                    promises.push(remove(ref(db, 'chat/' + child.key)));
+                }
+            } else {
+                if (msg.ts && (now - msg.ts) > LIMITE_TEMPO_NORMAL) {
+                    promises.push(remove(ref(db, 'chat/' + child.key)));
+                }
+            }
+        });
+        if (promises.length > 0) {
+            await Promise.all(promises);
+            console.log(`🧹 Limpeza automática: ${promises.length} mensagens removidas.`);
+        }
+    }
+    
+    window.forcarLimpezaAutomatica = async () => {
+        await executarLimpezaAutomatica();
+        toast('⚡ Limpeza automática executada!', true);
+    };
+    
+    // ═══ INIT ═══
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const isAdmin = await checkAdmin(user);
+        if (!isAdmin) {
+            document.body.innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;flex-direction:column;gap:1rem;padding:2rem;">
+                    <h1 style="font-family:'Space Grotesk',sans-serif;font-size:3rem;color:#ef4444;">🚫 Acesso Negado</h1>
+                    <p style="color:#9ca3af;">Você não tem permissão.</p>
+                    <a href="looto.html" style="background:#6366f1;color:#fff;padding:.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;">Ir para o Site</a>
+                </div>`;
+            setTimeout(() => window.location.href = 'looto.html', 3000);
+            return;
+        }
+        document.getElementById('admin-info').textContent = `👑 ${user.email}`;
+        carregarChat();
+        // Limpeza automática a cada 60 segundos
+        setInterval(executarLimpezaAutomatica, 60000);
+    });
+    </script>
+</body>
+</html>

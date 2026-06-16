@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Admins Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --bg-card: #151a26;
+            --text: #f3f4f6;
+            --text-2: #9ca3af;
+            --primary: #6366f1;
+            --green: #10b981;
+            --red: #ef4444;
+            --gold: #fbbf24;
+            --orange: #f59e0b;
+            --pink: #ec4899;
+            --border: rgba(255, 255, 255, 0.06);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+        
+        header {
+            background: rgba(11, 14, 20, 0.95);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(16px);
+            padding: .9rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .5rem;
+        }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text); text-decoration: none; }
+        .logo em { color: var(--red); font-style: normal; }
+        .btn-header { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: .4rem .8rem; border-radius: 6px; font-size: .8rem; cursor: pointer; transition: .3s; text-decoration: none; }
+        .btn-header:hover { border-color: var(--red); color: var(--red); }
+        
+        .main-layout { max-width: 1600px; margin: 0 auto; padding: 1.5rem 2rem; display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; }
+        
+        .sidebar { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1rem; position: sticky; top: 80px; height: fit-content; }
+        .sidebar-btn { background: transparent; border: none; color: var(--text-2); padding: .7rem 1rem; border-radius: 8px; font-size: .85rem; cursor: pointer; transition: .3s; text-align: left; display: flex; align-items: center; gap: .5rem; width: 100%; text-decoration: none; }
+        .sidebar-btn:hover { background: rgba(255, 255, 255, .03); color: var(--text); }
+        .sidebar-btn.active { background: rgba(99, 102, 241, .12); color: var(--primary); font-weight: 600; }
+        
+        .panel { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1.5rem; }
+        .panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+        
+        .scroll-table { max-height: 500px; overflow-y: auto; border: 1px solid var(--border); border-radius: 8px; }
+        .scroll-table::-webkit-scrollbar { width: 4px; }
+        .scroll-table::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+        th { text-align: left; padding: .6rem; color: var(--text-2); font-size: .7rem; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--bg-card); position: sticky; top: 0; z-index: 1; }
+        td { padding: .55rem .6rem; border-bottom: 1px solid rgba(255, 255, 255, .04); }
+        
+        input { background: rgba(11, 14, 20, .6); border: 1px solid var(--border); padding: .5rem .7rem; border-radius: 6px; color: var(--text); font-size: .82rem; outline: none; width: 100%; }
+        input:focus { border-color: var(--primary); }
+        
+        .btn { padding: .5rem 1rem; border-radius: 6px; font-size: .8rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .15rem; }
+        .btn.primary { background: var(--primary); color: #fff; }
+        
+        .btn-sm { padding: .3rem .6rem; border-radius: 4px; font-size: .7rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .1rem; }
+        .btn-sm.red { background: var(--red); color: #fff; }
+        
+        .badge { padding: .15rem .5rem; border-radius: 99px; font-size: .7rem; font-weight: 600; display: inline-block; }
+        .badge-gold { background: rgba(251, 191, 36, .15); color: var(--gold); }
+        .badge-blue { background: rgba(99, 102, 241, .15); color: var(--primary); }
+        
+        .field { margin-bottom: .8rem; }
+        .field label { font-size: .75rem; color: var(--text-2); display: block; margin-bottom: .2rem; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+        
+        .toast { position: fixed; top: 1.5rem; right: 1.5rem; background: var(--bg-card); border: 1px solid var(--red); padding: .8rem 1.2rem; border-radius: 12px; font-size: .85rem; z-index: 999; transform: translateX(140%); transition: .3s; max-width: 320px; }
+        .toast.show { transform: translateX(0); }
+        .toast.ok { border-color: var(--green); }
+        
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; padding: 1rem; }
+            .sidebar { display: flex; flex-wrap: wrap; gap: .3rem; position: static; }
+            .sidebar-btn { width: auto; font-size: .7rem; padding: .4rem .6rem; }
+            .field-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    
+    <header>
+        <a href="/looto.html" class="logo"><em>🛡️</em> Looto Admin</a>
+        <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+        <div>
+            <a href="/looto.html" class="btn-header">🏠 Site</a>
+            <button class="btn-header" onclick="logout()" style="margin-left:.5rem;">🚪 Sair</button>
+        </div>
+    </header>
+    
+    <div class="main-layout">
+        <aside class="sidebar">
+            <a href="admin.html" class="sidebar-btn">📊 Dashboard</a>
+            <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+            <a href="abots.html" class="sidebar-btn">🤖 Bots</a>
+            <a href="asorteios.html" class="sidebar-btn">🎁 Sorteios</a>
+            <a href="alogsorteios.html" class="sidebar-btn">📋 Log Sorteios</a>
+            <a href="achat.html" class="sidebar-btn">💬 Chat</a>
+            <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+            <a href="aloja.html" class="sidebar-btn">🛒 Loja</a>
+            <a href="admins.html" class="sidebar-btn active">🔑 Admins</a>
+            <a href="aassinantes.html" class="sidebar-btn">⭐ Assinantes</a>
+            <a href="aferramentas.html" class="sidebar-btn">🔧 Ferramentas</a>
+        </aside>
+        
+        <div class="panel">
+            <div class="panel-title">🔑 Gerenciar Admins</div>
+            <div class="field-row" style="margin-bottom:1rem;">
+                <div class="field"><label>Email</label><input type="email" id="new-admin-email"></div>
+                <div class="field"><label>UID (opcional)</label><input type="text" id="new-admin-uid"></div>
+            </div>
+            <button class="btn primary" onclick="adicionarAdmin()" style="margin-bottom:1rem;">➕ Adicionar Admin</button>
+            <button class="btn primary" onclick="sincronizarAdminUIDs()" style="margin-bottom:1rem;background:var(--green);">🔄 Sincronizar adminUIDs</button>
+            <div class="scroll-table">
+                <table>
+                    <thead><tr><th>Email</th><th>UID</th><th>Tipo</th><th></th></tr></thead>
+                    <tbody id="table-admins"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, push, set, get, remove, update } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+        authDomain: "looto-f46e5.firebaseapp.com",
+        databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+        projectId: "looto-f46e5",
+        storageBucket: "looto-f46e5.firebasestorage.app",
+        messagingSenderId: "295066400995",
+        appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    let currentUser = null;
+    
+    function toast(msg, ok = false) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (ok ? ' ok' : '');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+    
+    window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+    
+    async function checkAdmin(user) {
+        if (!user) return false;
+        if (user.email === 'startubez.com@gmail.com') return true;
+        const snap = await get(ref(db, 'admins'));
+        if (!snap.exists()) return false;
+        const admins = snap.val();
+        for (let key of Object.keys(admins)) { const a = admins[key]; if (a.uid === user.uid || a.email === user.email) return true; }
+        return false;
+    }
+    
+    // ═══════════════ SINCRONIZAR adminUIDs ═══════════════
+    window.sincronizarAdminUIDs = async function() {
+        const snap = await get(ref(db, 'admins'));
+        if (!snap.exists()) { toast('Nenhum admin encontrado!'); return; }
+        
+        const admins = snap.val();
+        const updates = {};
+        let count = 0;
+        
+        for (const key of Object.keys(admins)) {
+            const admin = admins[key];
+            if (admin.uid) {
+                updates[`adminUIDs/${admin.uid}`] = true;
+                count++;
+            }
+        }
+        
+        if (count > 0) {
+            await update(ref(db), updates);
+            toast(`✅ ${count} UIDs sincronizados em adminUIDs!`, true);
+        } else {
+            toast('⚠️ Nenhum UID encontrado para sincronizar.');
+        }
+    };
+    
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const isAdmin = await checkAdmin(user);
+        if (!isAdmin) {
+            document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;flex-direction:column;gap:1rem;padding:2rem;"><h1 style="font-family:'Space Grotesk',sans-serif;font-size:3rem;color:#ef4444;">🚫 Acesso Negado</h1><p style="color:#9ca3af;">Você não tem permissão.</p><a href="/looto.html" style="background:#6366f1;color:#fff;padding:.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;">Ir para o Site</a></div>`;
+            setTimeout(() => window.location.href = '/looto.html', 3000);
+            return;
+        }
+        currentUser = user;
+        document.getElementById('admin-info').textContent = `👑 ${user.email}`;
+        carregarAdmins();
+        // Sincroniza automaticamente ao carregar
+        await window.sincronizarAdminUIDs();
+    });
+    
+    async function carregarAdmins() {
+        const snap = await get(ref(db, 'admins'));
+        const tbody = document.getElementById('table-admins');
+        tbody.innerHTML = '';
+        if (!snap.exists()) { tbody.innerHTML = '<tr><td colspan="4">Nenhum admin</td></tr>'; return; }
+        const admins = snap.val();
+        let html = '';
+        for (let key of Object.keys(admins)) {
+            const a = admins[key];
+            html += `<tr><td>${a.email || '—'}</td><td style="font-size:.7rem;">${a.uid || '—'}</td><td>${a.master ? '<span class="badge badge-gold">👑 Master</span>' : '<span class="badge badge-blue">Admin</span>'}</td><td>${!a.master ? `<button class="btn-sm red" onclick="removerAdmin('${key}')">🗑️</button>` : ''}</td></tr>`;
+        }
+        tbody.innerHTML = html;
+    }
+    
+    window.adicionarAdmin = async () => {
+        const email = document.getElementById('new-admin-email').value.trim();
+        const uid = document.getElementById('new-admin-uid').value.trim();
+        if (!email && !uid) { toast('Preencha email ou UID!'); return; }
+        
+        // Adiciona no nó admins
+        const r = push(ref(db, 'admins'));
+        await set(r, { email: email || null, uid: uid || null, addedAt: Date.now(), addedBy: currentUser.email });
+        
+        // Sincroniza com adminUIDs imediatamente
+        if (uid) {
+            await set(ref(db, `adminUIDs/${uid}`), true);
+        }
+        
+        toast('Admin adicionado! ✅', true);
+        document.getElementById('new-admin-email').value = '';
+        document.getElementById('new-admin-uid').value = '';
+        carregarAdmins();
+    };
+    
+    window.removerAdmin = async (key) => {
+        if (!confirm('Remover?')) return;
+        
+        // Remove do adminUIDs também
+        const snap = await get(ref(db, `admins/${key}`));
+        if (snap.exists()) {
+            const admin = snap.val();
+            if (admin.uid) {
+                await remove(ref(db, `adminUIDs/${admin.uid}`));
+            }
+        }
+        
+        await remove(ref(db, 'admins/' + key));
+        carregarAdmins();
+    };
+    </script>
+</body>
+</html>

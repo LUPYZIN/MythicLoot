@@ -1,0 +1,1325 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Loja Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --bg-card: #151a26;
+            --text: #f3f4f6;
+            --text-2: #9ca3af;
+            --primary: #6366f1;
+            --green: #10b981;
+            --red: #ef4444;
+            --gold: #fbbf24;
+            --orange: #f59e0b;
+            --pink: #ec4899;
+            --border: rgba(255, 255, 255, 0.06);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        header {
+            background: rgba(11, 14, 20, 0.95);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(16px);
+            padding: .9rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: .5rem;
+        }
+
+        .logo {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text);
+            text-decoration: none;
+        }
+
+        .logo em {
+            color: var(--red);
+            font-style: normal;
+        }
+
+        .btn-header {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-2);
+            padding: .4rem .8rem;
+            border-radius: 6px;
+            font-size: .8rem;
+            cursor: pointer;
+            transition: .3s;
+            text-decoration: none;
+        }
+
+        .btn-header:hover {
+            border-color: var(--red);
+            color: var(--red);
+        }
+
+        .main-layout {
+            max-width: 1600px;
+            margin: 0 auto;
+            padding: 1.5rem 2rem;
+            display: grid;
+            grid-template-columns: 220px 1fr;
+            gap: 1.5rem;
+        }
+
+        .sidebar {
+            background: var(--bg-card);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            padding: 1rem;
+            position: sticky;
+            top: 80px;
+            height: fit-content;
+        }
+
+        .sidebar-btn {
+            background: transparent;
+            border: none;
+            color: var(--text-2);
+            padding: .7rem 1rem;
+            border-radius: 8px;
+            font-size: .85rem;
+            cursor: pointer;
+            transition: .3s;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+            width: 100%;
+            text-decoration: none;
+        }
+
+        .sidebar-btn:hover {
+            background: rgba(255, 255, 255, .03);
+            color: var(--text);
+        }
+
+        .sidebar-btn.active {
+            background: rgba(99, 102, 241, .12);
+            color: var(--primary);
+            font-weight: 600;
+        }
+
+        .panel {
+            background: var(--bg-card);
+            border-radius: 14px;
+            border: 1px solid var(--border);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .panel-title {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: .5rem;
+        }
+
+        .tabs {
+            display: flex;
+            gap: .3rem;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-btn {
+            padding: .5rem 1.2rem;
+            border-radius: 8px;
+            font-size: .85rem;
+            cursor: pointer;
+            border: 1px solid var(--border);
+            background: transparent;
+            color: var(--text-2);
+            transition: .3s;
+        }
+
+        .tab-btn:hover {
+            color: var(--text);
+        }
+
+        .tab-btn.active {
+            background: rgba(99, 102, 241, .12);
+            color: var(--primary);
+            border-color: var(--primary);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .search-box {
+            margin-bottom: .8rem;
+        }
+
+        .search-box input {
+            width: 100%;
+        }
+
+        .table-container {
+            border: 1px solid var(--border);
+            border-radius: 8px;
+        }
+
+        .table-wrapper {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .table-wrapper::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .table-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, .1);
+            border-radius: 99px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: .8rem;
+        }
+
+        th {
+            text-align: left;
+            padding: .6rem;
+            color: var(--text-2);
+            font-size: .7rem;
+            text-transform: uppercase;
+            border-bottom: 1px solid var(--border);
+            background: var(--bg-card);
+            position: sticky;
+            top: 0;
+            z-index: 1;
+        }
+
+        td {
+            padding: .55rem .6rem;
+            border-bottom: 1px solid rgba(255, 255, 255, .04);
+        }
+
+        input,
+        select,
+        textarea {
+            background: rgba(11, 14, 20, .6);
+            border: 1px solid var(--border);
+            padding: .5rem .7rem;
+            border-radius: 6px;
+            color: var(--text);
+            font-size: .82rem;
+            outline: none;
+            width: 100%;
+        }
+
+        input:focus,
+        select:focus,
+        textarea:focus {
+            border-color: var(--primary);
+        }
+
+        .btn {
+            padding: .5rem 1rem;
+            border-radius: 6px;
+            font-size: .8rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: .3s;
+            margin: .15rem;
+        }
+
+        .btn.primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn.red {
+            background: var(--red);
+            color: #fff;
+        }
+
+        .btn.green {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn.gold {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .btn.orange {
+            background: var(--orange);
+            color: #000;
+        }
+
+        .btn.pink {
+            background: var(--pink);
+            color: #fff;
+        }
+
+        .btn-sm {
+            padding: .3rem .6rem;
+            border-radius: 4px;
+            font-size: .7rem;
+            font-weight: 600;
+            cursor: pointer;
+            border: none;
+            transition: .3s;
+            margin: .1rem;
+        }
+
+        .btn-sm.primary {
+            background: var(--primary);
+            color: #fff;
+        }
+
+        .btn-sm.red {
+            background: var(--red);
+            color: #fff;
+        }
+
+        .btn-sm.green {
+            background: var(--green);
+            color: #fff;
+        }
+
+        .btn-sm.gold {
+            background: var(--gold);
+            color: #000;
+        }
+
+        .btn-sm.orange {
+            background: var(--orange);
+            color: #000;
+        }
+
+        .field {
+            margin-bottom: .8rem;
+        }
+
+        .field label {
+            font-size: .75rem;
+            color: var(--text-2);
+            display: block;
+            margin-bottom: .2rem;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: .75rem;
+        }
+
+        .field-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: .75rem;
+        }
+
+        .badge {
+            padding: .15rem .5rem;
+            border-radius: 99px;
+            font-size: .7rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+
+        .badge-green {
+            background: rgba(16, 185, 129, .15);
+            color: var(--green);
+        }
+
+        .badge-red {
+            background: rgba(239, 68, 68, .15);
+            color: var(--red);
+        }
+
+        .badge-orange {
+            background: rgba(245, 158, 11, .15);
+            color: var(--orange);
+        }
+
+        .count-badge {
+            background: rgba(99, 102, 241, .15);
+            color: var(--primary);
+            padding: .1rem .5rem;
+            border-radius: 99px;
+            font-size: .7rem;
+            margin-left: .3rem;
+        }
+
+        .card-config {
+            background: rgba(255, 255, 255, .02);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 1rem;
+            margin-bottom: .8rem;
+        }
+
+        .card-config h5 {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: .85rem;
+            margin-bottom: .5rem;
+            display: flex;
+            align-items: center;
+            gap: .4rem;
+        }
+
+        .card-preview {
+            background: linear-gradient(135deg, #1a1d2e, #0f1220);
+            border: 1px solid var(--border);
+            border-radius: 14px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            position: relative;
+            overflow: hidden;
+            min-height: 120px;
+        }
+
+        .card-preview.full-bg {
+            padding: 0;
+            height: 200px;
+            justify-content: center;
+            align-items: flex-end;
+        }
+
+        .card-preview .preview-img {
+            width: 80px;
+            height: 80px;
+            background: rgba(255, 255, 255, .05);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+
+        .card-preview .preview-img img,
+        .card-preview .preview-img video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-preview .preview-bg {
+            position: absolute;
+            inset: 0;
+            z-index: 0;
+        }
+
+        .card-preview .preview-bg img,
+        .card-preview .preview-bg video {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .card-preview .preview-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        hr {
+            border-color: var(--border);
+            margin: 1rem 0;
+        }
+
+        .toast {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--red);
+            padding: .8rem 1.2rem;
+            border-radius: 12px;
+            font-size: .85rem;
+            z-index: 999;
+            transform: translateX(140%);
+            transition: .3s;
+            max-width: 320px;
+        }
+
+        .toast.show {
+            transform: translateX(0);
+        }
+
+        .toast.ok {
+            border-color: var(--green);
+        }
+
+        .uid-link {
+            cursor: pointer;
+            color: var(--primary);
+            text-decoration: underline;
+            font-weight: 500;
+        }
+
+        .uid-link:hover {
+            color: #818cf8;
+        }
+
+        @media (max-width: 768px) {
+            .main-layout {
+                grid-template-columns: 1fr;
+                padding: 1rem;
+            }
+
+            .sidebar {
+                display: flex;
+                flex-wrap: wrap;
+                gap: .3rem;
+                position: static;
+            }
+
+            .sidebar-btn {
+                width: auto;
+                font-size: .7rem;
+                padding: .4rem .6rem;
+            }
+
+            .field-row,
+            .field-row-3 {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div id="toast" class="toast"></div>
+
+    <header>
+        <a href="looto.html" class="logo"><em>🛡️</em> Looto Admin</a>
+        <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+        <div>
+            <a href="looto.html" class="btn-header">🏠 Site</a>
+            <button class="btn-header" onclick="logout()" style="margin-left:.5rem;">🚪 Sair</button>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar">
+            <a href="admin.html" class="sidebar-btn">📊 Dashboard</a>
+            <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+            <a href="abots.html" class="sidebar-btn">🤖 Bots</a>
+            <a href="asorteios.html" class="sidebar-btn">🎁 Sorteios</a>
+            <a href="alogsorteios.html" class="sidebar-btn">📋 Log Sorteios</a>
+            <a href="achat.html" class="sidebar-btn">💬 Chat</a>
+            <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+            <a href="aloja.html" class="sidebar-btn active">🛒 Loja</a>
+            <a href="admins.html" class="sidebar-btn">🔑 Admins</a>
+            <a href="aferramentas.html" class="sidebar-btn">🔧 Ferramentas</a>
+        </aside>
+
+        <div>
+            <div class="tabs" style="margin-bottom:1rem;">
+                <button class="tab-btn active" onclick="switchTab('games')">🎮 Jogos <span class="count-badge" id="count-games">0</span></button>
+                <button class="tab-btn" onclick="switchTab('xp')">⭐ Pacotes XP <span class="count-badge" id="count-xp">0</span></button>
+                <button class="tab-btn" onclick="switchTab('vendas')">💰 Vendas <span class="count-badge" id="count-vendas">0</span></button>
+                <button class="tab-btn" onclick="switchTab('cosmeticos')">🎨 Cosméticos <span class="count-badge" id="count-cosmeticos">0</span></button>
+            </div>
+
+            <!-- ═══════════════ TAB JOGOS ═══════════════ -->
+            <div class="tab-content active" id="tab-games">
+                <div class="panel">
+                    <div class="panel-title">🎮 Adicionar/Editar Jogo</div>
+                    <div class="card-preview" id="game-preview">
+                        <div class="preview-img" id="game-preview-img">🎮</div>
+                        <div>
+                            <strong id="game-preview-name">Nome do Jogo</strong>
+                            <div style="font-size:.75rem;color:var(--text-2);" id="game-preview-platform">Steam</div>
+                            <div style="font-size:.9rem;color:var(--gold);font-weight:700;" id="game-preview-price">💰 0 Looto</div>
+                            <div style="font-size:.7rem;color:var(--text-2);" id="game-preview-stock">📦 0 em estoque</div>
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field"><label>🏷️ Nome do Jogo *</label><input type="text" id="game-name" placeholder="Ex: Elden Ring" oninput="updateGamePreview()"></div>
+                        <div class="field"><label>🎮 Plataforma *</label><select id="game-platform" onchange="updateGamePreview()">
+                                <option value="steam">Steam</option>
+                                <option value="xbox">Xbox</option>
+                                <option value="epic">Epic Games</option>
+                                <option value="gog">GOG</option>
+                                <option value="other">Outro</option>
+                            </select></div>
+                    </div>
+                    <div class="field-row-3">
+                        <div class="field"><label>💰 Preço (Looto Money) *</label><input type="number" id="game-price" value="0" min="0" oninput="updateGamePreview()"></div>
+                        <div class="field"><label>💰 Preço Antigo</label><input type="number" id="game-oldprice" value="0" min="0" oninput="updateGamePreview()"></div>
+                        <div class="field"><label>🔢 Desconto %</label><input type="number" id="game-discount" value="0" min="0" max="100" readonly style="opacity:.7;"></div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field"><label>📦 Estoque *</label><input type="number" id="game-stock" value="1" min="0" oninput="updateGamePreview()"></div>
+                        <div class="field"><label>🖼️ Imagem (URL ou emoji)</label><input type="text" id="game-image" placeholder="https://... ou 🎮" oninput="updateGamePreview()"></div>
+                    </div>
+                    <div class="field"><label>🔑 Key do Jogo</label><input type="text" id="game-key" placeholder="XXXXX-XXXXX-XXXXX"></div>
+                    <div class="field"><label>🖼️ Banner URL</label><input type="text" id="game-banner" placeholder="https://..."></div>
+                    <div class="field"><label>📝 Descrição</label><textarea id="game-desc" rows="2" placeholder="Descrição do jogo..."></textarea></div>
+                    <div class="field"><label>Status</label><select id="game-active">
+                            <option value="true">🟢 Ativo</option>
+                            <option value="false">🔴 Inativo</option>
+                        </select></div>
+                    <input type="hidden" id="game-edit-id" value="">
+                    <div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:1rem;">
+                        <button class="btn primary" onclick="salvarJogo()">💾 Salvar Jogo</button>
+                        <button class="btn red" onclick="cancelarEdicaoGame()">❌ Cancelar</button>
+                    </div>
+                    <hr>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;">
+                        <h4 style="font-family:'Space Grotesk',sans-serif;">📋 Jogos Cadastrados</h4>
+                        <div class="search-box" style="width:300px;"><input type="text" id="search-games" placeholder="🔍 Buscar jogo..." oninput="filtrarJogos()"></div>
+                    </div>
+                    <div class="table-container">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead><tr><th>Jogo</th><th>Plataforma</th><th>Preço</th><th>Estoque</th><th>Key</th><th>Status</th><th>Ações</th></tr></thead>
+                                <tbody id="table-games"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div style="text-align:center;padding:.5rem;font-size:.7rem;color:var(--text-2);" id="games-info"></div>
+                </div>
+            </div>
+
+            <!-- ═══════════════ TAB XP ═══════════════ -->
+            <div class="tab-content" id="tab-xp">
+                <div class="panel">
+                    <div class="panel-title">⭐ Adicionar/Editar Pacote XP</div>
+                    <div class="field-row">
+                        <div class="field"><label>🏷️ Nome do Pacote *</label><input type="text" id="xp-name" placeholder="Ex: 5.000 XP"></div>
+                        <div class="field"><label>⭐ Quantidade de XP *</label><input type="number" id="xp-xp" value="100" min="1"></div>
+                    </div>
+                    <div class="field-row-3">
+                        <div class="field"><label>💰 Preço (Looto Money) *</label><input type="number" id="xp-price" value="0" min="0"></div>
+                        <div class="field"><label>🔢 Desconto %</label><input type="number" id="xp-discount" value="0" min="0" max="100"></div>
+                        <div class="field"><label>🖼️ Imagem</label><input type="text" id="xp-image" placeholder="⭐ ou https://..."></div>
+                    </div>
+                    <div class="field"><label>Status</label><select id="xp-active">
+                            <option value="true">🟢 Ativo</option>
+                            <option value="false">🔴 Inativo</option>
+                        </select></div>
+                    <input type="hidden" id="xp-edit-id" value="">
+                    <div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:1rem;">
+                        <button class="btn primary" onclick="salvarXP()">💾 Salvar Pacote</button>
+                        <button class="btn red" onclick="cancelarEdicaoXP()">❌ Cancelar</button>
+                    </div>
+                    <hr>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;">
+                        <h4 style="font-family:'Space Grotesk',sans-serif;">📋 Pacotes Cadastrados</h4>
+                        <div class="search-box" style="width:300px;"><input type="text" id="search-xp" placeholder="🔍 Buscar pacote..." oninput="filtrarXP()"></div>
+                    </div>
+                    <div class="table-container">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead><tr><th>Pacote</th><th>XP</th><th>Preço</th><th>Desconto</th><th>Status</th><th>Ações</th></tr></thead>
+                                <tbody id="table-xp"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div style="text-align:center;padding:.5rem;font-size:.7rem;color:var(--text-2);" id="xp-info"></div>
+                </div>
+            </div>
+
+            <!-- ═══════════════ TAB VENDAS ═══════════════ -->
+            <div class="tab-content" id="tab-vendas">
+                <div class="panel">
+                    <div class="panel-title">💰 Gerenciamento de Vendas <span class="count-badge" id="count-vendas-header">0</span></div>
+                    <p style="font-size:.78rem;color:var(--text-2);margin-bottom:1rem;">Gerencie compras de jogos, XP e cosméticos. Clique no UID para copiar.</p>
+
+                    <div class="card-config">
+                        <h5>⚙️ Modo de Entrega</h5>
+                        <div style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;">
+                            <select id="modo-entrega" onchange="salvarModoEntrega()" style="width:auto;min-width:250px;">
+                                <option value="auto">🚀 Automático (entrega instantânea)</option>
+                                <option value="manual">✋ Manual (aprovar compras)</option>
+                            </select>
+                        </div>
+                        <div style="margin-top:.5rem;font-size:.7rem;color:var(--text-2);">Status atual: <strong id="modo-entrega-status" style="color:var(--green);">🚀 Automático</strong></div>
+                    </div>
+
+                    <div style="display:flex;gap:.5rem;margin-bottom:1rem;flex-wrap:wrap;">
+                        <button class="btn green" onclick="entregarTodasPendentes()">✅ Entregar Todas Pendentes</button>
+                        <button class="btn red" onclick="recusarTodasPendentes()">❌ Recusar Todas</button>
+                        <button class="btn red" onclick="apagarTodasVendas()">🗑️ Apagar Entregues/Recusadas</button>
+                    </div>
+
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;">
+                        <div class="search-box" style="width:300px;"><input type="text" id="search-vendas" placeholder="🔍 Buscar por comprador, item..." oninput="filtrarVendas()"></div>
+                        <div style="display:flex;gap:.5rem;align-items:center;">
+                            <span style="font-size:.7rem;color:var(--text-2);">Exibindo últimas <span id="vendas-limit-info">200</span></span>
+                            <button class="btn-sm primary" onclick="carregarMaisVendas()">➕ Mais 200</button>
+                            <button class="btn-sm primary" onclick="recarregarVendas()">🔄</button>
+                        </div>
+                    </div>
+
+                    <div class="table-container">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead><tr><th>Comprador</th><th>Item</th><th>Tipo</th><th>Preço</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead>
+                                <tbody id="table-vendas"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div style="text-align:center;padding:.5rem;font-size:.7rem;color:var(--text-2);" id="vendas-info"></div>
+
+                    <hr>
+                    <div class="card-config">
+                        <h5>➕ Adicionar Venda Manual</h5>
+                        <div class="field-row">
+                            <div class="field"><label>UID do Comprador</label><input type="text" id="venda-uid" placeholder="UID"></div>
+                            <div class="field"><label>Nome do Comprador</label><input type="text" id="venda-nome" placeholder="Nome"></div>
+                        </div>
+                        <div class="field-row-3">
+                            <div class="field"><label>Item</label><input type="text" id="venda-item" placeholder="Nome do item"></div>
+                            <div class="field"><label>Tipo</label><select id="venda-tipo">
+                                    <option value="game">🎮 Jogo</option>
+                                    <option value="xp">⭐ XP</option>
+                                    <option value="cosmetico">🎨 Cosmético</option>
+                                </select></div>
+                            <div class="field"><label>Preço</label><input type="number" id="venda-preco" value="0" min="0"></div>
+                        </div>
+                        <div class="field"><label>🔑 Key (para jogos)</label><input type="text" id="venda-key" placeholder="XXXXX-XXXXX-XXXXX"></div>
+                        <div class="field"><label>⭐ XP (para pacotes)</label><input type="number" id="venda-xp" value="0" min="0"></div>
+                        <button class="btn primary" onclick="adicionarVendaManual()" style="width:100%;">➕ Adicionar Venda</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════ TAB COSMÉTICOS ═══════════════ -->
+            <div class="tab-content" id="tab-cosmeticos">
+                <div class="panel">
+                    <div class="panel-title">🎨 Adicionar/Editar Cosmético</div>
+                    <div class="card-preview" id="cosmetico-preview">
+                        <div class="preview-bg" id="cosmetico-preview-bg" style="display:none;"></div>
+                        <div class="preview-content" style="display:flex;gap:1rem;align-items:center;width:100%;">
+                            <div class="preview-img" id="cosmetico-preview-img">🖼️</div>
+                            <div>
+                                <strong id="cosmetico-preview-name">Nome do Item</strong>
+                                <div style="font-size:.75rem;color:var(--text-2);" id="cosmetico-preview-tipo">Wallpaper</div>
+                                <div style="font-size:.9rem;color:var(--gold);font-weight:700;" id="cosmetico-preview-price">💰 0 Looto</div>
+                                <div style="font-size:.7rem;" id="cosmetico-preview-rarity"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="field-row">
+                        <div class="field"><label>🏷️ Nome do Item *</label><input type="text" id="cosmetico-name" placeholder="Ex: Galaxy Neon" oninput="updateCosmeticoPreview()"></div>
+                        <div class="field"><label>📁 Tipo *</label><select id="cosmetico-tipo" onchange="updateCosmeticoPreview()">
+                                <option value="wallpaper">🖼️ Wallpaper (Banner)</option>
+                                <option value="fundo_perfil">🌌 Fundo de Perfil</option>
+                                <option value="moldura">🖼️ Moldura de Avatar</option>
+                                <option value="efeito">✨ Efeito (GIF/MP4)</option>
+                            </select></div>
+                    </div>
+                    <div class="field-row-3">
+                        <div class="field"><label>💰 Preço (Looto Money) *</label><input type="number" id="cosmetico-preco" value="0" min="0" oninput="updateCosmeticoPreview()"></div>
+                        <div class="field"><label>💵 Preço Real (futuro)</label><input type="number" id="cosmetico-preco-real" value="0" min="0" step="0.01"></div>
+                        <div class="field"><label>⭐ Raridade</label><select id="cosmetico-raridade" onchange="updateCosmeticoPreview()">
+                                <option value="comum">⚪ Comum</option>
+                                <option value="raro">🔵 Raro</option>
+                                <option value="epico">🟣 Épico</option>
+                                <option value="lendario">🟡 Lendário</option>
+                            </select></div>
+                    </div>
+                    <div class="field"><label>🔗 URL do Recurso *</label><input type="url" id="cosmetico-url" placeholder="https://... (imagem, GIF ou vídeo)" oninput="updateCosmeticoPreview()"></div>
+                    <div class="field"><label>Status</label><select id="cosmetico-active">
+                            <option value="true">🟢 Ativo</option>
+                            <option value="false">🔴 Inativo</option>
+                        </select></div>
+                    <input type="hidden" id="cosmetico-edit-id" value="">
+                    <div style="display:flex;gap:.3rem;flex-wrap:wrap;margin-bottom:1rem;">
+                        <button class="btn primary" onclick="salvarCosmetico()">💾 Salvar Cosmético</button>
+                        <button class="btn red" onclick="cancelarEdicaoCosmetico()">❌ Cancelar</button>
+                    </div>
+                    <hr>
+                    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:.8rem;flex-wrap:wrap;gap:.5rem;">
+                        <h4 style="font-family:'Space Grotesk',sans-serif;">📋 Cosméticos Cadastrados</h4>
+                        <div class="search-box" style="width:300px;"><input type="text" id="search-cosmeticos" placeholder="🔍 Buscar cosmético..." oninput="filtrarCosmeticos()"></div>
+                    </div>
+                    <div class="table-container">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead><tr><th>Nome</th><th>Tipo</th><th>Preço (LM)</th><th>Raridade</th><th>Status</th><th>Ações</th></tr></thead>
+                                <tbody id="table-cosmeticos"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div style="text-align:center;padding:.5rem;font-size:.7rem;color:var(--text-2);" id="cosmeticos-info"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, push, set, get, update, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+            authDomain: "looto-f46e5.firebaseapp.com",
+            databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+            projectId: "looto-f46e5",
+            storageBucket: "looto-f46e5.firebasestorage.app",
+            messagingSenderId: "295066400995",
+            appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let allGames = [];
+        let allXP = [];
+        let allVendas = [];
+        let allCosmeticos = [];
+        let vendasLimit = 200;
+
+        function toast(msg, ok = false) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast show' + (ok ? ' ok' : '');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+
+        async function checkAdmin(user) {
+            if (!user) return false;
+            if (user.email === 'startubez.com@gmail.com') return true;
+            const snap = await get(ref(db, 'admins'));
+            if (!snap.exists()) return false;
+            const admins = snap.val();
+            for (let key of Object.keys(admins)) {
+                const a = admins[key];
+                if (a.uid === user.uid || a.email === user.email) return true;
+            }
+            return false;
+        }
+
+        onAuthStateChanged(auth, async (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+            const isAdmin = await checkAdmin(user);
+            if (!isAdmin) {
+                document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;flex-direction:column;gap:1rem;padding:2rem;"><h1 style="font-family:'Space Grotesk',sans-serif;font-size:3rem;color:#ef4444;">🚫 Acesso Negado</h1><p style="color:#9ca3af;">Você não tem permissão.</p><a href="looto.html" style="background:#6366f1;color:#fff;padding:.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;">Ir para o Site</a></div>`;
+                setTimeout(() => window.location.href = 'looto.html', 3000);
+                return;
+            }
+            document.getElementById('admin-info').textContent = `👑 ${user.email}`;
+            carregarJogos();
+            carregarXP();
+            carregarCosmeticos();
+            if (document.getElementById('tab-vendas').classList.contains('active')) {
+                carregarVendas();
+                carregarModoEntrega();
+            }
+        });
+
+        window.switchTab = function(tab) {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+            document.getElementById('tab-' + tab).classList.add('active');
+            if (tab === 'vendas') { carregarVendas(); carregarModoEntrega(); }
+            if (tab === 'cosmeticos') carregarCosmeticos();
+        };
+
+        // ═══ PREVIEWS ═══
+        window.updateGamePreview = function() {
+            const name = document.getElementById('game-name').value || 'Nome do Jogo';
+            const platform = document.getElementById('game-platform').value;
+            const price = parseInt(document.getElementById('game-price').value) || 0;
+            const oldPrice = parseInt(document.getElementById('game-oldprice').value) || 0;
+            const stock = parseInt(document.getElementById('game-stock').value) || 0;
+            const image = document.getElementById('game-image').value;
+
+            let discount = 0;
+            if (oldPrice > price && price > 0) discount = Math.round((1 - price / oldPrice) * 100);
+            document.getElementById('game-discount').value = discount;
+            document.getElementById('game-preview-name').textContent = name;
+
+            const platNames = { steam: '🎮 Steam', xbox: '🟢 Xbox', epic: '🟣 Epic', gog: '⚪ GOG', other: '⚫ Outro' };
+            document.getElementById('game-preview-platform').textContent = platNames[platform] || platform;
+            document.getElementById('game-preview-price').innerHTML = `💰 ${price} <small>Looto</small>${oldPrice > price ? ` <span style="font-size:.65rem;color:#ef4444;text-decoration:line-through;">${oldPrice}</span>` : ''}`;
+            document.getElementById('game-preview-stock').textContent = stock > 0 ? `📦 ${stock} em estoque` : '❌ Esgotado';
+            document.getElementById('game-preview-stock').style.color = stock > 3 ? 'var(--green)' : (stock > 0 ? 'var(--orange)' : 'var(--red)');
+
+            const previewImg = document.getElementById('game-preview-img');
+            if (image && (image.startsWith('http://') || image.startsWith('https://'))) {
+                previewImg.innerHTML = `<img src="${image}" style="width:100%;height:100%;object-fit:cover;">`;
+            } else { previewImg.innerHTML = image || '🎮'; }
+        };
+
+        window.updateCosmeticoPreview = function() {
+            const name = document.getElementById('cosmetico-name').value || 'Nome do Item';
+            const tipo = document.getElementById('cosmetico-tipo').value;
+            const preco = parseInt(document.getElementById('cosmetico-preco').value) || 0;
+            const raridade = document.getElementById('cosmetico-raridade').value;
+            const url = document.getElementById('cosmetico-url').value;
+
+            document.getElementById('cosmetico-preview-name').textContent = name;
+            const tipoNomes = { wallpaper: '🖼️ Wallpaper', fundo_perfil: '🌌 Fundo de Perfil', moldura: '🖼️ Moldura', efeito: '✨ Efeito' };
+            document.getElementById('cosmetico-preview-tipo').textContent = tipoNomes[tipo] || tipo;
+            document.getElementById('cosmetico-preview-price').textContent = `💰 ${preco} Looto`;
+            const rarityEl = document.getElementById('cosmetico-preview-rarity');
+            const rarityColors = { comum: '#9ca3af', raro: '#6366f1', epico: '#a855f7', lendario: '#fbbf24' };
+            rarityEl.textContent = `⭐ ${raridade.charAt(0).toUpperCase() + raridade.slice(1)}`;
+            rarityEl.style.color = rarityColors[raridade] || '#9ca3af';
+
+            const previewImg = document.getElementById('cosmetico-preview-img');
+            const previewBg = document.getElementById('cosmetico-preview-bg');
+            const previewCard = document.getElementById('cosmetico-preview');
+            previewCard.classList.remove('full-bg');
+            previewBg.style.display = 'none';
+            previewBg.innerHTML = '';
+            previewImg.innerHTML = '🖼️';
+
+            if (url && (url.startsWith('http://') || url.startsWith('https://'))) {
+                const isVideo = url.match(/\.(mp4|webm|ogg)$/i);
+                if (tipo === 'fundo_perfil') {
+                    previewCard.classList.add('full-bg');
+                    previewBg.style.display = 'block';
+                    previewBg.innerHTML = isVideo ? `<video src="${url}" autoplay loop muted style="width:100%;height:100%;object-fit:cover;"></video>` : `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+                    previewImg.innerHTML = '🌌';
+                } else if (isVideo) {
+                    previewImg.innerHTML = `<video src="${url}" autoplay loop muted style="width:100%;height:100%;object-fit:cover;"></video>`;
+                } else {
+                    previewImg.innerHTML = `<img src="${url}" style="width:100%;height:100%;object-fit:cover;">`;
+                }
+            }
+        };
+
+        // ═══ JOGOS ═══
+        async function carregarJogos() {
+            const snap = await get(ref(db, 'store/games'));
+            allGames = [];
+            if (snap.exists()) {
+                const data = snap.val();
+                allGames = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+            }
+            document.getElementById('count-games').textContent = allGames.length;
+            filtrarJogos();
+        }
+
+        window.filtrarJogos = function() {
+            const search = (document.getElementById('search-games')?.value || '').toLowerCase();
+            const tbody = document.getElementById('table-games');
+            const info = document.getElementById('games-info');
+            let filtered = allGames;
+            if (search) filtered = allGames.filter(g => (g.name || '').toLowerCase().includes(search));
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;">Nenhum jogo encontrado</td></tr>';
+                info.textContent = search ? `Nenhum resultado para "${search}"` : 'Nenhum jogo cadastrado';
+                return;
+            }
+            info.textContent = `Mostrando ${filtered.length} de ${allGames.length} jogos`;
+            tbody.innerHTML = filtered.map(g => `
+                <tr>
+                    <td><strong>${g.name || '—'}</strong></td>
+                    <td>${g.platform === 'steam' ? '🎮 Steam' : g.platform === 'xbox' ? '🟢 Xbox' : g.platform || '—'}</td>
+                    <td>💰 ${g.price || 0}</td>
+                    <td>📦 ${g.stock || 0}</td>
+                    <td style="font-size:.65rem;color:var(--text-2);">${g.key ? '🔑 Sim' : '—'}</td>
+                    <td><span class="badge ${g.active !== false ? 'badge-green' : 'badge-red'}">${g.active !== false ? 'Ativo' : 'Inativo'}</span></td>
+                    <td>
+                        <button class="btn-sm primary" onclick="editarJogo('${g.id}')">✏️</button>
+                        <button class="btn-sm red" onclick="deletarJogo('${g.id}')">🗑️</button>
+                    </td>
+                </tr>`).join('');
+        };
+
+        window.editarJogo = async function(id) {
+            const snap = await get(ref(db, `store/games/${id}`));
+            if (!snap.exists()) return;
+            const g = snap.val();
+            document.getElementById('game-edit-id').value = id;
+            document.getElementById('game-name').value = g.name || '';
+            document.getElementById('game-platform').value = g.platform || 'steam';
+            document.getElementById('game-price').value = g.price || 0;
+            document.getElementById('game-oldprice').value = g.oldPrice || 0;
+            document.getElementById('game-stock').value = g.stock || 0;
+            document.getElementById('game-image').value = g.image || '';
+            document.getElementById('game-key').value = g.key || '';
+            document.getElementById('game-banner').value = g.bannerUrl || '';
+            document.getElementById('game-desc').value = g.description || '';
+            document.getElementById('game-active').value = g.active !== false ? 'true' : 'false';
+            updateGamePreview();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        };
+
+        window.cancelarEdicaoGame = function() {
+            document.getElementById('game-edit-id').value = '';
+            document.getElementById('game-name').value = '';
+            document.getElementById('game-price').value = '0';
+            document.getElementById('game-oldprice').value = '0';
+            document.getElementById('game-stock').value = '1';
+            document.getElementById('game-image').value = '';
+            document.getElementById('game-key').value = '';
+            document.getElementById('game-banner').value = '';
+            document.getElementById('game-desc').value = '';
+            document.getElementById('game-active').value = 'true';
+            updateGamePreview();
+        };
+
+        window.salvarJogo = async function() {
+            const name = document.getElementById('game-name').value.trim();
+            if (!name) { toast('⚠️ Nome obrigatório!'); return; }
+            const gameData = {
+                name,
+                platform: document.getElementById('game-platform').value,
+                price: parseInt(document.getElementById('game-price').value) || 0,
+                oldPrice: parseInt(document.getElementById('game-oldprice').value) || 0,
+                discount: parseInt(document.getElementById('game-discount').value) || 0,
+                stock: parseInt(document.getElementById('game-stock').value) || 0,
+                image: document.getElementById('game-image').value.trim(),
+                key: document.getElementById('game-key').value.trim(),
+                bannerUrl: document.getElementById('game-banner').value.trim(),
+                description: document.getElementById('game-desc').value.trim(),
+                active: document.getElementById('game-active').value === 'true',
+                updatedAt: Date.now()
+            };
+            const editId = document.getElementById('game-edit-id').value;
+            try {
+                if (editId) { await update(ref(db, `store/games/${editId}`), gameData); toast('✅ Atualizado!', true); } else { const nr = push(ref(db, 'store/games')); await set(nr, { ...gameData, createdAt: Date.now() }); toast('✅ Criado!', true); }
+                cancelarEdicaoGame();
+                carregarJogos();
+            } catch (e) { toast('❌ Erro: ' + e.message, false); }
+        };
+
+        window.deletarJogo = async function(id) { if (!confirm('🗑️ Deletar?')) return; await remove(ref(db, `store/games/${id}`)); carregarJogos(); toast('🗑️ Removido!', true); };
+
+        // ═══ XP ═══
+        async function carregarXP() {
+            const snap = await get(ref(db, 'store/xp'));
+            allXP = [];
+            if (snap.exists()) {
+                const data = snap.val();
+                allXP = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+            }
+            document.getElementById('count-xp').textContent = allXP.length;
+            filtrarXP();
+        }
+
+        window.filtrarXP = function() {
+            const search = (document.getElementById('search-xp')?.value || '').toLowerCase();
+            const tbody = document.getElementById('table-xp');
+            const info = document.getElementById('xp-info');
+            let filtered = allXP;
+            if (search) filtered = allXP.filter(p => (p.name || '').toLowerCase().includes(search));
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">Nenhum pacote</td></tr>';
+                info.textContent = search ? `Nenhum resultado para "${search}"` : 'Nenhum pacote cadastrado';
+                return;
+            }
+            info.textContent = `Mostrando ${filtered.length} de ${allXP.length} pacotes`;
+            tbody.innerHTML = filtered.map(p => `
+                <tr>
+                    <td><strong>${p.name || '—'}</strong></td><td>⭐ ${p.xp || 0}</td><td>💰 ${p.price || 0}</td>
+                    <td>${p.discount ? `-${p.discount}%` : '—'}</td>
+                    <td><span class="badge ${p.active !== false ? 'badge-green' : 'badge-red'}">${p.active !== false ? 'Ativo' : 'Inativo'}</span></td>
+                    <td><button class="btn-sm primary" onclick="editarXP('${p.id}')">✏️</button> <button class="btn-sm red" onclick="deletarXP('${p.id}')">🗑️</button></td>
+                </tr>`).join('');
+        };
+
+        window.editarXP = async function(id) { const snap = await get(ref(db, `store/xp/${id}`)); if (!snap.exists()) return; const p = snap.val(); document.getElementById('xp-edit-id').value = id; document.getElementById('xp-name').value = p.name; document.getElementById('xp-xp').value = p.xp; document.getElementById('xp-price').value = p.price; document.getElementById('xp-discount').value = p.discount || 0; document.getElementById('xp-image').value = p.image || ''; document.getElementById('xp-active').value = p.active !== false ? 'true' : 'false'; };
+        window.cancelarEdicaoXP = function() { document.getElementById('xp-edit-id').value = ''; document.getElementById('xp-name').value = ''; document.getElementById('xp-xp').value = '100'; document.getElementById('xp-price').value = '0'; document.getElementById('xp-discount').value = '0'; document.getElementById('xp-image').value = ''; document.getElementById('xp-active').value = 'true'; };
+        window.salvarXP = async function() {
+            const name = document.getElementById('xp-name').value.trim();
+            if (!name) { toast('⚠️ Nome obrigatório!'); return; }
+            const packData = { name, xp: parseInt(document.getElementById('xp-xp').value) || 100, price: parseInt(document.getElementById('xp-price').value) || 0, discount: parseInt(document.getElementById('xp-discount').value) || 0, image: document.getElementById('xp-image').value.trim(), active: document.getElementById('xp-active').value === 'true', updatedAt: Date.now() };
+            const editId = document.getElementById('xp-edit-id').value;
+            try { if (editId) { await update(ref(db, `store/xp/${editId}`), packData); } else { const nr = push(ref(db, 'store/xp')); await set(nr, { ...packData, createdAt: Date.now() }); } cancelarEdicaoXP(); carregarXP(); toast('✅ Salvo!', true); } catch (e) { toast('❌ Erro: ' + e.message, false); }
+        };
+        window.deletarXP = async function(id) { if (!confirm('🗑️ Deletar?')) return; await remove(ref(db, `store/xp/${id}`)); carregarXP(); toast('🗑️ Removido!', true); };
+
+        // ═══ MODO DE ENTREGA ═══
+        async function carregarModoEntrega() {
+            const snap = await get(ref(db, 'configLoja'));
+            const modo = snap.exists() && snap.val().entregaAutomatica !== false ? 'auto' : 'manual';
+            document.getElementById('modo-entrega').value = modo;
+            document.getElementById('modo-entrega-status').textContent = modo === 'auto' ? '🚀 Automático' : '✋ Manual';
+            document.getElementById('modo-entrega-status').style.color = modo === 'auto' ? 'var(--green)' : 'var(--orange)';
+        }
+
+        window.salvarModoEntrega = async function() {
+            const modo = document.getElementById('modo-entrega').value === 'auto';
+            await set(ref(db, 'configLoja'), { entregaAutomatica: modo, atualizadoEm: Date.now() });
+            document.getElementById('modo-entrega-status').textContent = modo ? '🚀 Automático' : '✋ Manual';
+            document.getElementById('modo-entrega-status').style.color = modo ? 'var(--green)' : 'var(--orange)';
+            toast(`✅ Modo: ${modo ? '🚀 Automático' : '✋ Manual'}`, true);
+        };
+
+        // ═══ VENDAS ═══
+        async function carregarVendas() {
+            try {
+                const snap = await get(ref(db, 'purchases'));
+                allVendas = [];
+                if (snap.exists()) {
+                    const data = snap.val();
+                    for (const uid in data) {
+                        for (const pid in data[uid]) {
+                            allVendas.push({ id: pid, uid, ...data[uid][pid] });
+                        }
+                    }
+                }
+                allVendas.sort((a, b) => (b.purchasedAt || 0) - (a.purchasedAt || 0));
+                if (allVendas.length > vendasLimit) allVendas = allVendas.slice(0, vendasLimit);
+                document.getElementById('count-vendas').textContent = allVendas.length;
+                document.getElementById('count-vendas-header').textContent = allVendas.length;
+                document.getElementById('vendas-limit-info').textContent = vendasLimit;
+                filtrarVendas();
+            } catch (e) {
+                console.error('Erro ao carregar vendas:', e);
+                toast('❌ Erro ao carregar vendas');
+                document.getElementById('table-vendas').innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;color:var(--red);">Erro ao carregar vendas. Verifique as permissões do Firebase.</td></tr>';
+            }
+        }
+
+        window.recarregarVendas = () => { vendasLimit = 200; carregarVendas(); };
+        window.carregarMaisVendas = () => { vendasLimit += 200; carregarVendas(); };
+
+        window.filtrarVendas = function() {
+            const search = (document.getElementById('search-vendas')?.value || '').toLowerCase();
+            const tbody = document.getElementById('table-vendas');
+            const info = document.getElementById('vendas-info');
+            let filtered = allVendas;
+            if (search) filtered = allVendas.filter(v => (v.itemName || '').toLowerCase().includes(search) || (v.uid || '').toLowerCase().includes(search));
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;">Nenhuma venda encontrada</td></tr>';
+                info.textContent = search ? `Nenhum resultado para "${search}"` : 'Nenhuma venda';
+                return;
+            }
+            info.textContent = `Mostrando ${filtered.length} vendas (limite: ${vendasLimit})`;
+            tbody.innerHTML = filtered.map(v => {
+                const statusBadge = v.status === 'delivered' ? 'badge-green' : v.status === 'refused' ? 'badge-red' : 'badge-orange';
+                const statusText = v.status === 'delivered' ? '✅ Entregue' : v.status === 'refused' ? '❌ Recusada' : '⏳ Pendente';
+                const tipo = v.type === 'game' ? '🎮 Jogo' : v.type === 'xp' ? '⭐ XP' : '🎨 Cosmético';
+                const safeItem = (v.itemName || '').replace(/'/g, "\\'");
+                const safePlatform = (v.platform || 'Steam').replace(/'/g, "\\'");
+                return `<tr>
+                    <td><span class="uid-link" onclick="navigator.clipboard.writeText('${v.uid}');toast('UID copiado!',true)" title="Clique para copiar">${v.uid?.slice(0, 12)}...</span></td>
+                    <td>${v.itemName || '—'}</td><td>${tipo}</td><td>💰 ${v.price || 0}</td>
+                    <td style="font-size:.7rem;">${v.purchasedAt ? new Date(v.purchasedAt).toLocaleString('pt-BR') : '—'}</td>
+                    <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                    <td style="display:flex;gap:3px;flex-wrap:wrap;">
+                        ${v.status === 'pending' ? `<button class="btn-sm green" onclick="entregarVenda('${v.uid}','${v.id}','${v.type}','${safeItem}','${safePlatform}')">✅</button><button class="btn-sm red" onclick="recusarVenda('${v.uid}','${v.id}')">❌</button>` : ''}
+                        ${v.status === 'delivered' && v.type === 'cosmetico' ? `<button class="btn-sm orange" onclick="reembolsarCosmetico('${v.uid}','${v.id}','${safeItem}')">💰 Reembolsar</button>` : ''}
+                        <button class="btn-sm red" onclick="deletarVenda('${v.uid}','${v.id}')">🗑️</button>
+                    </td>
+                </tr>`;
+            }).join('');
+        };
+
+        window.entregarVenda = async function(uid, pid, type, itemName, platform) {
+            if (type === 'game') {
+                const key = prompt(`🔑 Digite a key para "${itemName}":`, '');
+                if (!key) return;
+                await push(ref(db, 'chat'), { uid, nome: 'Comprador', texto: '', ts: Date.now(), type: 'treasure', keyCode: key, keyGame: itemName, keyPlatform: platform || 'Steam', sorteioId: 'store-purchase', opened: false });
+            }
+            await update(ref(db, `purchases/${uid}/${pid}`), { status: 'delivered', deliveredAt: Date.now() });
+            await push(ref(db, 'chat'), { uid: 'bot', nome: 'LootoBot 🤖', texto: type === 'game' ? `🛒 <strong>${itemName}</strong> foi entregue! 🎮` : type === 'xp' ? `⭐ Pacote de XP entregue! 🎉` : `🎨 <strong>${itemName}</strong> foi entregue! 🎒`, ts: Date.now(), type: 'system' });
+            carregarVendas();
+            toast('✅ Venda entregue!', true);
+        };
+
+        window.recusarVenda = async function(uid, pid) {
+            if (!confirm('Recusar esta venda?')) return;
+            await update(ref(db, `purchases/${uid}/${pid}`), { status: 'refused', refusedAt: Date.now() });
+            carregarVendas();
+            toast('❌ Venda recusada!', true);
+        };
+
+        window.deletarVenda = async function(uid, pid) {
+            if (!confirm('Deletar esta venda?')) return;
+            await remove(ref(db, `purchases/${uid}/${pid}`));
+            carregarVendas();
+            toast('🗑️ Deletada!', true);
+        };
+
+        window.reembolsarCosmetico = async function(uid, pid, itemName) {
+            if (!confirm(`Reembolsar "${itemName}" e remover do inventário do usuário?`)) return;
+            try {
+                const snap = await get(ref(db, `purchases/${uid}/${pid}`));
+                if (!snap.exists()) return toast('Compra não encontrada.');
+                const compra = snap.val();
+                const invSnap = await get(ref(db, `usuarios/${uid}/inventario`));
+                let itemKey = null;
+                if (invSnap.exists()) {
+                    const inv = invSnap.val();
+                    for (const key in inv) { if (inv[key].nome === compra.itemName) { itemKey = key; break; } }
+                }
+                const updates = {};
+                updates[`purchases/${uid}/${pid}/status`] = 'refused';
+                updates[`purchases/${uid}/${pid}/refusedAt`] = Date.now();
+                if (itemKey) updates[`usuarios/${uid}/inventario/${itemKey}`] = null;
+                const userSnap = await get(ref(db, `usuarios/${uid}`));
+                const currentMoney = userSnap.val()?.dinheiro || 0;
+                updates[`usuarios/${uid}/dinheiro`] = currentMoney + (compra.price || 0);
+                await update(ref(db), updates);
+                carregarVendas();
+                toast('✅ Reembolsado!', true);
+            } catch (e) { toast('❌ Erro: ' + e.message); }
+        };
+
+        window.entregarTodasPendentes = async function() {
+            const pendentes = allVendas.filter(v => v.status === 'pending');
+            if (pendentes.length === 0) { toast('Nenhuma venda pendente!'); return; }
+            if (!confirm(`Entregar ${pendentes.length} vendas pendentes?`)) return;
+            for (const v of pendentes) {
+                if (v.type === 'game') {
+                    const gameSnap = await get(ref(db, 'store/games'));
+                    let foundKey = '';
+                    if (gameSnap.exists()) {
+                        const games = gameSnap.val();
+                        for (const gid in games) {
+                            if (games[gid].name === v.itemName && games[gid].key) {
+                                foundKey = games[gid].key;
+                                await update(ref(db, `store/games/${gid}`), { key: '', stock: (games[gid].stock || 1) - 1 });
+                                break;
+                            }
+                        }
+                    }
+                    if (foundKey) {
+                        await push(ref(db, 'chat'), { uid: v.uid, nome: 'Comprador', texto: '', ts: Date.now(), type: 'treasure', keyCode: foundKey, keyGame: v.itemName, keyPlatform: v.platform || 'Steam', sorteioId: 'store-purchase', opened: false });
+                    }
+                }
+                await update(ref(db, `purchases/${v.uid}/${v.id}`), { status: 'delivered', deliveredAt: Date.now() });
+            }
+            carregarVendas();
+            toast(`✅ ${pendentes.length} vendas entregues!`, true);
+        };
+
+        window.recusarTodasPendentes = async function() {
+            const pendentes = allVendas.filter(v => v.status === 'pending');
+            if (pendentes.length === 0) { toast('Nenhuma venda pendente!'); return; }
+            if (!confirm(`Recusar ${pendentes.length} vendas?`)) return;
+            for (const v of pendentes) { await update(ref(db, `purchases/${v.uid}/${v.id}`), { status: 'refused', refusedAt: Date.now() }); }
+            carregarVendas();
+            toast(`❌ ${pendentes.length} recusadas!`, true);
+        };
+
+        window.adicionarVendaManual = async function() {
+            const uid = document.getElementById('venda-uid').value.trim();
+            const item = document.getElementById('venda-item').value.trim();
+            const tipo = document.getElementById('venda-tipo').value;
+            const preco = parseInt(document.getElementById('venda-preco').value) || 0;
+            const key = document.getElementById('venda-key').value.trim();
+            const xp = parseInt(document.getElementById('venda-xp').value) || 0;
+            if (!uid || !item) { toast('⚠️ Preencha UID e Item!'); return; }
+            const vendaRef = push(ref(db, `purchases/${uid}`));
+            await set(vendaRef, { type: tipo, itemName: item, price: preco, platform: 'Steam', xp: xp, purchasedAt: Date.now(), status: 'pending' });
+            document.getElementById('venda-uid').value = '';
+            document.getElementById('venda-nome').value = '';
+            document.getElementById('venda-item').value = '';
+            document.getElementById('venda-key').value = '';
+            document.getElementById('venda-preco').value = '0';
+            document.getElementById('venda-xp').value = '0';
+            carregarVendas();
+            toast('✅ Venda adicionada!', true);
+        };
+
+        window.apagarTodasVendas = async function() {
+            const paraApagar = allVendas.filter(v => v.status === 'delivered' || v.status === 'refused');
+            if (paraApagar.length === 0) { toast('Nenhuma venda para apagar!'); return; }
+            if (!confirm(`🗑️ Apagar ${paraApagar.length} vendas permanentemente?`)) return;
+            for (const v of paraApagar) { await remove(ref(db, `purchases/${v.uid}/${v.id}`)); }
+            carregarVendas();
+            toast(`🗑️ ${paraApagar.length} vendas apagadas!`, true);
+        };
+
+        // ═══ COSMÉTICOS ═══
+        async function carregarCosmeticos() {
+            const snap = await get(ref(db, 'store/cosmeticos'));
+            allCosmeticos = [];
+            if (snap.exists()) {
+                const data = snap.val();
+                allCosmeticos = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+            }
+            document.getElementById('count-cosmeticos').textContent = allCosmeticos.length;
+            filtrarCosmeticos();
+        }
+
+        window.filtrarCosmeticos = function() {
+            const search = (document.getElementById('search-cosmeticos')?.value || '').toLowerCase();
+            const tbody = document.getElementById('table-cosmeticos');
+            const info = document.getElementById('cosmeticos-info');
+            let filtered = allCosmeticos;
+            if (search) filtered = allCosmeticos.filter(c => (c.nome || '').toLowerCase().includes(search));
+            if (filtered.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">Nenhum cosmético encontrado</td></tr>';
+                info.textContent = search ? `Nenhum resultado para "${search}"` : 'Nenhum cosmético cadastrado';
+                return;
+            }
+            info.textContent = `Mostrando ${filtered.length} de ${allCosmeticos.length} cosméticos`;
+            const rarityColors = { comum: '#9ca3af', raro: '#6366f1', epico: '#a855f7', lendario: '#fbbf24' };
+            const tipoNomes = { wallpaper: '🖼️ Wallpaper', fundo_perfil: '🌌 Fundo de Perfil', moldura: '🖼️ Moldura', efeito: '✨ Efeito' };
+            tbody.innerHTML = filtered.map(c => `
+                <tr>
+                    <td><strong>${c.nome || '—'}</strong></td>
+                    <td>${tipoNomes[c.tipo] || c.tipo}</td>
+                    <td>💰 ${c.preco || 0}</td>
+                    <td><span style="color:${rarityColors[c.raridade]||'#9ca3af'}; font-weight:600;">${c.raridade ? c.raridade.charAt(0).toUpperCase() + c.raridade.slice(1) : 'Comum'}</span></td>
+                    <td><span class="badge ${c.active !== false ? 'badge-green' : 'badge-red'}">${c.active !== false ? 'Ativo' : 'Inativo'}</span></td>
+                    <td>
+                        <button class="btn-sm primary" onclick="editarCosmetico('${c.id}')">✏️</button>
+                        <button class="btn-sm red" onclick="deletarCosmetico('${c.id}')">🗑️</button>
+                    </td>
+                </tr>`).join('');
+        };
+
+        window.editarCosmetico = async function(id) { const snap = await get(ref(db, `store/cosmeticos/${id}`)); if (!snap.exists()) return; const c = snap.val(); document.getElementById('cosmetico-edit-id').value = id; document.getElementById('cosmetico-name').value = c.nome; document.getElementById('cosmetico-tipo').value = c.tipo; document.getElementById('cosmetico-preco').value = c.preco; document.getElementById('cosmetico-preco-real').value = c.precoReal || 0; document.getElementById('cosmetico-raridade').value = c.raridade; document.getElementById('cosmetico-url').value = c.url; document.getElementById('cosmetico-active').value = c.active !== false ? 'true' : 'false'; updateCosmeticoPreview(); window.scrollTo({ top: 0, behavior: 'smooth' }); };
+        window.cancelarEdicaoCosmetico = function() { document.getElementById('cosmetico-edit-id').value = ''; document.getElementById('cosmetico-name').value = ''; document.getElementById('cosmetico-tipo').value = 'wallpaper'; document.getElementById('cosmetico-preco').value = '0'; document.getElementById('cosmetico-preco-real').value = '0'; document.getElementById('cosmetico-raridade').value = 'comum'; document.getElementById('cosmetico-url').value = ''; document.getElementById('cosmetico-active').value = 'true'; updateCosmeticoPreview(); };
+        window.salvarCosmetico = async function() {
+            const nome = document.getElementById('cosmetico-name').value.trim();
+            const url = document.getElementById('cosmetico-url').value.trim();
+            if (!nome || !url) { toast('⚠️ Preencha nome e URL!'); return; }
+            const cosmeticoData = { nome, tipo: document.getElementById('cosmetico-tipo').value, preco: parseInt(document.getElementById('cosmetico-preco').value) || 0, precoReal: parseFloat(document.getElementById('cosmetico-preco-real').value) || 0, raridade: document.getElementById('cosmetico-raridade').value, url: url, active: document.getElementById('cosmetico-active').value === 'true', updatedAt: Date.now() };
+            const editId = document.getElementById('cosmetico-edit-id').value;
+            try { if (editId) { await update(ref(db, `store/cosmeticos/${editId}`), cosmeticoData); } else { const nr = push(ref(db, 'store/cosmeticos')); await set(nr, { ...cosmeticoData, createdAt: Date.now() }); } cancelarEdicaoCosmetico(); carregarCosmeticos(); toast('✅ Salvo!', true); } catch (e) { toast('❌ Erro: ' + e.message, false); }
+        };
+        window.deletarCosmetico = async function(id) { if (!confirm('🗑️ Deletar?')) return; await remove(ref(db, `store/cosmeticos/${id}`)); carregarCosmeticos(); toast('🗑️ Removido!', true); };
+
+        updateGamePreview();
+        updateCosmeticoPreview();
+    </script>
+</body>
+
+</html>

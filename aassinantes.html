@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Assinantes Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --bg-card: #151a26;
+            --text: #f3f4f6;
+            --text-2: #9ca3af;
+            --primary: #6366f1;
+            --green: #10b981;
+            --red: #ef4444;
+            --gold: #fbbf24;
+            --orange: #f59e0b;
+            --pink: #ec4899;
+            --diamond: #38bdf8;
+            --border: rgba(255, 255, 255, 0.06);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+
+        header {
+            background: rgba(11, 14, 20, 0.95);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(16px);
+            padding: .9rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .5rem;
+        }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text); text-decoration: none; }
+        .logo em { color: var(--red); font-style: normal; }
+        .btn-header { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: .4rem .8rem; border-radius: 6px; font-size: .8rem; cursor: pointer; transition: .3s; text-decoration: none; }
+        .btn-header:hover { border-color: var(--red); color: var(--red); }
+
+        .main-layout { max-width: 1600px; margin: 0 auto; padding: 1.5rem 2rem; display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; }
+
+        .sidebar { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1rem; position: sticky; top: 80px; height: fit-content; }
+        .sidebar-btn { background: transparent; border: none; color: var(--text-2); padding: .7rem 1rem; border-radius: 8px; font-size: .85rem; cursor: pointer; transition: .3s; text-align: left; display: flex; align-items: center; gap: .5rem; width: 100%; text-decoration: none; }
+        .sidebar-btn:hover { background: rgba(255, 255, 255, .03); color: var(--text); }
+        .sidebar-btn.active { background: rgba(99, 102, 241, .12); color: var(--primary); font-weight: 600; }
+
+        .panel { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; }
+        .panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+        .stat-card { background: rgba(255,255,255,.02); border: 1px solid var(--border); border-radius: 12px; padding: 1.25rem; text-align: center; }
+        .stat-value { font-family: 'Space Grotesk', sans-serif; font-size: 2rem; font-weight: 700; color: var(--primary); }
+        .stat-label { font-size: .75rem; color: var(--text-2); margin-top: .25rem; text-transform: uppercase; letter-spacing: .05em; }
+
+        .search-box { margin-bottom: .8rem; }
+        .search-box input { width: 100%; }
+
+        .table-container { border: 1px solid var(--border); border-radius: 8px; }
+        .table-wrapper { max-height: 500px; overflow-y: auto; }
+        .table-wrapper::-webkit-scrollbar { width: 4px; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; }
+
+        table { width: 100%; border-collapse: collapse; font-size: .82rem; }
+        th { text-align: left; padding: .6rem; color: var(--text-2); font-size: .7rem; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--bg-card); position: sticky; top: 0; z-index: 1; }
+        td { padding: .55rem .6rem; border-bottom: 1px solid rgba(255, 255, 255, .04); }
+
+        input, select { background: rgba(11, 14, 20, .6); border: 1px solid var(--border); padding: .5rem .7rem; border-radius: 6px; color: var(--text); font-size: .82rem; outline: none; width: 100%; }
+        input:focus, select:focus { border-color: var(--primary); }
+
+        .btn { padding: .5rem 1rem; border-radius: 6px; font-size: .8rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .15rem; }
+        .btn.primary { background: var(--primary); color: #fff; }
+        .btn.red { background: var(--red); color: #fff; }
+        .btn.green { background: var(--green); color: #fff; }
+        .btn.gold { background: var(--gold); color: #000; }
+
+        .btn-sm { padding: .3rem .6rem; border-radius: 4px; font-size: .7rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .1rem; }
+        .btn-sm.primary { background: var(--primary); color: #fff; }
+        .btn-sm.red { background: var(--red); color: #fff; }
+        .btn-sm.green { background: var(--green); color: #fff; }
+        .btn-sm.gold { background: var(--gold); color: #000; }
+
+        .badge { padding: .15rem .5rem; border-radius: 99px; font-size: .7rem; font-weight: 600; display: inline-block; }
+        .badge-green { background: rgba(16,185,129,.15); color: var(--green); }
+        .badge-red { background: rgba(239,68,68,.15); color: var(--red); }
+        .badge-gold { background: rgba(251,191,36,.15); color: var(--gold); }
+        .badge-blue { background: rgba(99,102,241,.15); color: var(--primary); }
+        .badge-pink { background: rgba(236,72,153,.15); color: var(--pink); }
+
+        .count-badge { background: rgba(99,102,241,.15); color: var(--primary); padding: .1rem .5rem; border-radius: 99px; font-size: .7rem; margin-left: .3rem; }
+
+        .field { margin-bottom: .8rem; }
+        .field label { font-size: .75rem; color: var(--text-2); display: block; margin-bottom: .2rem; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+
+        .card-config { background: rgba(255,255,255,.02); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: .8rem; }
+        .card-config h5 { font-family: 'Space Grotesk', sans-serif; font-size: .85rem; margin-bottom: .5rem; display: flex; align-items: center; gap: .4rem; }
+
+        .toast { position: fixed; top: 1.5rem; right: 1.5rem; background: var(--bg-card); border: 1px solid var(--red); padding: .8rem 1.2rem; border-radius: 12px; font-size: .85rem; z-index: 999; transform: translateX(140%); transition: .3s; max-width: 320px; }
+        .toast.show { transform: translateX(0); }
+        .toast.ok { border-color: var(--green); }
+
+        .tabs { display: flex; gap: .3rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .tab-btn { padding: .5rem 1.2rem; border-radius: 8px; font-size: .85rem; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text-2); transition: .3s; }
+        .tab-btn:hover { color: var(--text); }
+        .tab-btn.active { background: rgba(99,102,241,.12); color: var(--primary); border-color: var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; padding: 1rem; }
+            .sidebar { display: flex; flex-wrap: wrap; gap: .3rem; position: static; }
+            .sidebar-btn { width: auto; font-size: .7rem; padding: .4rem .6rem; }
+            .field-row { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+
+    <header>
+        <a href="looto.html" class="logo"><em>🛡️</em> Looto Admin</a>
+        <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+        <div>
+            <a href="looto.html" class="btn-header">🏠 Site</a>
+            <button class="btn-header" onclick="logout()" style="margin-left:.5rem;">🚪 Sair</button>
+        </div>
+    </header>
+
+    <div class="main-layout">
+        <aside class="sidebar">
+            <a href="admin.html" class="sidebar-btn">📊 Dashboard</a>
+            <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+            <a href="abots.html" class="sidebar-btn">🤖 Bots</a>
+            <a href="asorteios.html" class="sidebar-btn">🎁 Sorteios</a>
+            <a href="alogsorteios.html" class="sidebar-btn">📋 Log Sorteios</a>
+            <a href="achat.html" class="sidebar-btn">💬 Chat</a>
+            <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+            <a href="aloja.html" class="sidebar-btn">🛒 Loja</a>
+            <a href="admins.html" class="sidebar-btn">🔑 Admins</a>
+            <a href="aassinantes.html" class="sidebar-btn active">⭐ Assinantes</a>
+            <a href="aferramentas.html" class="sidebar-btn">🔧 Ferramentas</a>
+        </aside>
+
+        <div>
+            <!-- TABS -->
+            <div class="tabs" style="margin-bottom:1rem;">
+                <button class="tab-btn active" onclick="switchTab('ativos')">⭐ Ativos <span class="count-badge" id="count-ativos">0</span></button>
+                <button class="tab-btn" onclick="switchTab('todos')">📋 Todos <span class="count-badge" id="count-todos">0</span></button>
+                <button class="tab-btn" onclick="switchTab('adicionar')">➕ Adicionar</button>
+            </div>
+
+            <!-- ═══════════════ TAB ATIVOS ═══════════════ -->
+            <div class="tab-content active" id="tab-ativos">
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-ativos">0</div>
+                        <div class="stat-label">Assinantes Ativos</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-expiram-breve" style="color: var(--orange);">0</div>
+                        <div class="stat-label">Expiram em 3 dias</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-expirados" style="color: var(--red);">0</div>
+                        <div class="stat-label">Expirados</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-value" id="stat-total-arrecadado" style="color: var(--gold);">0</div>
+                        <div class="stat-label">Total Arrecadado (R$)</div>
+                    </div>
+                </div>
+
+                <div class="panel">
+                    <div class="panel-title">⭐ Assinantes Ativos <span class="count-badge" id="count-ativos-header">0</span></div>
+                    <div class="search-box">
+                        <input type="text" id="search-ativos" placeholder="🔍 Buscar por nome, UID..." oninput="filtrarAtivos()">
+                    </div>
+                    <div class="table-container">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Usuário</th>
+                                        <th>UID</th>
+                                        <th>Início</th>
+                                        <th>Expira em</th>
+                                        <th>Dias rest.</th>
+                                        <th>Meses acum.</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-ativos"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════ TAB TODOS ═══════════════ -->
+            <div class="tab-content" id="tab-todos">
+                <div class="panel">
+                    <div class="panel-title">📋 Todas as Assinaturas <span class="count-badge" id="count-todos-header">0</span></div>
+                    <div class="search-box">
+                        <input type="text" id="search-todos" placeholder="🔍 Buscar por nome, UID..." oninput="filtrarTodos()">
+                    </div>
+                    <div class="table-container">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Usuário</th>
+                                        <th>UID</th>
+                                        <th>Status</th>
+                                        <th>Início</th>
+                                        <th>Expira em</th>
+                                        <th>Meses acum.</th>
+                                        <th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-todos"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ═══════════════ TAB ADICIONAR ═══════════════ -->
+            <div class="tab-content" id="tab-adicionar">
+                <div class="panel">
+                    <div class="panel-title">➕ Adicionar Assinante</div>
+                    <p style="font-size:.78rem;color:var(--text-2);margin-bottom:1rem;">Adicione uma assinatura premium a um usuário existente.</p>
+
+                    <div class="card-config">
+                        <h5>🔍 Buscar Usuário</h5>
+                        <div class="field">
+                            <label>UID do Usuário</label>
+                            <input type="text" id="add-uid" placeholder="Cole o UID do usuário...">
+                        </div>
+                        <button class="btn primary" onclick="buscarUsuarioParaAssinar()" style="width:100%;">🔍 Buscar</button>
+                        <div id="add-user-info" style="margin-top:.8rem;font-size:.85rem;"></div>
+                    </div>
+
+                    <div class="card-config" id="add-confirm-section" style="display:none;">
+                        <h5>✅ Confirmar Assinatura</h5>
+                        <div class="field-row">
+                            <div class="field">
+                                <label>Duração (dias)</label>
+                                <input type="number" id="add-dias" value="30" min="1" max="365">
+                            </div>
+                            <div class="field">
+                                <label>Valor pago (R$) - opcional</label>
+                                <input type="number" id="add-valor" value="0" min="0" step="0.01">
+                            </div>
+                        </div>
+                        <button class="btn green" onclick="confirmarAssinatura()" style="width:100%;">⭐ Ativar Assinatura</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, get, set, update, remove } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+        authDomain: "looto-f46e5.firebaseapp.com",
+        databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+        projectId: "looto-f46e5",
+        storageBucket: "looto-f46e5.firebasestorage.app",
+        messagingSenderId: "295066400995",
+        appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let allAssinaturas = [];
+    let currentUserUidParaAssinar = null;
+
+    function toast(msg, ok = false) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (ok ? ' ok' : '');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+
+    async function checkAdmin(user) {
+        if (!user) return false;
+        if (user.email === 'startubez.com@gmail.com') return true;
+        const snap = await get(ref(db, 'admins'));
+        if (!snap.exists()) return false;
+        const admins = snap.val();
+        for (let key of Object.keys(admins)) { const a = admins[key]; if (a.uid === user.uid || a.email === user.email) return true; }
+        return false;
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const isAdmin = await checkAdmin(user);
+        if (!isAdmin) {
+            document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;flex-direction:column;gap:1rem;padding:2rem;"><h1 style="font-family:'Space Grotesk',sans-serif;font-size:3rem;color:#ef4444;">🚫 Acesso Negado</h1><p style="color:#9ca3af;">Você não tem permissão.</p><a href="looto.html" style="background:#6366f1;color:#fff;padding:.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;">Ir para o Site</a></div>`;
+            setTimeout(() => window.location.href = 'looto.html', 3000);
+            return;
+        }
+        document.getElementById('admin-info').textContent = `👑 ${user.email}`;
+        carregarTudo();
+    });
+
+    window.switchTab = function(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+    };
+
+    async function carregarTudo() {
+        await carregarAssinaturas();
+        atualizarEstatisticas();
+    }
+
+    async function carregarAssinaturas() {
+        const snap = await get(ref(db, 'assinaturas'));
+        allAssinaturas = [];
+        if (snap.exists()) {
+            const data = snap.val();
+            for (const [uid, val] of Object.entries(data)) {
+                // Buscar nome do usuário
+                const userSnap = await get(ref(db, 'usuarios/' + uid));
+                const userData = userSnap.val() || {};
+                allAssinaturas.push({
+                    uid,
+                    nome: userData.username || '—',
+                    email: userData.email || '—',
+                    ...val
+                });
+            }
+        }
+        document.getElementById('count-ativos').textContent = allAssinaturas.filter(a => a.ativo).length;
+        document.getElementById('count-todos').textContent = allAssinaturas.length;
+        document.getElementById('count-ativos-header').textContent = allAssinaturas.filter(a => a.ativo).length;
+        document.getElementById('count-todos-header').textContent = allAssinaturas.length;
+        filtrarAtivos();
+        filtrarTodos();
+    }
+
+    function atualizarEstatisticas() {
+        const agora = Date.now();
+        const tresDias = 3 * 24 * 60 * 60 * 1000;
+        const ativos = allAssinaturas.filter(a => a.ativo);
+        const expiramBreve = ativos.filter(a => a.dataExpiracao && (a.dataExpiracao - agora) <= tresDias && (a.dataExpiracao - agora) > 0);
+        const expirados = allAssinaturas.filter(a => !a.ativo);
+        const totalArrecadado = allAssinaturas.reduce((s, a) => s + (a.valorPago || 0), 0);
+
+        document.getElementById('stat-ativos').textContent = ativos.length;
+        document.getElementById('stat-expiram-breve').textContent = expiramBreve.length;
+        document.getElementById('stat-expirados').textContent = expirados.length;
+        document.getElementById('stat-total-arrecadado').textContent = 'R$ ' + totalArrecadado.toFixed(2);
+    }
+
+    window.filtrarAtivos = function() {
+        const search = (document.getElementById('search-ativos')?.value || '').toLowerCase();
+        const tbody = document.getElementById('table-ativos');
+        let filtered = allAssinaturas.filter(a => a.ativo);
+        if (search) {
+            filtered = filtered.filter(a =>
+                (a.nome || '').toLowerCase().includes(search) ||
+                (a.uid || '').toLowerCase().includes(search) ||
+                (a.email || '').toLowerCase().includes(search)
+            );
+        }
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;">Nenhum assinante ativo</td></tr>';
+            return;
+        }
+        tbody.innerHTML = filtered.map(a => {
+            const diasRest = a.dataExpiracao ? Math.ceil((a.dataExpiracao - Date.now()) / (24 * 60 * 60 * 1000)) : 0;
+            const statusDias = diasRest <= 3 ? 'badge-red' : diasRest <= 7 ? 'badge-gold' : 'badge-green';
+            return `
+            <tr>
+                <td><strong>${a.nome}</strong><br><span style="font-size:.7rem;color:var(--text-2);">${a.email}</span></td>
+                <td style="font-size:.7rem;" title="${a.uid}">${a.uid?.slice(0, 10)}...</td>
+                <td style="font-size:.75rem;">${a.dataInicio ? new Date(a.dataInicio).toLocaleDateString('pt-BR') : '—'}</td>
+                <td style="font-size:.75rem;">${a.dataExpiracao ? new Date(a.dataExpiracao).toLocaleDateString('pt-BR') : '—'}</td>
+                <td><span class="badge ${statusDias}">${diasRest} dias</span></td>
+                <td><span class="badge badge-pink">⭐ ${a.mesesAcumulados || 1} mês(es)</span></td>
+                <td>
+                    <button class="btn-sm green" onclick="renovarAssinatura('${a.uid}')">🔄 +30d</button>
+                    <button class="btn-sm red" onclick="cancelarAssinatura('${a.uid}')">❌ Cancelar</button>
+                </td>
+            </tr>`;
+        }).join('');
+    };
+
+    window.filtrarTodos = function() {
+        const search = (document.getElementById('search-todos')?.value || '').toLowerCase();
+        const tbody = document.getElementById('table-todos');
+        let filtered = allAssinaturas;
+        if (search) {
+            filtered = filtered.filter(a =>
+                (a.nome || '').toLowerCase().includes(search) ||
+                (a.uid || '').toLowerCase().includes(search) ||
+                (a.email || '').toLowerCase().includes(search)
+            );
+        }
+        if (filtered.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:2rem;">Nenhuma assinatura encontrada</td></tr>';
+            return;
+        }
+        tbody.innerHTML = filtered.map(a => {
+            const statusBadge = a.ativo ? 'badge-green' : 'badge-red';
+            const statusText = a.ativo ? '⭐ Ativo' : '❌ Expirado';
+            return `
+            <tr>
+                <td><strong>${a.nome}</strong><br><span style="font-size:.7rem;color:var(--text-2);">${a.email}</span></td>
+                <td style="font-size:.7rem;" title="${a.uid}">${a.uid?.slice(0, 10)}...</td>
+                <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                <td style="font-size:.75rem;">${a.dataInicio ? new Date(a.dataInicio).toLocaleDateString('pt-BR') : '—'}</td>
+                <td style="font-size:.75rem;">${a.dataExpiracao ? new Date(a.dataExpiracao).toLocaleDateString('pt-BR') : '—'}</td>
+                <td><span class="badge badge-pink">⭐ ${a.mesesAcumulados || 1} mês(es)</span></td>
+                <td>
+                    ${a.ativo ? `<button class="btn-sm green" onclick="renovarAssinatura('${a.uid}')">🔄 +30d</button>` : ''}
+                    ${a.ativo ? `<button class="btn-sm red" onclick="cancelarAssinatura('${a.uid}')">❌ Cancelar</button>` : ''}
+                    <button class="btn-sm red" onclick="removerHistorico('${a.uid}')">🗑️</button>
+                </td>
+            </tr>`;
+        }).join('');
+    };
+
+    window.renovarAssinatura = async function(uid) {
+        if (!confirm('Adicionar +30 dias a esta assinatura?')) return;
+        const assinatura = allAssinaturas.find(a => a.uid === uid);
+        if (!assinatura) return;
+        const novaExpiracao = (assinatura.dataExpiracao || Date.now()) + 30 * 24 * 60 * 60 * 1000;
+        const historico = assinatura.historico || [];
+        historico.push({ dataInicio: Date.now(), dataExpiracao: novaExpiracao });
+        await update(ref(db, 'assinaturas/' + uid), {
+            dataExpiracao: novaExpiracao,
+            ativo: true,
+            mesesAcumulados: (assinatura.mesesAcumulados || 0) + 1,
+            historico
+        });
+        await update(ref(db, 'usuarios/' + uid), { premium: true });
+        toast('✅ Assinatura renovada!', true);
+        carregarTudo();
+    };
+
+    window.cancelarAssinatura = async function(uid) {
+        if (!confirm('Cancelar esta assinatura? O usuário perderá o acesso premium imediatamente.')) return;
+        await update(ref(db, 'assinaturas/' + uid), { ativo: false, dataExpiracao: Date.now() });
+        await update(ref(db, 'usuarios/' + uid), { premium: false });
+        toast('❌ Assinatura cancelada!', true);
+        carregarTudo();
+    };
+
+    window.removerHistorico = async function(uid) {
+        if (!confirm('Remover todo o histórico de assinatura deste usuário? Esta ação é irreversível.')) return;
+        await remove(ref(db, 'assinaturas/' + uid));
+        await update(ref(db, 'usuarios/' + uid), { premium: false });
+        toast('🗑️ Histórico removido!', true);
+        carregarTudo();
+    };
+
+    // ═══ ADICIONAR ASSINANTE ═══
+    window.buscarUsuarioParaAssinar = async function() {
+        const uid = document.getElementById('add-uid').value.trim();
+        if (!uid) { toast('Digite um UID!'); return; }
+        const snap = await get(ref(db, 'usuarios/' + uid));
+        if (!snap.exists()) {
+            document.getElementById('add-user-info').innerHTML = '<span style="color:var(--red);">❌ Usuário não encontrado.</span>';
+            document.getElementById('add-confirm-section').style.display = 'none';
+            return;
+        }
+        const user = snap.val();
+        currentUserUidParaAssinar = uid;
+        document.getElementById('add-user-info').innerHTML = `
+            <div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:.7rem;">
+                ✅ <strong>${user.username || 'Usuário'}</strong> (${user.email || 'sem email'})<br>
+                <span style="font-size:.75rem;color:var(--text-2);">UID: ${uid}</span>
+                ${user.premium ? '<br><span style="color:var(--gold);">⚠️ Este usuário já possui assinatura ativa.</span>' : ''}
+            </div>`;
+        document.getElementById('add-confirm-section').style.display = 'block';
+    };
+
+    window.confirmarAssinatura = async function() {
+        if (!currentUserUidParaAssinar) { toast('Busque um usuário primeiro!'); return; }
+        const dias = parseInt(document.getElementById('add-dias').value) || 30;
+        const valor = parseFloat(document.getElementById('add-valor').value) || 0;
+        const agora = Date.now();
+        const expiracao = agora + dias * 24 * 60 * 60 * 1000;
+
+        // Verificar se já existe assinatura
+        const snap = await get(ref(db, 'assinaturas/' + currentUserUidParaAssinar));
+        const existente = snap.val();
+        const mesesAcumulados = existente ? (existente.mesesAcumulados || 0) + 1 : 1;
+        const historico = existente?.historico || [];
+        historico.push({ dataInicio: agora, dataExpiracao: expiracao, valorPago: valor });
+
+        await set(ref(db, 'assinaturas/' + currentUserUidParaAssinar), {
+            ativo: true,
+            dataInicio: existente?.dataInicio || agora,
+            dataExpiracao: expiracao,
+            mesesAcumulados,
+            valorPago: (existente?.valorPago || 0) + valor,
+            historico
+        });
+        await update(ref(db, 'usuarios/' + currentUserUidParaAssinar), { premium: true });
+
+        toast('✅ Assinatura ativada!', true);
+        document.getElementById('add-uid').value = '';
+        document.getElementById('add-dias').value = '30';
+        document.getElementById('add-valor').value = '0';
+        document.getElementById('add-user-info').innerHTML = '';
+        document.getElementById('add-confirm-section').style.display = 'none';
+        currentUserUidParaAssinar = null;
+        carregarTudo();
+    };
+    </script>
+</body>
+</html>

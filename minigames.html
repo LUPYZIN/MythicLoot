@@ -1,0 +1,814 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Looto | Minigames</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --bg-card: #151a26;
+            --text: #f3f4f6;
+            --text-2: #9ca3af;
+            --primary: #6366f1;
+            --primary-h: #4f46e5;
+            --green: #10b981;
+            --gold: #fbbf24;
+            --pink: #ec4899;
+            --orange: #f59e0b;
+            --red: #ef4444;
+            --border: rgba(255,255,255,0.06);
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --nav-bg: rgba(11, 14, 20, 0.95);
+            --nav-border: rgba(255, 255, 255, 0.06);
+            --nav-text: #9ca3af;
+            --nav-text-hover: #f3f4f6;
+            --nav-active: #6366f1;
+            --nav-active-bg: rgba(99, 102, 241, 0.1);
+            --nav-mobile-bg: #151a26;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+
+        body {
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            overflow-x: hidden;
+            padding-bottom: 80px;
+        }
+
+        .navbar {
+            background: var(--nav-bg);
+            border-bottom: 1px solid var(--nav-border);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            backdrop-filter: blur(16px);
+        }
+
+        .navbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .navbar-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #f3f4f6;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        .navbar-brand .brand-icon { color: #6366f1; }
+
+        .navbar-links { display: flex; gap: 0.25rem; align-items: center; }
+
+        .navbar-link {
+            color: var(--nav-text);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.45rem 0.85rem;
+            border-radius: 8px;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            position: relative;
+        }
+
+        .navbar-link:hover {
+            color: var(--nav-text-hover);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .navbar-link.active {
+            color: var(--nav-active);
+            background: var(--nav-active-bg);
+            font-weight: 600;
+        }
+
+        .navbar-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: var(--nav-active);
+            border-radius: 2px;
+        }
+
+        .navbar-link .nav-icon { width: 18px; height: 18px; }
+        .navbar-link .nav-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        .user-pill {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid var(--border);
+            padding: 0.35rem 0.9rem 0.35rem 0.55rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+        }
+        .user-pill:hover { border-color: var(--primary); }
+        .upill-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            background: #2e3748;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.75rem;
+            font-weight: 700;
+            border: 2px solid var(--primary);
+            overflow: hidden;
+        }
+        .upill-info { display: flex; flex-direction: column; gap: 1px; }
+        .upill-name { font-size: 0.8rem; font-weight: 600; }
+        .upill-money { font-size: 0.7rem; color: var(--orange); font-weight: 600; }
+        .login-btn-header {
+            background: var(--primary);
+            color: #fff;
+            border: none;
+            padding: 0.45rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .login-btn-header:hover { background: var(--primary-h); }
+
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-mobile-bg);
+            border-top: 1px solid var(--nav-border);
+            z-index: 199;
+            padding: 0.5rem 0.25rem;
+        }
+        .mobile-nav-inner {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+        .mobile-nav-link {
+            color: var(--nav-text);
+            text-decoration: none;
+            font-size: 0.65rem;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.35rem 0.5rem;
+            border-radius: 10px;
+            min-width: 50px;
+            position: relative;
+        }
+        .mobile-nav-link.active { color: var(--nav-active); }
+        .mobile-nav-link.active::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--nav-active);
+            border-radius: 50%;
+        }
+        .mobile-nav-link .nav-icon { width: 22px; height: 22px; }
+        .mobile-nav-link .nav-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2; }
+        .mobile-nav-link .nav-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        .rules-wrapper {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 2rem;
+        }
+        .rules-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(99, 102, 241, 0.08);
+            border: 1px solid rgba(99, 102, 241, 0.2);
+            padding: 0.5rem 1.2rem;
+            border-radius: 50px;
+            color: var(--primary);
+            font-size: 0.8rem;
+            font-weight: 500;
+            text-decoration: none;
+            transition: var(--transition);
+            backdrop-filter: blur(4px);
+        }
+        .rules-link:hover {
+            background: rgba(99, 102, 241, 0.15);
+            border-color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(99, 102, 241, 0.2);
+        }
+        .rules-link svg { width: 16px; height: 16px; stroke: currentColor; }
+
+        .games-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1rem;
+        }
+
+        .game-card {
+            background: var(--bg-card);
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            padding: 1.8rem;
+            text-align: center;
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .game-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--primary);
+            box-shadow: 0 15px 35px rgba(0,0,0,.3);
+        }
+
+        .game-icon { font-size: 3rem; display: block; margin-bottom: 0.8rem; }
+        .game-name { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 0.4rem; }
+        .game-desc { font-size: 0.8rem; color: var(--text-2); margin-bottom: 0.8rem; line-height: 1.4; }
+        .game-cost { display: inline-block; background: rgba(245, 158, 11, 0.12); color: var(--orange); padding: 0.25rem 0.8rem; border-radius: 99px; font-size: 0.75rem; font-weight: 600; margin-bottom: 1rem; }
+        .game-btn { display: inline-block; background: var(--primary); color: #fff; padding: 0.6rem 1.8rem; border-radius: 12px; font-weight: 600; font-size: 0.85rem; cursor: pointer; border: none; transition: var(--transition); }
+        .game-btn:hover { background: var(--primary-h); transform: scale(1.02); }
+
+        .online-status {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            background: rgba(0, 0, 0, 0.5);
+            padding: 3px 8px;
+            border-radius: 50px;
+            font-size: 0.7rem;
+            backdrop-filter: blur(4px);
+        }
+        .online-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: var(--green);
+            box-shadow: 0 0 4px var(--green);
+            animation: pulse 1.5s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 1; } 50% { opacity: 0.4; } }
+        .online-count-text { color: var(--text-2); font-weight: 600; }
+
+        .vs-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 500;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(12px);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+        .vs-overlay.active { display: flex; }
+        .vs-container { display: flex; align-items: center; gap: 2rem; animation: vsZoom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); }
+        @keyframes vsZoom { from { transform: scale(0.3); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .vs-player { text-align: center; }
+        .vs-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: 700;
+            margin: 0 auto 0.5rem;
+            border: 3px solid;
+            overflow: hidden;
+            background: #1e2533;
+        }
+        .vs-name { font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 1rem; }
+        .vs-level { font-size: 0.75rem; color: var(--text-2); }
+        .vs-vs {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 3rem;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--gold), var(--orange));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: vsPulse 0.4s infinite alternate;
+        }
+        @keyframes vsPulse { from { transform: scale(1); } to { transform: scale(1.15); } }
+        .vs-status-text { color: var(--text-2); margin-top: 2rem; font-size: 0.9rem; }
+        .vs-cancel-btn {
+            margin-top: 2rem;
+            background: var(--red);
+            border: none;
+            padding: 0.6rem 1.5rem;
+            border-radius: 50px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .vs-cancel-btn:hover { background: #dc2626; transform: scale(1.02); }
+
+        .toast {
+            position: fixed;
+            top: 1.5rem;
+            right: 1.5rem;
+            background: var(--bg-card);
+            border: 1px solid var(--red);
+            padding: 0.8rem 1.2rem;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            z-index: 999;
+            transform: translateX(140%);
+            transition: var(--transition);
+            max-width: 300px;
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.ok { border-color: var(--green); }
+
+        .footer-text {
+            text-align: center;
+            margin-top: 3rem;
+            color: var(--text-2);
+            font-size: 0.75rem;
+            padding: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .navbar-links { display: none; }
+            .mobile-nav { display: block; }
+            .navbar-inner { padding: 0.65rem 1rem; flex-wrap: wrap; gap: 0.5rem; }
+            .container { padding: 1rem; }
+            .games-grid { gap: 1rem; }
+            .upill-name { display: none; }
+            .vs-container { flex-direction: column; gap: 1rem; }
+            .vs-avatar { width: 70px; height: 70px; font-size: 1.5rem; }
+            .vs-vs { font-size: 2rem; }
+        }
+        @media (min-width: 769px) { .mobile-nav { display: none; } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="looto.html" class="navbar-brand">
+                <span class="brand-icon">🎮</span> Looto
+            </a>
+            <div class="navbar-links">
+                <a href="looto.html" class="navbar-link">🎁 Sorteios</a>
+                <a href="loja.html" class="navbar-link">✨ Loja</a>
+                <a href="minigames.html" class="navbar-link active">🎮 Minijogos</a>
+                <a href="chat.html" class="navbar-link">💬 Chat</a>
+                <a href="conta.html" class="navbar-link">👤 Perfil</a>
+            </div>
+            <div id="header-auth-area">
+                <button class="login-btn-header" onclick="window.location.href='login.html'">🔐 Entrar</button>
+            </div>
+        </div>
+    </nav>
+
+    <nav class="mobile-nav">
+        <div class="mobile-nav-inner">
+            <a href="looto.html" class="mobile-nav-link">🎁<span>Sorteios</span></a>
+            <a href="loja.html" class="mobile-nav-link">✨<span>Loja</span></a>
+            <a href="minigames.html" class="mobile-nav-link active">🎮<span>Jogos</span></a>
+            <a href="chat.html" class="mobile-nav-link">💬<span>Chat</span></a>
+            <a href="conta.html" class="mobile-nav-link">👤<span>Perfil</span></a>
+        </div>
+    </nav>
+
+    <div id="toast" class="toast"></div>
+
+    <div class="vs-overlay" id="vs-overlay">
+        <div class="vs-container" id="vs-container"></div>
+        <div class="vs-status-text" id="vs-status">Procurando oponente...</div>
+        <button class="vs-cancel-btn" onclick="cancelMatchmaking()">❌ Cancelar</button>
+    </div>
+
+    <div class="container">
+        <div class="rules-wrapper">
+            <a href="politica-privacidade.html" class="rules-link">
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                    <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Regras e Diretrizes dos Minigames
+                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M7 17L17 7M17 7H7M17 7V17"/>
+                </svg>
+            </a>
+        </div>
+
+        <div class="games-grid">
+            <div class="game-card">
+                <div class="online-status" id="online-velha">
+                    <div class="online-dot"></div>
+                    <span class="online-count-text">0 online</span>
+                </div>
+                <span class="game-icon">❌⭕</span>
+                <h3 class="game-name">Jogo da Velha</h3>
+                <p class="game-desc">Melhor de 3! Alinhe 3 símbolos em 20s por jogada.</p>
+                <div class="game-cost">💰 20 Money (pote: 40)</div>
+                <button class="game-btn" onclick="startGame('velha')">🎮 Jogar</button>
+            </div>
+
+            <div class="game-card">
+                <div class="online-status" id="online-ppp">
+                    <div class="online-dot"></div>
+                    <span class="online-count-text">0 online</span>
+                </div>
+                <span class="game-icon">✊✋✌️</span>
+                <h3 class="game-name">Pedra, Papel, Tesoura</h3>
+                <p class="game-desc">Melhor de 3! Escolha em 15s e derrote seu oponente.</p>
+                <div class="game-cost">💰 20 Money (pote: 40)</div>
+                <button class="game-btn" onclick="startGame('ppp')">🎮 Jogar</button>
+            </div>
+
+            <div class="game-card">
+                <div class="online-status" id="online-mines">
+                    <div class="online-dot"></div>
+                    <span class="online-count-text">0 online</span>
+                </div>
+                <span class="game-icon">💣🔍</span>
+                <h3 class="game-name">Campo Minado Duelo</h3>
+                <p class="game-desc">Posicione 3 bombas! Quem explodir 3 primeiro PERDE.</p>
+                <div class="game-cost">💰 20 Money (pote: 40)</div>
+                <button class="game-btn" onclick="startGame('mines')">🎮 Jogar</button>
+            </div>
+        </div>
+
+        <p class="footer-text">🎮 Divirta-se e ganhe recompensas! Boa sorte!</p>
+    </div>
+
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, push, set, get, update, remove, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+        authDomain: "looto-f46e5.firebaseapp.com",
+        databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+        projectId: "looto-f46e5",
+        storageBucket: "looto-f46e5.firebasestorage.app",
+        messagingSenderId: "295066400995",
+        appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let currentUser = null;
+    let userData = null;
+    let gameRoomId = null;
+    let cancelSearch = false;
+    let searchTimeout = null;
+    let roomListener = null;
+    let moneyDebited = false;
+
+    const ENTRY_COST = 20;
+
+    function toast(msg, ok = false) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (ok ? ' ok' : '');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+
+    async function renderHeader() {
+        if (!currentUser) {
+            document.getElementById('header-auth-area').innerHTML = '<button class="login-btn-header" onclick="window.location.href=\'login.html\'">🔐 Entrar</button>';
+            return;
+        }
+        try {
+            const snap = await get(ref(db, 'usuarios/' + currentUser.uid));
+            if (snap.exists()) userData = snap.val();
+            const nome = userData?.username || currentUser.displayName || 'Jogador';
+            const money = userData?.dinheiro || 0;
+            
+            document.getElementById('header-auth-area').innerHTML = `
+                <a href="conta.html" class="user-pill">
+                    <div class="upill-avatar">${nome[0]?.toUpperCase() || '?'}</div>
+                    <div class="upill-info">
+                        <div class="upill-name">${nome}</div>
+                        <div class="upill-money">💰 ${money}</div>
+                    </div>
+                </a>`;
+        } catch (error) {
+            console.error("Erro ao renderizar header:", error);
+        }
+    }
+
+    function updateOnlineCounts() {
+        const roomsRef = ref(db, 'gameRooms');
+        onValue(roomsRef, (snap) => {
+            const counts = { velha: 0, ppp: 0, mines: 0 };
+            if (snap.exists()) {
+                const rooms = snap.val();
+                for (const id in rooms) {
+                    const room = rooms[id];
+                    if (room.status === 'waiting' && room.gameType) {
+                        if (room.gameType === 'tictactoe') counts.velha++;
+                        else if (room.gameType === 'rps') counts.ppp++;
+                        else if (room.gameType === 'mines') counts.mines++;
+                    }
+                }
+            }
+            for (const [game, count] of Object.entries(counts)) {
+                const statusDiv = document.getElementById(`online-${game}`);
+                if (statusDiv) {
+                    const countSpan = statusDiv.querySelector('.online-count-text');
+                    if (countSpan) countSpan.textContent = `${count} online`;
+                }
+            }
+        });
+    }
+
+    function showVS(waiting = false, opponent = null) {
+        const overlay = document.getElementById('vs-overlay');
+        overlay.classList.add('active');
+        
+        const me = { 
+            name: userData?.username || currentUser?.displayName || 'Você', 
+            level: userData?.nivelConta || 0, 
+            color: '#3b82f6' 
+        };
+        const opp = opponent || { name: '???', level: 0, color: '#ef4444' };
+        
+        document.getElementById('vs-container').innerHTML = `
+            <div class="vs-player">
+                <div class="vs-avatar" style="border-color:${me.color};">${me.name[0]?.toUpperCase() || '?'}</div>
+                <div class="vs-name" style="color:${me.color};">${me.name}</div>
+                <div class="vs-level">Nv ${me.level}</div>
+            </div>
+            <div class="vs-vs">VS</div>
+            <div class="vs-player">
+                <div class="vs-avatar" style="border-color:${opp.color};">${opp.name[0]?.toUpperCase() || '?'}</div>
+                <div class="vs-name" style="color:${opp.color};">${opp.name}</div>
+                <div class="vs-level">Nv ${opp.level}</div>
+            </div>`;
+        
+        document.getElementById('vs-status').textContent = waiting ? 'Procurando oponente...' : 'Oponente encontrado! Iniciando partida...';
+    }
+
+    async function refundMoney() {
+        if (!moneyDebited || !currentUser) return false;
+        try {
+            const snap = await get(ref(db, 'usuarios/' + currentUser.uid));
+            const currentMoney = snap.val()?.dinheiro || 0;
+            await update(ref(db, 'usuarios/' + currentUser.uid), { dinheiro: currentMoney + ENTRY_COST });
+            if (userData) userData.dinheiro = currentMoney + ENTRY_COST;
+            toast('💰 Seu dinheiro foi devolvido!', true);
+            moneyDebited = false;
+            await renderHeader();
+            return true;
+        } catch (error) {
+            console.error("Erro ao devolver dinheiro:", error);
+            return false;
+        }
+    }
+
+    window.cancelMatchmaking = async function() {
+        if (cancelSearch) return;
+        cancelSearch = true;
+        
+        if (searchTimeout) clearTimeout(searchTimeout);
+        if (roomListener && typeof roomListener === 'function') roomListener();
+        
+        if (gameRoomId) {
+            try {
+                await remove(ref(db, 'gameRooms/' + gameRoomId));
+            } catch(e) { console.error("Erro ao remover sala:", e); }
+            gameRoomId = null;
+        }
+        
+        await refundMoney();
+        
+        document.getElementById('vs-overlay').classList.remove('active');
+        toast('Busca cancelada', true);
+    };
+
+    window.startGame = async function(gameTypeParam) {
+        // Resetar estados
+        if (cancelSearch) cancelSearch = false;
+        if (roomListener && typeof roomListener === 'function') roomListener();
+        if (searchTimeout) clearTimeout(searchTimeout);
+        
+        let firebaseGameType = gameTypeParam;
+        let htmlFile = gameTypeParam;
+        
+        if (gameTypeParam === 'velha') {
+            firebaseGameType = 'tictactoe';
+            htmlFile = 'velha';
+        } else if (gameTypeParam === 'ppp') {
+            firebaseGameType = 'rps';
+            htmlFile = 'ppp';
+        } else if (gameTypeParam === 'mines') {
+            firebaseGameType = 'mines';
+            htmlFile = 'mines';
+        }
+        
+        if (!currentUser) { toast('Faça login primeiro!'); return; }
+        
+        // Verificar saldo
+        try {
+            const userSnap = await get(ref(db, 'usuarios/' + currentUser.uid));
+            if (!userSnap.exists()) { toast('Erro ao carregar seus dados!'); return; }
+            userData = userSnap.val();
+            
+            if ((userData?.dinheiro || 0) < ENTRY_COST) { 
+                toast('💰 Você precisa de 20 Money!'); 
+                return;
+            }
+        } catch (error) {
+            console.error("Erro ao verificar usuário:", error);
+            toast('Erro de conexão. Tente novamente!');
+            return;
+        }
+        
+        // Mostrar tela VS (procurando)
+        showVS(true);
+        
+        // Debitar dinheiro
+        try {
+            const newMoney = (userData.dinheiro || 0) - ENTRY_COST;
+            await update(ref(db, 'usuarios/' + currentUser.uid), { dinheiro: newMoney });
+            userData.dinheiro = newMoney;
+            moneyDebited = true;
+            await renderHeader();
+        } catch (error) {
+            console.error("Erro ao debitar dinheiro:", error);
+            toast('Erro ao processar pagamento!');
+            document.getElementById('vs-overlay').classList.remove('active');
+            return;
+        }
+        
+        // Procurar sala existente
+        try {
+            const roomsSnap = await get(ref(db, 'gameRooms'));
+            let foundRoom = null;
+            
+            if (roomsSnap.exists()) {
+                const rooms = roomsSnap.val();
+                for (const id in rooms) {
+                    const room = rooms[id];
+                    if (room.gameType === firebaseGameType && room.status === 'waiting' && room.player1 !== currentUser.uid) {
+                        foundRoom = { id, ...room };
+                        break;
+                    }
+                }
+            }
+            
+            if (foundRoom && !cancelSearch) {
+                // Entrar na sala existente
+                gameRoomId = foundRoom.id;
+                const roomRef = ref(db, 'gameRooms/' + gameRoomId);
+                await update(roomRef, {
+                    player2: currentUser.uid,
+                    player2Name: userData?.username || currentUser.displayName || 'Jogador',
+                    player2Level: userData?.nivelConta || 0,
+                    status: 'playing'
+                });
+                
+                // Mostrar VS com oponente e redirecionar IMEDIATAMENTE
+                const opponent = {
+                    name: foundRoom.player1Name,
+                    level: foundRoom.player1Level,
+                    color: '#ef4444'
+                };
+                showVS(false, opponent);
+                
+                // Redirecionar após 1 segundo (só para mostrar o VS)
+                setTimeout(() => {
+                    if (!cancelSearch && gameRoomId) {
+                        window.location.href = `${htmlFile}.html?room=${gameRoomId}`;
+                    }
+                }, 1000);
+                
+            } else if (!cancelSearch) {
+                // Criar nova sala e aguardar
+                const newRoom = push(ref(db, 'gameRooms'));
+                gameRoomId = newRoom.key;
+                
+                await set(newRoom, {
+                    gameType: firebaseGameType,
+                    player1: currentUser.uid,
+                    player1Name: userData?.username || currentUser.displayName || 'Jogador',
+                    player1Level: userData?.nivelConta || 0,
+                    status: 'waiting',
+                    createdAt: Date.now(),
+                    entryFee: ENTRY_COST
+                });
+                
+                // Aguardar alguém entrar
+                roomListener = onValue(ref(db, 'gameRooms/' + gameRoomId), (snap) => {
+                    if (!snap.exists() || cancelSearch) return;
+                    const room = snap.val();
+                    if (room.status === 'playing' && room.player2) {
+                        // Oponente entrou!
+                        if (roomListener) roomListener();
+                        
+                        const opponent = {
+                            name: room.player2Name,
+                            level: room.player2Level,
+                            color: '#ef4444'
+                        };
+                        showVS(false, opponent);
+                        
+                        // Redirecionar imediatamente
+                        setTimeout(() => {
+                            if (!cancelSearch && gameRoomId) {
+                                window.location.href = `${htmlFile}.html?room=${gameRoomId}`;
+                            }
+                        }, 1000);
+                    }
+                });
+                
+                // Timeout de 60 segundos
+                searchTimeout = setTimeout(async () => {
+                    if (!cancelSearch && gameRoomId) {
+                        cancelSearch = true;
+                        if (roomListener) roomListener();
+                        try {
+                            await remove(ref(db, 'gameRooms/' + gameRoomId));
+                        } catch(e) {}
+                        gameRoomId = null;
+                        document.getElementById('vs-overlay').classList.remove('active');
+                        await refundMoney();
+                        toast('⏰ Nenhum oponente encontrado. Seu dinheiro foi devolvido!');
+                    }
+                }, 60000);
+            }
+        } catch (error) {
+            console.error("Erro no matchmaking:", error);
+            document.getElementById('vs-overlay').classList.remove('active');
+            await refundMoney();
+            toast('❌ Erro ao buscar partida. Dinheiro devolvido!');
+        }
+    };
+
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            currentUser = user;
+            try {
+                const snap = await get(ref(db, 'usuarios/' + user.uid));
+                userData = snap.val() || {};
+                if (!userData.dinheiro) userData.dinheiro = 0;
+                await renderHeader();
+                updateOnlineCounts();
+            } catch (error) {
+                console.error("Erro ao carregar dados:", error);
+            }
+        } else {
+            currentUser = null;
+            userData = null;
+            renderHeader();
+        }
+    });
+    </script>
+</body>
+</html>

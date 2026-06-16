@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Minhas Keys</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --bg-card: #151a26;
+            --text: #f3f4f6;
+            --text-2: #9ca3af;
+            --primary: #6366f1;
+            --primary-h: #4f46e5;
+            --green: #10b981;
+            --gold: #fbbf24;
+            --red: #ef4444;
+            --pink: #ec4899;
+            --border: rgba(255,255,255,0.06);
+            --border-light: rgba(255,255,255,0.04);
+            --transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+            --nav-bg: rgba(11, 14, 20, 0.95);
+            --nav-border: rgba(255, 255, 255, 0.06);
+            --nav-text: #9ca3af;
+            --nav-text-hover: #f3f4f6;
+            --nav-active: #6366f1;
+            --nav-active-bg: rgba(99, 102, 241, 0.1);
+            --nav-mobile-bg: #151a26;
+        }
+
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+        body { 
+            background:var(--bg); 
+            color:var(--text); 
+            min-height:100vh; 
+            padding-bottom: 80px;
+        }
+
+        /* ═══ PC NAV ═══ */
+        .navbar {
+            background: var(--nav-bg);
+            border-bottom: 1px solid var(--nav-border);
+            position: sticky;
+            top: 0;
+            z-index: 200;
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+        }
+
+        .navbar-inner {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 0.75rem 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+        }
+
+        .navbar-brand {
+            font-family: 'Space Grotesk', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: #f3f4f6;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            letter-spacing: -0.02em;
+        }
+
+        .navbar-brand .brand-icon { color: #6366f1; }
+
+        .navbar-links { display: flex; gap: 0.25rem; align-items: center; }
+
+        .navbar-link {
+            color: var(--nav-text);
+            text-decoration: none;
+            font-size: 0.85rem;
+            font-weight: 500;
+            padding: 0.45rem 0.85rem;
+            border-radius: 8px;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+            white-space: nowrap;
+            position: relative;
+        }
+
+        .navbar-link:hover {
+            color: var(--nav-text-hover);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .navbar-link.active {
+            color: var(--nav-active);
+            background: var(--nav-active-bg);
+            font-weight: 600;
+        }
+
+        .navbar-link.active::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 20px;
+            height: 2px;
+            background: var(--nav-active);
+            border-radius: 2px;
+        }
+
+        .navbar-link .nav-icon { width: 18px; height: 18px; flex-shrink: 0; }
+        .navbar-link .nav-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .header-actions { display: flex; gap: 0.5rem; align-items: center; }
+        .btn-header {
+            background: transparent;
+            border: 1px solid var(--border);
+            color: var(--text-2);
+            padding: 0.45rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            cursor: pointer;
+            transition: var(--transition);
+            text-decoration: none;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .btn-header:hover { border-color: var(--primary); color: var(--text); background: rgba(255,255,255,0.03); }
+        .btn-header svg { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        /* ═══ MOBILE BOTTOM NAV ═══ */
+        .mobile-nav {
+            display: none;
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            background: var(--nav-mobile-bg);
+            border-top: 1px solid var(--nav-border);
+            z-index: 199;
+            padding: 0.5rem 0.25rem;
+            padding-bottom: env(safe-area-inset-bottom, 0.5rem);
+            box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .mobile-nav-inner {
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            max-width: 500px;
+            margin: 0 auto;
+        }
+
+        .mobile-nav-link {
+            color: var(--nav-text);
+            text-decoration: none;
+            font-size: 0.65rem;
+            font-weight: 500;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.25rem;
+            padding: 0.35rem 0.5rem;
+            border-radius: 10px;
+            transition: var(--transition);
+            min-width: 50px;
+            position: relative;
+        }
+
+        .mobile-nav-link:hover { color: var(--nav-text-hover); }
+        .mobile-nav-link.active { color: var(--nav-active); }
+        .mobile-nav-link.active::before {
+            content: '';
+            position: absolute;
+            top: -6px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 4px;
+            height: 4px;
+            background: var(--nav-active);
+            border-radius: 50%;
+        }
+
+        .mobile-nav-link .nav-icon { width: 22px; height: 22px; flex-shrink: 0; }
+        .mobile-nav-link .nav-icon svg { width: 100%; height: 100%; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+        .mobile-nav-link .nav-label { font-size: 0.6rem; text-transform: uppercase; letter-spacing: 0.04em; }
+
+        /* ═══ MAIN CONTENT ═══ */
+        .container { max-width: 900px; margin: 0 auto; padding: 2rem; }
+        .page-header { margin-bottom: 2rem; }
+        .page-title { 
+            font-family: 'Space Grotesk', sans-serif; 
+            font-size: 1.8rem; 
+            font-weight: 700; 
+            margin-bottom: 0.3rem; 
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .page-title .title-icon { color: var(--primary); }
+        .page-title .title-icon svg { width: 28px; height: 28px; stroke: currentColor; fill: none; stroke-width: 2; }
+        .page-subtitle { color: var(--text-2); font-size: 0.88rem; line-height: 1.5; }
+
+        /* TABS */
+        .tabs-bar { display: flex; gap: 0; border-bottom: 1px solid var(--border); margin-bottom: 1.5rem; }
+        .tab-btn {
+            background: none; border: none; color: var(--text-2);
+            padding: 0.75rem 1.5rem; font-size: 0.88rem; font-weight: 500;
+            cursor: pointer; transition: var(--transition); position: relative;
+            font-family: 'Space Grotesk', sans-serif;
+            display: flex; align-items: center; gap: 0.4rem;
+        }
+        .tab-btn::after {
+            content: ''; position: absolute; bottom: -1px; left: 0; right: 0;
+            height: 2px; background: var(--primary); transform: scaleX(0); transition: var(--transition);
+        }
+        .tab-btn.active { color: var(--text); }
+        .tab-btn.active::after { transform: scaleX(1); }
+        .tab-btn:hover { color: var(--text); }
+        .tab-badge {
+            background: var(--primary); color: #fff; font-size: 0.62rem;
+            padding: 0.1rem 0.45rem; border-radius: 99px; font-weight: 600;
+        }
+
+        /* EMPTY STATE */
+        .empty-state { text-align: center; padding: 4rem 1rem; color: var(--text-2); }
+        .empty-icon { font-size: 4rem; display: block; margin-bottom: 1rem; }
+        .empty-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; color: var(--text); margin-bottom: 0.5rem; }
+        .empty-text { font-size: 0.88rem; line-height: 1.6; }
+        .empty-btn {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            margin-top: 1.5rem; background: var(--primary); color: #fff;
+            padding: 0.7rem 1.5rem; border-radius: 10px; text-decoration: none;
+            font-weight: 600; font-size: 0.85rem; transition: var(--transition);
+            font-family: 'Space Grotesk', sans-serif;
+        }
+        .empty-btn:hover { background: var(--primary-h); transform: translateY(-2px); }
+        .empty-btn svg { width: 16px; height: 16px; stroke: currentColor; fill: none; stroke-width: 2; }
+
+        /* KEY CARDS */
+        .keys-grid { display: flex; flex-direction: column; gap: 1rem; }
+        
+        .key-card {
+            background: var(--bg-card); border: 1px solid var(--border);
+            border-radius: 16px; padding: 1.5rem;
+            display: flex; align-items: center; gap: 1.5rem;
+            transition: var(--transition); position: relative;
+        }
+        .key-card:hover { border-color: rgba(99,102,241,.3); box-shadow: 0 4px 20px rgba(0,0,0,0.2); }
+        .key-card.new { border-color: rgba(251,191,36,.2); background: linear-gradient(135deg, rgba(251,191,36,0.03), var(--bg-card)); }
+        .key-card.used { opacity: 0.8; }
+        
+        .key-icon {
+            width: 60px; height: 60px; border-radius: 16px;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 2rem; flex-shrink: 0;
+        }
+        .key-icon.new { background: rgba(251,191,36,0.08); }
+        .key-icon.used { background: rgba(255,255,255,0.03); }
+        
+        .key-info { flex: 1; min-width: 0; }
+        .key-game { font-family: 'Space Grotesk', sans-serif; font-size: 1.05rem; font-weight: 700; margin-bottom: 0.2rem; }
+        .key-platform { font-size: 0.78rem; color: var(--text-2); margin-bottom: 0.6rem; display: flex; align-items: center; gap: 0.3rem; }
+        .key-code-wrap { display: flex; align-items: center; gap: 0.5rem; }
+        .key-code {
+            background: rgba(0,0,0,0.4); border: 1px dashed var(--gold);
+            padding: 0.5rem 0.8rem; border-radius: 8px;
+            font-family: 'Courier New', monospace; font-size: 0.82rem;
+            color: var(--gold); letter-spacing: 0.05em;
+            cursor: pointer; user-select: all; transition: var(--transition);
+        }
+        .key-code:hover { border-color: #fff; background: rgba(0,0,0,0.6); }
+        .key-code.blur { filter: blur(5px); }
+        .key-code.blur:hover { filter: blur(2px); }
+        
+        .key-meta { font-size: 0.7rem; color: var(--text-2); margin-top: 0.4rem; display: flex; gap: 1rem; flex-wrap: wrap; }
+        
+        .key-actions { display: flex; flex-direction: column; gap: 0.4rem; flex-shrink: 0; }
+        .btn {
+            padding: 0.5rem 1rem; border-radius: 8px; font-size: 0.8rem;
+            font-weight: 600; cursor: pointer; border: none; transition: var(--transition);
+            font-family: 'Space Grotesk', sans-serif; white-space: nowrap; text-align: center;
+            display: flex; align-items: center; gap: 0.3rem;
+        }
+        .btn.primary { background: var(--primary); color: #fff; }
+        .btn.primary:hover { background: var(--primary-h); }
+        .btn.green { background: var(--green); color: #fff; }
+        .btn.green:hover { background: #059669; }
+        .btn.gold { background: var(--gold); color: #000; }
+        .btn.gold:hover { background: #f59e0b; }
+        .btn.outline { background: transparent; border: 1px solid var(--border); color: var(--text-2); }
+        .btn.outline:hover { border-color: var(--primary); color: var(--text); }
+        .btn svg { width: 14px; height: 14px; stroke: currentColor; fill: none; stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; }
+
+        .key-badge {
+            position: absolute; top: 1rem; right: 1rem;
+            padding: 0.2rem 0.6rem; border-radius: 99px; font-size: 0.68rem; font-weight: 600;
+            display: flex; align-items: center; gap: 0.25rem;
+        }
+        .key-badge.new { background: rgba(16,185,129,.1); color: var(--green); border: 1px solid rgba(16,185,129,.2); }
+        .key-badge.used { background: rgba(255,255,255,.04); color: var(--text-2); }
+
+        /* TOAST */
+        .toast {
+            position: fixed; top: 1.5rem; right: 1.5rem;
+            background: var(--bg-card); border: 1px solid var(--red);
+            padding: 0.85rem 1.2rem; border-radius: 12px; font-size: 0.85rem;
+            z-index: 999; transform: translateX(140%); transition: var(--transition); max-width: 320px;
+            backdrop-filter: blur(12px); box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        }
+        .toast.show { transform: translateX(0); }
+        .toast.ok { border-color: var(--green); }
+
+        @media (max-width: 768px) {
+            .navbar-links { display: none; }
+            .mobile-nav { display: block; }
+            .navbar-inner { padding: .65rem 1rem; flex-wrap: wrap; gap: .5rem; }
+            .container { padding: 1rem; }
+            .key-card { flex-direction: column; align-items: flex-start; gap: 1rem; }
+            .key-actions { flex-direction: row; width: 100%; }
+            .key-actions .btn { flex: 1; justify-content: center; }
+            .key-badge { position: static; align-self: flex-start; }
+            .page-title { font-size: 1.4rem; }
+        }
+        @media (min-width: 769px) { .mobile-nav { display: none; } }
+        @media (max-width: 360px) {
+            .mobile-nav-link { min-width: 40px; padding: .3rem .4rem; }
+            .mobile-nav-link .nav-icon { width: 20px; height: 20px; }
+            .mobile-nav-link .nav-label { font-size: .55rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <div id="toast" class="toast"></div>
+
+    <!-- ═══ PC NAV ═══ -->
+    <nav class="navbar">
+        <div class="navbar-inner">
+            <a href="looto.html" class="navbar-brand">
+                <span class="brand-icon">
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z"/>
+                    </svg>
+                </span>
+                Looto
+            </a>
+            
+            <div class="navbar-links">
+                <a href="looto.html" class="navbar-link">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        </svg>
+                    </span>
+                    Sorteios
+                </a>
+                <a href="loja.html" class="navbar-link">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                            <line x1="3" y1="6" x2="21" y2="6"/>
+                            <path d="M16 10a4 4 0 0 1-8 0"/>
+                        </svg>
+                    </span>
+                    Loja
+                </a>
+                <a href="minigames.html" class="navbar-link">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <circle cx="12" cy="12" r="10"/>
+                            <polygon points="10,8 16,12 10,16"/>
+                        </svg>
+                    </span>
+                    Minijogos
+                </a>
+                <a href="chat.html" class="navbar-link">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                        </svg>
+                    </span>
+                    Chat
+                </a>
+                <a href="conta.html" class="navbar-link">
+                    <span class="nav-icon">
+                        <svg viewBox="0 0 24 24">
+                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                            <circle cx="12" cy="7" r="4"/>
+                        </svg>
+                    </span>
+                    Perfil
+                </a>
+            </div>
+
+            <div class="header-actions">
+                <a href="looto.html" class="btn-header">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/>
+                    </svg>
+                    Início
+                </a>
+            </div>
+        </div>
+    </nav>
+
+    <!-- ═══ MOBILE BOTTOM NAV ═══ -->
+    <nav class="mobile-nav">
+        <div class="mobile-nav-inner">
+            <a href="looto.html" class="mobile-nav-link">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <rect x="3" y="3" width="7" height="7" rx="1"/>
+                        <rect x="14" y="3" width="7" height="7" rx="1"/>
+                        <rect x="3" y="14" width="7" height="7" rx="1"/>
+                        <rect x="14" y="14" width="7" height="7" rx="1"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Sorteios</span>
+            </a>
+            <a href="loja.html" class="mobile-nav-link">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"/>
+                        <line x1="3" y1="6" x2="21" y2="6"/>
+                        <path d="M16 10a4 4 0 0 1-8 0"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Loja</span>
+            </a>
+            <a href="minigames.html" class="mobile-nav-link">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <circle cx="12" cy="12" r="10"/>
+                        <polygon points="10,8 16,12 10,16"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Jogos</span>
+            </a>
+            <a href="chat.html" class="mobile-nav-link">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Chat</span>
+            </a>
+            <a href="conta.html" class="mobile-nav-link">
+                <span class="nav-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+                        <circle cx="12" cy="7" r="4"/>
+                    </svg>
+                </span>
+                <span class="nav-label">Perfil</span>
+            </a>
+        </div>
+    </nav>
+
+    <!-- ═══ MAIN CONTENT ═══ -->
+    <div class="container">
+        <div class="page-header">
+            <div class="page-title">
+                <span class="title-icon">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
+                    </svg>
+                </span>
+                Minhas Keys
+            </div>
+            <p class="page-subtitle">Keys que você ganhou nos sorteios. Abra o baú no chat ou resgate aqui!</p>
+        </div>
+
+        <div class="tabs-bar">
+            <button class="tab-btn active" onclick="switchTab('novas', this)">
+                🎁 Novas <span class="tab-badge" id="count-novas">0</span>
+            </button>
+            <button class="tab-btn" onclick="switchTab('resgatadas', this)">
+                ✅ Resgatadas <span class="tab-badge" id="count-resgatadas" style="background:var(--text-2);">0</span>
+            </button>
+        </div>
+
+        <div id="tab-novas">
+            <div class="keys-grid" id="keys-novas">
+                <div class="empty-state">
+                    <span class="empty-icon">🎁</span>
+                    <div class="empty-title">Nenhuma key nova</div>
+                    <p class="empty-text">Participe de sorteios para ganhar keys de jogos!</p>
+                    <a href="looto.html" class="empty-btn">
+                        <svg viewBox="0 0 24 24">
+                            <rect x="3" y="3" width="7" height="7" rx="1"/>
+                            <rect x="14" y="3" width="7" height="7" rx="1"/>
+                            <rect x="3" y="14" width="7" height="7" rx="1"/>
+                            <rect x="14" y="14" width="7" height="7" rx="1"/>
+                        </svg>
+                        Ver Sorteios
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div id="tab-resgatadas" style="display:none;">
+            <div class="keys-grid" id="keys-resgatadas">
+                <div class="empty-state">
+                    <span class="empty-icon">📭</span>
+                    <div class="empty-title">Nenhuma key resgatada</div>
+                    <p class="empty-text">As keys que você abrir aparecerão aqui.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+        import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+        import { getDatabase, ref, update, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+            authDomain: "looto-f46e5.firebaseapp.com",
+            databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+            projectId: "looto-f46e5",
+            storageBucket: "looto-f46e5.firebasestorage.app",
+            messagingSenderId: "295066400995",
+            appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6",
+            measurementId: "G-KP9RDFZ41M"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+        const db = getDatabase(app);
+
+        let currentUser = null;
+
+        function toast(msg, ok = false) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.className = 'toast show' + (ok ? ' ok' : '');
+            clearTimeout(toast._t);
+            toast._t = setTimeout(() => el.classList.remove('show'), 3000);
+        }
+
+        function timeAgo(ts) {
+            if (!ts) return '';
+            const diff = Date.now() - ts;
+            const min = Math.floor(diff / 60000);
+            if (min < 1) return 'agora';
+            if (min < 60) return `há ${min}min`;
+            const h = Math.floor(min / 60);
+            if (h < 24) return `há ${h}h`;
+            return `há ${Math.floor(h/24)}d`;
+        }
+
+        // ═══ TABS ═══
+        window.switchTab = function(tab, btn) {
+            document.getElementById('tab-novas').style.display = tab === 'novas' ? 'block' : 'none';
+            document.getElementById('tab-resgatadas').style.display = tab === 'resgatadas' ? 'block' : 'none';
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+        };
+
+        // ═══ RESGATAR KEY ═══
+        window.resgatarKey = async function(msgId) {
+            if (!currentUser) return;
+            try {
+                await update(ref(db, 'chat/' + msgId), {
+                    opened: true,
+                    openedBy: currentUser.uid,
+                    openedByName: currentUser.displayName || 'Usuário',
+                    openedAt: Date.now()
+                });
+                toast('✅ Key resgatada com sucesso! 🎉', true);
+            } catch (e) {
+                toast('❌ Erro ao resgatar: ' + e.message);
+            }
+        };
+
+        // ═══ COPIAR KEY ═══
+        window.copyKey = function(code) {
+            if (!code || code === 'XXXXX-XXXXX-XXXXX') return;
+            navigator.clipboard.writeText(code).then(() => {
+                toast('📋 Key copiada para a área de transferência!', true);
+            }).catch(() => {
+                toast('⚠️ Selecione e copie manualmente');
+            });
+        };
+
+        // ═══ REVELAR KEY ═══
+        window.revealKey = function(el) {
+            el.classList.toggle('blur');
+        };
+
+        // ═══ CARREGAR KEYS ═══
+        function carregarKeys() {
+            if (!currentUser) return;
+
+            onValue(ref(db, 'chat'), (snap) => {
+                const novas = [];
+                const resgatadas = [];
+
+                if (snap.exists()) {
+                    snap.forEach(child => {
+                        const msg = child.val();
+                        if (msg.type === 'treasure' && msg.uid === currentUser.uid) {
+                            const item = { id: child.key, ...msg };
+                            if (msg.opened) {
+                                resgatadas.push(item);
+                            } else {
+                                novas.push(item);
+                            }
+                        }
+                    });
+                }
+
+                novas.sort((a, b) => (b.ts || 0) - (a.ts || 0));
+                resgatadas.sort((a, b) => (b.openedAt || 0) - (a.openedAt || 0));
+
+                document.getElementById('count-novas').textContent = novas.length;
+                document.getElementById('count-resgatadas').textContent = resgatadas.length;
+
+                // Renderizar NOVAS
+                const novasContainer = document.getElementById('keys-novas');
+                if (novas.length === 0) {
+                    novasContainer.innerHTML = `
+                        <div class="empty-state">
+                            <span class="empty-icon">🎁</span>
+                            <div class="empty-title">Nenhuma key nova</div>
+                            <p class="empty-text">Participe de sorteios para ganhar keys de jogos!</p>
+                            <a href="looto.html" class="empty-btn">
+                                <svg viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
+                                Ver Sorteios
+                            </a>
+                        </div>`;
+                } else {
+                    novasContainer.innerHTML = novas.map(k => {
+                        const keyCodeSafe = (k.keyCode || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                        return `
+                        <div class="key-card new">
+                            <span class="key-badge new">🆕 Nova</span>
+                            <div class="key-icon new">🎁</div>
+                            <div class="key-info">
+                                <div class="key-game">${k.keyGame || 'Jogo Surpresa'}</div>
+                                <div class="key-platform">🖥️ ${k.keyPlatform || 'Steam'}</div>
+                                <div class="key-code-wrap">
+                                    <span class="key-code blur" onclick="revealKey(this)" title="Clique para revelar">${k.keyCode || 'XXXXX-XXXXX-XXXXX'}</span>
+                                    <button class="btn outline" onclick="copyKey('${keyCodeSafe}')" title="Copiar">
+                                        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    </button>
+                                </div>
+                                <div class="key-meta">
+                                    <span>🎲 Sorteio: ${k.sorteioId ? k.sorteioId.slice(0,8) : '—'}</span>
+                                    <span>⏰ ${timeAgo(k.ts)}</span>
+                                </div>
+                            </div>
+                            <div class="key-actions">
+                                <button class="btn green" onclick="resgatarKey('${k.id}')">
+                                    <svg viewBox="0 0 24 24"><polyline points="20,6 9,17 4,12"/></svg>
+                                    Resgatar
+                                </button>
+                                <button class="btn gold" onclick="copyKey('${keyCodeSafe}')">
+                                    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    Copiar
+                                </button>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+
+                // Renderizar RESGATADAS
+                const resgatadasContainer = document.getElementById('keys-resgatadas');
+                if (resgatadas.length === 0) {
+                    resgatadasContainer.innerHTML = `
+                        <div class="empty-state">
+                            <span class="empty-icon">📭</span>
+                            <div class="empty-title">Nenhuma key resgatada</div>
+                            <p class="empty-text">As keys que você abrir aparecerão aqui.</p>
+                        </div>`;
+                } else {
+                    resgatadasContainer.innerHTML = resgatadas.map(k => {
+                        const keyCodeSafe = (k.keyCode || '').replace(/'/g, "\\'").replace(/"/g, '&quot;');
+                        return `
+                        <div class="key-card used">
+                            <span class="key-badge used">✅ Resgatada</span>
+                            <div class="key-icon used">✅</div>
+                            <div class="key-info">
+                                <div class="key-game">${k.keyGame || 'Jogo Surpresa'}</div>
+                                <div class="key-platform">🖥️ ${k.keyPlatform || 'Steam'}</div>
+                                <div class="key-code-wrap">
+                                    <span class="key-code" onclick="copyKey('${keyCodeSafe}')" title="Clique para copiar">${k.keyCode || 'XXXXX-XXXXX-XXXXX'}</span>
+                                    <button class="btn outline" onclick="copyKey('${keyCodeSafe}')" title="Copiar">
+                                        <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    </button>
+                                </div>
+                                <div class="key-meta">
+                                    <span>📅 Resgatada ${timeAgo(k.openedAt)}</span>
+                                </div>
+                            </div>
+                            <div class="key-actions">
+                                <button class="btn gold" onclick="copyKey('${keyCodeSafe}')">
+                                    <svg viewBox="0 0 24 24"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+                                    Copiar
+                                </button>
+                            </div>
+                        </div>`;
+                    }).join('');
+                }
+            });
+        }
+
+        // ═══ AUTH ═══
+        onAuthStateChanged(auth, (user) => {
+            if (!user) { window.location.href = 'login.html'; return; }
+            currentUser = user;
+            carregarKeys();
+        });
+    </script>
+    <script type="module" src="presence.js"></script>
+</body>
+</html>

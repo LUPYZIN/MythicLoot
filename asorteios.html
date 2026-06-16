@@ -1,0 +1,841 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Sorteios Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14;
+            --bg-card: #151a26;
+            --text: #f3f4f6;
+            --text-2: #9ca3af;
+            --primary: #6366f1;
+            --green: #10b981;
+            --red: #ef4444;
+            --gold: #fbbf24;
+            --orange: #f59e0b;
+            --pink: #ec4899;
+            --diamond: #38bdf8;
+            --border: rgba(255, 255, 255, 0.06);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+        
+        header {
+            background: rgba(11, 14, 20, 0.95);
+            border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100;
+            backdrop-filter: blur(16px);
+            padding: .9rem 2rem;
+            display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .5rem;
+        }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text); text-decoration: none; }
+        .logo em { color: var(--red); font-style: normal; }
+        .btn-header { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: .4rem .8rem; border-radius: 6px; font-size: .8rem; cursor: pointer; transition: .3s; text-decoration: none; }
+        .btn-header:hover { border-color: var(--red); color: var(--red); }
+        
+        .main-layout { max-width: 1600px; margin: 0 auto; padding: 1.5rem 2rem; display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; }
+        
+        .sidebar { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1rem; position: sticky; top: 80px; height: fit-content; }
+        .sidebar-btn { background: transparent; border: none; color: var(--text-2); padding: .7rem 1rem; border-radius: 8px; font-size: .85rem; cursor: pointer; transition: .3s; text-align: left; display: flex; align-items: center; gap: .5rem; width: 100%; text-decoration: none; }
+        .sidebar-btn:hover { background: rgba(255, 255, 255, .03); color: var(--text); }
+        .sidebar-btn.active { background: rgba(99, 102, 241, .12); color: var(--primary); font-weight: 600; }
+        
+        .panel { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; }
+        .panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+        
+        .tabs { display: flex; gap: .3rem; margin-bottom: 1rem; flex-wrap: wrap; }
+        .tab-btn { padding: .5rem 1.2rem; border-radius: 8px; font-size: .85rem; cursor: pointer; border: 1px solid var(--border); background: transparent; color: var(--text-2); transition: .3s; }
+        .tab-btn:hover { color: var(--text); }
+        .tab-btn.active { background: rgba(99, 102, 241, .12); color: var(--primary); border-color: var(--primary); }
+        .tab-content { display: none; }
+        .tab-content.active { display: block; }
+        
+        .search-box { margin-bottom: .8rem; }
+        .search-box input { width: 100%; }
+        
+        .table-container { border: 1px solid var(--border); border-radius: 8px; }
+        .table-wrapper { max-height: 600px; overflow-y: auto; }
+        .table-wrapper::-webkit-scrollbar { width: 4px; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; }
+        
+        table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+        th { text-align: left; padding: .6rem; color: var(--text-2); font-size: .7rem; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--bg-card); position: sticky; top: 0; z-index: 1; }
+        td { padding: .55rem .6rem; border-bottom: 1px solid rgba(255, 255, 255, .04); }
+        
+        input, select, textarea { background: rgba(11, 14, 20, .6); border: 1px solid var(--border); padding: .5rem .7rem; border-radius: 6px; color: var(--text); font-size: .82rem; outline: none; width: 100%; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+        
+        .btn { padding: .5rem 1rem; border-radius: 6px; font-size: .8rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .15rem; }
+        .btn.primary { background: var(--primary); color: #fff; }
+        .btn.red { background: var(--red); color: #fff; }
+        .btn.green { background: var(--green); color: #fff; }
+        .btn.gold { background: var(--gold); color: #000; }
+        .btn.orange { background: var(--orange); color: #000; }
+        .btn.pink { background: var(--pink); color: #fff; }
+        
+        .btn-sm { padding: .3rem .6rem; border-radius: 4px; font-size: .7rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .1rem; }
+        .btn-sm.primary { background: var(--primary); color: #fff; }
+        .btn-sm.red { background: var(--red); color: #fff; }
+        .btn-sm.green { background: var(--green); color: #fff; }
+        .btn-sm.gold { background: var(--gold); color: #000; }
+        .btn-sm.orange { background: var(--orange); color: #000; }
+        
+        .badge { padding: .15rem .5rem; border-radius: 99px; font-size: .7rem; font-weight: 600; display: inline-block; }
+        .badge-green { background: rgba(16, 185, 129, .15); color: var(--green); }
+        .badge-gold { background: rgba(251, 191, 36, .15); color: var(--gold); }
+        .badge-orange { background: rgba(245, 158, 11, .15); color: var(--orange); }
+        .badge-red { background: rgba(239, 68, 68, .15); color: var(--red); }
+        .badge-blue { background: rgba(99, 102, 241, .15); color: var(--primary); }
+        .badge-pink { background: rgba(236, 72, 153, .15); color: var(--pink); }
+        .badge-diamond { background: rgba(56, 189, 248, .15); color: var(--diamond); }
+        
+        .count-badge { background: rgba(99, 102, 241, .15); color: var(--primary); padding: .1rem .5rem; border-radius: 99px; font-size: .7rem; margin-left: .3rem; }
+        
+        .field { margin-bottom: .8rem; }
+        .field label { font-size: .75rem; color: var(--text-2); display: block; margin-bottom: .2rem; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+        .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .75rem; }
+        .field-row-4 { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: .75rem; }
+        
+        .card-config { background: rgba(255,255,255,.02); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: .8rem; }
+        .card-config h5 { font-family: 'Space Grotesk', sans-serif; font-size: .85rem; margin-bottom: .5rem; display: flex; align-items: center; gap: .4rem; }
+        
+        hr { border-color: var(--border); margin: 1rem 0; }
+        
+        .toast { position: fixed; top: 1.5rem; right: 1.5rem; background: var(--bg-card); border: 1px solid var(--red); padding: .8rem 1.2rem; border-radius: 12px; font-size: .85rem; z-index: 999; transform: translateX(140%); transition: .3s; max-width: 320px; }
+        .toast.show { transform: translateX(0); }
+        .toast.ok { border-color: var(--green); }
+        
+        .modal-overlay { position: fixed; inset: 0; z-index: 500; background: rgba(0,0,0,.85); backdrop-filter: blur(8px); display: none; align-items: center; justify-content: center; padding: 1rem; }
+        .modal-overlay.open { display: flex; }
+        .modal { background: var(--bg-card); border: 1px solid var(--border); border-radius: 20px; width: 100%; max-width: 800px; max-height: 90vh; overflow-y: auto; padding: 2rem; position: relative; }
+        .modal-close { position: absolute; top: 1rem; right: 1rem; background: rgba(255,255,255,.06); border: none; color: var(--text-2); width: 32px; height: 32px; border-radius: 50%; font-size: 1rem; cursor: pointer; transition: .3s; display: flex; align-items: center; justify-content: center; }
+        .modal-close:hover { background: rgba(255,255,255,.12); color: var(--text); }
+        .modal-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; margin-bottom: .3rem; }
+        
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; padding: 1rem; }
+            .sidebar { display: flex; flex-wrap: wrap; gap: .3rem; position: static; }
+            .sidebar-btn { width: auto; font-size: .7rem; padding: .4rem .6rem; }
+            .field-row, .field-row-3, .field-row-4 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    
+    <header>
+        <a href="looto.html" class="logo"><em>🛡️</em> Looto Admin</a>
+        <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+        <div>
+            <a href="looto.html" class="btn-header">🏠 Site</a>
+            <button class="btn-header" onclick="logout()" style="margin-left:.5rem;">🚪 Sair</button>
+        </div>
+    </header>
+    
+    <div class="main-layout">
+        <aside class="sidebar">
+            <a href="admin.html" class="sidebar-btn">📊 Dashboard</a>
+            <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+            <a href="abots.html" class="sidebar-btn">🤖 Bots</a>
+            <a href="asorteios.html" class="sidebar-btn active">🎁 Sorteios</a>
+            <a href="alogsorteios.html" class="sidebar-btn">📋 Log Sorteios</a>
+            <a href="achat.html" class="sidebar-btn">💬 Chat</a>
+            <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+            <a href="aloja.html" class="sidebar-btn">🛒 Loja</a>
+            <a href="admins.html" class="sidebar-btn">🔑 Admins</a>
+            <a href="aferramentas.html" class="sidebar-btn">🔧 Ferramentas</a>
+        </aside>
+        
+        <div>
+            <!-- TABS -->
+            <div class="tabs" style="margin-bottom:1rem;">
+                <button class="tab-btn active" onclick="switchTab('sorteios')">🎁 Sorteios <span class="count-badge" id="count-sorteios">0</span></button>
+                <button class="tab-btn" onclick="switchTab('recompensas')">⚙️ Config Recompensas</button>
+                <button class="tab-btn" onclick="switchTab('custos')">💰 Custos & Limites</button>
+            </div>
+            
+            <!-- TAB SORTEIOS -->
+            <div class="tab-content active" id="tab-sorteios">
+                <div class="panel">
+                    <div class="panel-title">🎁 Sorteios <span class="count-badge" id="count-sorteios-header">0</span></div>
+                    <div style="margin-bottom:1rem;display:flex;gap:.5rem;flex-wrap:wrap;">
+                        <button class="btn orange" onclick="forcarVerificacaoSorteios()">🎲 Forçar Verificação de Expirados</button>
+                        <button class="btn gold" onclick="sortearTodosExpirados()">🏆 Sortear Todos Expirados</button>
+                    </div>
+                    <div class="search-box">
+                        <input type="text" id="search-sorteios" placeholder="🔍 Buscar por jogo, criador..." oninput="filtrarSorteios()">
+                    </div>
+                    <div class="table-container">
+                        <div class="table-wrapper">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Jogo</th><th>Criador</th><th>Tipo</th><th>Part.</th>
+                                        <th>Expira</th><th>Status</th><th>Vencedor</th><th>Ações</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="table-sorteios"></tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div style="text-align:center;padding:.5rem;font-size:.7rem;color:var(--text-2);" id="sorteios-info"></div>
+                    <div style="text-align:center;margin-top:1rem;" id="ver-mais-wrap">
+                        <button class="btn primary" onclick="abrirModalSorteios()">📋 Ver Todos os Sorteios</button>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- TAB RECOMPENSAS -->
+            <div class="tab-content" id="tab-recompensas">
+                <div class="panel">
+                    <div class="panel-title">⚙️ Configuração de Recompensas</div>
+                    <p style="font-size:.78rem;color:var(--text-2);margin-bottom:1rem;">Configure o que cada tipo de usuário ganha ao final de cada sorteio.</p>
+                    
+                    <div class="card-config">
+                        <h5>🏆 Recompensa do Vencedor</h5>
+                        <div class="field-row-3">
+                            <div class="field"><label>⭐ XP</label><input type="number" id="r-vencedor-xp" value="75" min="0"></div>
+                            <div class="field"><label>💰 Money</label><input type="number" id="r-vencedor-money" value="0" min="0"></div>
+                            <div class="field"><label>📊 % do Pote</label><input type="number" id="r-vencedor-pote" value="0" min="0" max="100"><span style="font-size:.6rem;color:var(--text-2);">% do total arrecadado</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-config">
+                        <h5>👥 Recompensa de Participação (Perdedores)</h5>
+                        <div class="field-row-3">
+                            <div class="field"><label>⭐ XP</label><input type="number" id="r-participante-xp" value="20" min="0"></div>
+                            <div class="field"><label>💰 Money</label><input type="number" id="r-participante-money" value="0" min="0"></div>
+                            <div class="field"><label>📊 % do Pote</label><input type="number" id="r-participante-pote" value="0" min="0" max="100"><span style="font-size:.6rem;color:var(--text-2);">Dividido entre todos</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-config">
+                        <h5>👑 Recompensa do Criador</h5>
+                        <div class="field-row-3">
+                            <div class="field"><label>⭐ XP</label><input type="number" id="r-criador-xp" value="100" min="0"></div>
+                            <div class="field"><label>💰 Money</label><input type="number" id="r-criador-money" value="0" min="0"></div>
+                            <div class="field"><label>📊 % do Pote (Money)</label><input type="number" id="r-criador-pote" value="20" min="0" max="100"><span style="font-size:.6rem;color:var(--text-2);">% do total arrecadado em LootMoney</span></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-config">
+                        <h5>🏆 Grande Sorteio</h5>
+                        <div class="field-row-4">
+                            <div class="field"><label>⭐ XP Vencedor</label><input type="number" id="r-gs-vencedor-xp" value="1000" min="0"></div>
+                            <div class="field"><label>💰 Money Vencedor</label><input type="number" id="r-gs-vencedor-money" value="0" min="0"></div>
+                            <div class="field"><label>⭐ XP Participante</label><input type="number" id="r-gs-participante-xp" value="150" min="0"></div>
+                            <div class="field"><label>💰 Money Participante</label><input type="number" id="r-gs-participante-money" value="0" min="0"></div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn primary" onclick="salvarRecompensas()" style="width:100%;">💾 Salvar Recompensas</button>
+                </div>
+            </div>
+            
+            <!-- TAB CUSTOS & LIMITES -->
+            <div class="tab-content" id="tab-custos">
+                <div class="panel">
+                    <div class="panel-title">💰 Custos de Entrada & Limites</div>
+                    <p style="font-size:.78rem;color:var(--text-2);margin-bottom:1rem;">Configure custos e limites por tipo de sorteio.</p>
+                    
+                    <div class="card-config">
+                        <h5>💰 Custo de Entrada (Looto Money)</h5>
+                        <div class="field-row-4">
+                            <div class="field"><label>🌍 Público</label><input type="number" id="c-publico" value="5" min="0"></div>
+                            <div class="field"><label>🥈 Prata+ (Nv.10+)</label><input type="number" id="c-prata" value="10" min="0"></div>
+                            <div class="field"><label>🥇 Ouro+ (Nv.15+)</label><input type="number" id="c-ouro" value="20" min="0"></div>
+                            <div class="field"><label>💎 Diamante+ (Nv.30+)</label><input type="number" id="c-diamante" value="50" min="0"></div>
+                        </div>
+                        <div class="field-row-4" style="margin-top:.5rem;">
+                            <div class="field"><label>⭐ Exclusivo (Assinantes)</label><input type="number" id="c-exclusivo" value="0" min="0"></div>
+                            <div class="field"><label></label></div>
+                            <div class="field"><label></label></div>
+                            <div class="field"><label></label></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-config">
+                        <h5>⭐ Custo Exclusivo para Assinantes (Looto Money)</h5>
+                        <p style="font-size:.7rem;color:var(--text-2);margin-bottom:.5rem;">Preço especial para quem possui assinatura premium.</p>
+                        <div class="field-row-4">
+                            <div class="field"><label>🌍 Público</label><input type="number" id="c-publico-premium" value="3" min="0"></div>
+                            <div class="field"><label>🥈 Prata+</label><input type="number" id="c-prata-premium" value="7" min="0"></div>
+                            <div class="field"><label>🥇 Ouro+</label><input type="number" id="c-ouro-premium" value="14" min="0"></div>
+                            <div class="field"><label>💎 Diamante+</label><input type="number" id="c-diamante-premium" value="35" min="0"></div>
+                        </div>
+                        <div class="field-row-4" style="margin-top:.5rem;">
+                            <div class="field"><label>⭐ Exclusivo</label><input type="number" id="c-exclusivo-premium" value="0" min="0"></div>
+                            <div class="field"><label></label></div>
+                            <div class="field"><label></label></div>
+                            <div class="field"><label></label></div>
+                        </div>
+                    </div>
+                    
+                    <div class="card-config">
+                        <h5>📊 Limites de Participantes por Tipo de Sorteio</h5>
+                        <p style="font-size:.7rem;color:var(--text-2);margin-bottom:.5rem;">Define o mínimo e máximo de participantes para cada nível.</p>
+                        <table>
+                            <thead><tr><th>Tipo</th><th>Mín. Participantes</th><th>Máx. Participantes</th></tr></thead>
+                            <tbody>
+                                <tr><td>🌍 Público</td><td><input type="number" id="l-publico-min" value="2" min="2"></td><td><input type="number" id="l-publico-max" value="50" min="2"></td></tr>
+                                <tr><td>🥈 Prata+ (Nível 10+)</td><td><input type="number" id="l-prata-min" value="10" min="2"></td><td><input type="number" id="l-prata-max" value="80" min="2"></td></tr>
+                                <tr><td>🥇 Ouro+ (Nível 15+)</td><td><input type="number" id="l-ouro-min" value="20" min="2"></td><td><input type="number" id="l-ouro-max" value="150" min="2"></td></tr>
+                                <tr><td>💎 Diamante+ (Nível 30+)</td><td><input type="number" id="l-diamante-min" value="30" min="2"></td><td><input type="number" id="l-diamante-max" value="300" min="2"></td></tr>
+                                <tr><td>⭐ Exclusivo (Assinantes)</td><td><input type="number" id="l-exclusivo-min" value="2" min="2"></td><td><input type="number" id="l-exclusivo-max" value="500" min="2"></td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    
+                    <div class="card-config">
+                        <h5>📅 Limite de Sorteios por Dia (por Nível do Criador)</h5>
+                        <div class="field-row-4">
+                            <div class="field"><label>🟤 Bronze (0)</label><input type="number" id="l-bronze-dia" value="1" min="1"></div>
+                            <div class="field"><label>🥈 Prata (10+)</label><input type="number" id="l-prata-dia" value="2" min="1"></div>
+                            <div class="field"><label>🥇 Ouro (15+)</label><input type="number" id="l-ouro-dia" value="3" min="1"></div>
+                            <div class="field"><label>💎 Diamante (30+)</label><input type="number" id="l-diamante-dia" value="5" min="1"></div>
+                        </div>
+                        <div class="field-row-4" style="margin-top:.5rem;">
+                            <div class="field"><label>⭐ Exclusivo</label><input type="number" id="l-exclusivo-dia" value="10" min="1"></div>
+                            <div class="field"><label></label></div>
+                            <div class="field"><label></label></div>
+                            <div class="field"><label></label></div>
+                        </div>
+                    </div>
+                    
+                    <button class="btn primary" onclick="salvarCustos()" style="width:100%;">💾 Salvar Custos & Limites</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- MODAL VER TODOS -->
+    <div class="modal-overlay" id="modal-sorteios-overlay">
+        <div class="modal">
+            <button class="modal-close" onclick="fecharModalSorteios()">✕</button>
+            <div class="modal-title">📋 Todos os Sorteios</div>
+            <div class="search-box" style="margin-top:1rem;">
+                <input type="text" id="modal-search-sorteios" placeholder="🔍 Buscar..." oninput="filtrarModalSorteios()">
+            </div>
+            <div class="table-container" style="margin-top:.8rem;">
+                <div class="table-wrapper" style="max-height:400px;">
+                    <table>
+                        <thead>
+                            <tr><th>Jogo</th><th>Criador</th><th>Tipo</th><th>Part.</th><th>Expira</th><th>Status</th><th>Vencedor</th><th>Ações</th></tr>
+                        </thead>
+                        <tbody id="modal-table-sorteios"></tbody>
+                    </table>
+                </div>
+            </div>
+            <div style="text-align:center;padding:.5rem;font-size:.7rem;color:var(--text-2);" id="modal-sorteios-info"></div>
+        </div>
+    </div>
+    
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, get, update, remove, set, push } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+    
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+        authDomain: "looto-f46e5.firebaseapp.com",
+        databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+        projectId: "looto-f46e5",
+        storageBucket: "looto-f46e5.firebasestorage.app",
+        messagingSenderId: "295066400995",
+        appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+    };
+    
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+    
+    let allSorteios = [];
+    let RECOMPENSAS_CONFIG = { vencedorXp:75, vencedorMoney:0, vencedorPote:0, participanteXp:20, participanteMoney:0, participantePote:0, criadorXp:100, criadorMoney:0, criadorPote:20, gsVencedorXp:1000, gsVencedorMoney:0, gsParticipanteXp:150, gsParticipanteMoney:0 };
+    
+    function sanitize(str) {
+        const div = document.createElement('div');
+        div.textContent = str || '';
+        return div.innerHTML;
+    }
+    
+    function toast(msg, ok = false) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (ok ? ' ok' : '');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => el.classList.remove('show'), 3000);
+    }
+    
+    window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+    
+    async function checkAdmin(user) {
+        if (!user) return false;
+        if (user.email === 'startubez.com@gmail.com') return true;
+        const snap = await get(ref(db, 'admins'));
+        if (!snap.exists()) return false;
+        const admins = snap.val();
+        for (let key of Object.keys(admins)) {
+            const a = admins[key];
+            if (a.uid === user.uid || a.email === user.email) return true;
+        }
+        return false;
+    }
+    
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const isAdmin = await checkAdmin(user);
+        if (!isAdmin) {
+            document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;flex-direction:column;gap:1rem;padding:2rem;"><h1 style="font-family:'Space Grotesk',sans-serif;font-size:3rem;color:#ef4444;">🚫 Acesso Negado</h1><p style="color:#9ca3af;">Você não tem permissão.</p><a href="looto.html" style="background:#6366f1;color:#fff;padding:.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;">Ir para o Site</a></div>`;
+            setTimeout(() => window.location.href = 'looto.html', 3000);
+            return;
+        }
+        document.getElementById('admin-info').textContent = `👑 ${user.email}`;
+        carregarTudo();
+    });
+    
+    window.switchTab = function(tab) {
+        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+        document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+        document.querySelector(`[onclick="switchTab('${tab}')"]`).classList.add('active');
+        document.getElementById('tab-' + tab).classList.add('active');
+        if (tab === 'recompensas') carregarRecompensas();
+        if (tab === 'custos') carregarCustos();
+    };
+    
+    async function carregarTudo() {
+        await carregarSorteios();
+    }
+    
+    async function carregarConfigRecompensas() {
+        try {
+            const snap = await get(ref(db, 'configRecompensas'));
+            if (snap.exists()) {
+                RECOMPENSAS_CONFIG = { ...RECOMPENSAS_CONFIG, ...snap.val() };
+            }
+        } catch(e) { console.warn('Erro config recompensas:', e); }
+    }
+    
+    // ═══ SORTEIOS ═══
+    async function carregarSorteios() {
+        const snap = await get(ref(db, 'sorteios'));
+        allSorteios = [];
+        if (snap.exists()) {
+            const data = snap.val();
+            allSorteios = Object.entries(data).map(([id, val]) => ({ id, ...val }));
+        }
+        document.getElementById('count-sorteios').textContent = allSorteios.length;
+        document.getElementById('count-sorteios-header').textContent = allSorteios.length;
+        document.getElementById('ver-mais-wrap').style.display = allSorteios.length > 10 ? 'block' : 'none';
+        filtrarSorteios();
+    }
+    
+    window.filtrarSorteios = function() {
+        const search = (document.getElementById('search-sorteios')?.value || '').toLowerCase();
+        const tbody = document.getElementById('table-sorteios');
+        const info = document.getElementById('sorteios-info');
+        let filtered = allSorteios;
+        if (search) {
+            filtered = allSorteios.filter(s => 
+                (s.nomeJogo||'').toLowerCase().includes(search) ||
+                (s.titulo||'').toLowerCase().includes(search) ||
+                (s.criadoPorNome||'').toLowerCase().includes(search)
+            );
+        }
+        const display = filtered.slice(0, 10);
+        if (display.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="8" style="text-align:center;padding:2rem;">Nenhum sorteio</td></tr>';
+            info.textContent = search ? `Nenhum resultado para "${search}"` : 'Nenhum sorteio';
+            return;
+        }
+        info.textContent = `Mostrando ${display.length} de ${filtered.length} sorteios`;
+        tbody.innerHTML = display.map(s => {
+            const parts = Object.keys(s.participantes||{}).length;
+            const expirado = s.expiraEm && s.expiraEm < Date.now();
+            const statusHtml = s.keyEntregue ? '<span class="badge badge-green">✅ Finalizado</span>' : 
+                              (expirado && !s.keyEntregue) ? '<span class="badge badge-orange">⏳ Expirado</span>' :
+                              (s.ativo ? '<span class="badge badge-blue">⏳ Ativo</span>' : '<span class="badge badge-red">🔴 Inativo</span>');
+            return `<tr>
+                <td><strong>${sanitize(s.nomeJogo||s.titulo||'—')}</strong></td>
+                <td>${sanitize(s.criadoPorNome||'?')}</td>
+                <td><span class="badge badge-${s.tipo==='publico'?'green':s.tipo==='diamante'?'diamond':'gold'}">${s.tipo||'publico'}</span></td>
+                <td>${parts}/${s.maxParticipantes||0}</td>
+                <td style="font-size:.7rem;">${s.expiraEm?new Date(s.expiraEm).toLocaleString('pt-BR'):'—'}</td>
+                <td>${statusHtml}</td>
+                <td>${sanitize(s.vencedorNome||'—')}</td>
+                <td>
+                    <button class="btn-sm red" onclick="removerSorteio('${s.id}')">🗑️</button>
+                    ${expirado && !s.keyEntregue && parts > 0 ? `<button class="btn-sm gold" onclick="sortearIndividual('${s.id}')">🎲 Sortear</button>` : ''}
+                </td>
+            </tr>`;
+        }).join('');
+    };
+    
+    window.forcarVerificacaoSorteios = async function() {
+        toast('🔍 Verificando sorteios expirados...');
+        await carregarConfigRecompensas();
+        const now = Date.now();
+        let sorteados = 0;
+        for (const s of allSorteios) {
+            if (!s.ativo || s.keyEntregue || !s.expiraEm || s.expiraEm > now) continue;
+            await realizarSorteio(s);
+            sorteados++;
+        }
+        await carregarSorteios();
+        toast(`✅ ${sorteados} sorteio(s) processado(s)!`, true);
+    };
+    
+    window.sortearTodosExpirados = async function() {
+        if (!confirm('Tem certeza? Isso vai sortear TODOS os sorteios expirados agora!')) return;
+        await window.forcarVerificacaoSorteios();
+    };
+    
+    window.sortearIndividual = async function(id) {
+        if (!confirm('Sortear este sorteio agora?')) return;
+        await carregarConfigRecompensas();
+        const s = allSorteios.find(x => x.id === id);
+        if (!s) { toast('Sorteio não encontrado!'); return; }
+        await realizarSorteio(s);
+        await carregarSorteios();
+        toast('✅ Sorteio realizado!', true);
+    };
+    
+    // ═══ REALIZAR SORTEIO (com leitura atualizada das configs) ═══
+    async function realizarSorteio(s) {
+        const snapRec = await get(ref(db, 'configRecompensas'));
+        if (snapRec.exists()) {
+            RECOMPENSAS_CONFIG = { ...RECOMPENSAS_CONFIG, ...snapRec.val() };
+        }
+        
+        const participantes = s.participantes || {};
+        const participantesIds = Object.keys(participantes);
+        if (participantesIds.length === 0) {
+            await update(ref(db, `sorteios/${s.id}`), {
+                ativo: false, keyEntregue: true, encerradoEm: Date.now(), status: 'cancelado'
+            });
+            return;
+        }
+        
+        // Cancelar se menos de 10 participantes
+        if (participantesIds.length < 10) {
+            // Cancelar sorteio
+            await update(ref(db, `sorteios/${s.id}`), {
+                ativo: false, keyEntregue: true, encerradoEm: Date.now(), status: 'cancelado'
+            });
+            // Notificar criador e participantes
+            if (s.criadoPor) {
+                const criadorSnap = await get(ref(db, `usuarios/${s.criadoPor}`));
+                const criadorNome = criadorSnap.val()?.username || 'Criador';
+                await push(ref(db, 'chat'), {
+                    uid: s.criadoPor, nome: criadorNome,
+                    texto: `❌ Seu sorteio de ${sanitize(s.nomeJogo)} foi cancelado por não atingir o mínimo de 10 participantes.`,
+                    ts: Date.now(), type: 'notification', notifType: 'lose', notifTitle: '🚫 SORTEIO CANCELADO'
+                });
+            }
+            for (const uid of participantesIds) {
+                try {
+                    const pSnap = await get(ref(db, `usuarios/${uid}`));
+                    const pNome = pSnap.val()?.username || 'Usuário';
+                    await push(ref(db, 'chat'), {
+                        uid, nome: pNome,
+                        texto: `❌ O sorteio de ${sanitize(s.nomeJogo)} foi cancelado porque não atingiu o mínimo de 10 participantes.`,
+                        ts: Date.now(), type: 'notification', notifType: 'lose', notifTitle: '🚫 SORTEIO CANCELADO'
+                    });
+                } catch(e) {}
+            }
+            await push(ref(db, 'logSorteios'), {
+                sorteioId: s.id, nomeJogo: s.nomeJogo, status: 'cancelado',
+                participantes: participantesIds.length, encerradoEm: Date.now(), tipo: s.tipo
+            });
+            return;
+        }
+        
+        const winnerId = participantesIds[Math.floor(Math.random() * participantesIds.length)];
+        const winnerData = participantes[winnerId];
+        
+        // Processar vencedor
+        try {
+            const userSnap = await get(ref(db, `usuarios/${winnerId}`));
+            const ud = userSnap.val() || {};
+            const rewardXp = RECOMPENSAS_CONFIG.vencedorXp || 0;
+            const rewardMoney = RECOMPENSAS_CONFIG.vencedorMoney || 0;
+            
+            await update(ref(db, `usuarios/${winnerId}`), {
+                pontos: (ud.pontos || 0) + rewardXp,
+                dinheiro: (ud.dinheiro || 0) + rewardMoney
+            });
+            
+            await push(ref(db, 'chat'), {
+                uid: winnerId, nome: ud.username || 'Vencedor',
+                texto: `🎉 PARABÉNS! Você venceu o sorteio de ${sanitize(s.nomeJogo)}!`,
+                ts: Date.now(), type: 'notification', notifType: 'win',
+                notifTitle: '🏆 VITÓRIA NO SORTEIO',
+                rewards: { money: rewardMoney, xp: rewardXp }, sorteioId: s.id
+            });
+        } catch(e) { console.error('Erro vencedor:', e); }
+        
+        // Processar perdedores
+        for (const uid of participantesIds) {
+            if (uid === winnerId) continue;
+            try {
+                const userSnap = await get(ref(db, `usuarios/${uid}`));
+                const ud = userSnap.val() || {};
+                const rewardXp = RECOMPENSAS_CONFIG.participanteXp || 0;
+                const rewardMoney = RECOMPENSAS_CONFIG.participanteMoney || 0;
+                
+                await update(ref(db, `usuarios/${uid}`), {
+                    pontos: (ud.pontos || 0) + rewardXp,
+                    dinheiro: (ud.dinheiro || 0) + rewardMoney
+                });
+                
+                await push(ref(db, 'chat'), {
+                    uid: uid, nome: ud.username || 'Usuário',
+                    texto: `😢 Não foi dessa vez no sorteio de ${sanitize(s.nomeJogo)}. +${rewardXp} XP e +${rewardMoney} Money de consolação!`,
+                    ts: Date.now(), type: 'notification', notifType: 'lose',
+                    notifTitle: '🎲 RESULTADO DO SORTEIO',
+                    rewards: { money: rewardMoney, xp: rewardXp }, sorteioId: s.id
+                });
+            } catch(e) { console.error('Erro perdedor:', uid, e); }
+        }
+        
+        // Processar criador (com % do pote em Money)
+        if (s.criadoPor) {
+            try {
+                const criadorSnap = await get(ref(db, `usuarios/${s.criadoPor}`));
+                const criadorData = criadorSnap.val() || {};
+                const criadorXp = RECOMPENSAS_CONFIG.criadorXp || 0;
+                const criadorMoney = RECOMPENSAS_CONFIG.criadorMoney || 0;
+                const criadorPote = RECOMPENSAS_CONFIG.criadorPote || 0;
+                
+                // Buscar custo de entrada para calcular o pote total
+                const custoSnap = await get(ref(db, 'configCustos'));
+                let custoPorPessoa = 0;
+                if (custoSnap.exists()) {
+                    const c = custoSnap.val();
+                    custoPorPessoa = c[s.tipo] || 0;
+                }
+                const totalParticipantes = participantesIds.length;
+                const poteTotal = totalParticipantes * custoPorPessoa;
+                const moneyPote = Math.floor(poteTotal * (criadorPote / 100));
+                const moneyTotal = criadorMoney + moneyPote;
+                
+                await update(ref(db, `usuarios/${s.criadoPor}`), {
+                    pontos: (criadorData.pontos || 0) + criadorXp,
+                    dinheiro: (criadorData.dinheiro || 0) + moneyTotal
+                });
+                
+                await push(ref(db, 'chat'), {
+                    uid: s.criadoPor, nome: criadorData.username || 'Criador',
+                    texto: `👑 Seu sorteio de ${sanitize(s.nomeJogo)} terminou! Vencedor: ${sanitize(winnerData.nome)}. +${criadorXp} XP e +${moneyTotal} LootMoney (inclui ${moneyPote} do pote)!`,
+                    ts: Date.now(), type: 'notification', notifType: 'creator_reward',
+                    notifTitle: '👑 SORTEIO FINALIZADO',
+                    rewards: { money: moneyTotal, xp: criadorXp }, sorteioId: s.id
+                });
+            } catch(e) { console.error('Erro criador:', e); }
+        }
+        
+        // Entregar key
+        if (s.key) {
+            await push(ref(db, 'chat'), {
+                uid: winnerId, nome: winnerData.nome || 'Vencedor', texto: '',
+                ts: Date.now(), type: 'treasure', keyCode: s.key,
+                keyGame: s.nomeJogo || 'Sorteio', keyPlatform: s.plataforma || 'Steam',
+                sorteioId: s.id, opened: false
+            });
+        }
+        
+        // Atualizar sorteio
+        await update(ref(db, `sorteios/${s.id}`), {
+            ativo: false, keyEntregue: true, encerradoEm: Date.now(),
+            vencedorId: winnerId, vencedorNome: winnerData.nome || 'Anônimo'
+        });
+        
+        // Log
+        await push(ref(db, 'logSorteios'), {
+            sorteioId: s.id, nomeJogo: s.nomeJogo, criador: s.criadoPorNome,
+            vencedor: winnerData.nome, participantes: participantesIds.length,
+            encerradoEm: Date.now(), tipo: s.tipo
+        });
+        
+        // Sistema
+        await push(ref(db, 'chat'), {
+            uid: 'system', nome: '🎉 Sistema',
+            texto: `🏆✨ SORTEIO FINALIZADO! ${sanitize(winnerData.nome)} venceu ${sanitize(s.nomeJogo)}! Parabéns! 🎉✨`,
+            ts: Date.now(), type: 'system'
+        });
+    }
+    
+    window.removerSorteio = async (id) => {
+        if (!confirm('Remover?')) return;
+        await remove(ref(db, 'sorteios/'+id));
+        carregarSorteios();
+        toast('🗑️ Removido!', true);
+    };
+    
+    window.abrirModalSorteios = function() {
+        document.getElementById('modal-sorteios-overlay').classList.add('open');
+        filtrarModalSorteios();
+    };
+    
+    window.fecharModalSorteios = function() {
+        document.getElementById('modal-sorteios-overlay').classList.remove('open');
+    };
+    
+    window.filtrarModalSorteios = function() {
+        const search = (document.getElementById('modal-search-sorteios')?.value||'').toLowerCase();
+        const tbody = document.getElementById('modal-table-sorteios');
+        const info = document.getElementById('modal-sorteios-info');
+        let filtered = allSorteios;
+        if (search) {
+            filtered = allSorteios.filter(s => 
+                (s.nomeJogo||'').toLowerCase().includes(search) ||
+                (s.titulo||'').toLowerCase().includes(search) ||
+                (s.criadoPorNome||'').toLowerCase().includes(search)
+            );
+        }
+        info.textContent = `Mostrando ${filtered.length} de ${allSorteios.length} sorteios`;
+        tbody.innerHTML = filtered.map(s => {
+            const parts = Object.keys(s.participantes||{}).length;
+            const expirado = s.expiraEm && s.expiraEm < Date.now();
+            const statusHtml = s.keyEntregue ? '<span class="badge badge-green">✅ Finalizado</span>' : 
+                              (expirado && !s.keyEntregue) ? '<span class="badge badge-orange">⏳ Expirado</span>' :
+                              (s.ativo ? '<span class="badge badge-blue">⏳ Ativo</span>' : '<span class="badge badge-red">🔴 Inativo</span>');
+            return `<tr>
+                <td><strong>${sanitize(s.nomeJogo||s.titulo||'—')}</strong></td>
+                <td>${sanitize(s.criadoPorNome||'?')}</td>
+                <td><span class="badge badge-${s.tipo==='publico'?'green':s.tipo==='diamante'?'diamond':'gold'}">${s.tipo||'publico'}</span></td>
+                <td>${parts}/${s.maxParticipantes||0}</td>
+                <td style="font-size:.7rem;">${s.expiraEm?new Date(s.expiraEm).toLocaleString('pt-BR'):'—'}</td>
+                <td>${statusHtml}</td>
+                <td>${sanitize(s.vencedorNome||'—')}</td>
+                <td>
+                    <button class="btn-sm red" onclick="removerSorteio('${s.id}')">🗑️</button>
+                    ${expirado && !s.keyEntregue && parts > 0 ? `<button class="btn-sm gold" onclick="sortearIndividual('${s.id}')">🎲 Sortear</button>` : ''}
+                </td>
+            </tr>`;
+        }).join('');
+    };
+    
+    document.getElementById('modal-sorteios-overlay').addEventListener('click', function(e) {
+        if (e.target === this) fecharModalSorteios();
+    });
+    
+    // ═══ RECOMPENSAS ═══
+    async function carregarRecompensas() {
+        const snap = await get(ref(db, 'configRecompensas'));
+        if (snap.exists()) {
+            const d = snap.val();
+            document.getElementById('r-vencedor-xp').value = d.vencedorXp ?? 75;
+            document.getElementById('r-vencedor-money').value = d.vencedorMoney ?? 0;
+            document.getElementById('r-vencedor-pote').value = d.vencedorPote ?? 0;
+            document.getElementById('r-participante-xp').value = d.participanteXp ?? 20;
+            document.getElementById('r-participante-money').value = d.participanteMoney ?? 0;
+            document.getElementById('r-participante-pote').value = d.participantePote ?? 0;
+            document.getElementById('r-criador-xp').value = d.criadorXp ?? 100;
+            document.getElementById('r-criador-money').value = d.criadorMoney ?? 0;
+            document.getElementById('r-criador-pote').value = d.criadorPote ?? 20;
+            document.getElementById('r-gs-vencedor-xp').value = d.gsVencedorXp ?? 1000;
+            document.getElementById('r-gs-vencedor-money').value = d.gsVencedorMoney ?? 0;
+            document.getElementById('r-gs-participante-xp').value = d.gsParticipanteXp ?? 150;
+            document.getElementById('r-gs-participante-money').value = d.gsParticipanteMoney ?? 0;
+        }
+    }
+    
+    window.salvarRecompensas = async function() {
+        const data = {
+            vencedorXp: +document.getElementById('r-vencedor-xp').value || 0,
+            vencedorMoney: +document.getElementById('r-vencedor-money').value || 0,
+            vencedorPote: +document.getElementById('r-vencedor-pote').value || 0,
+            participanteXp: +document.getElementById('r-participante-xp').value || 0,
+            participanteMoney: +document.getElementById('r-participante-money').value || 0,
+            participantePote: +document.getElementById('r-participante-pote').value || 0,
+            criadorXp: +document.getElementById('r-criador-xp').value || 0,
+            criadorMoney: +document.getElementById('r-criador-money').value || 0,
+            criadorPote: +document.getElementById('r-criador-pote').value || 0,
+            gsVencedorXp: +document.getElementById('r-gs-vencedor-xp').value || 0,
+            gsVencedorMoney: +document.getElementById('r-gs-vencedor-money').value || 0,
+            gsParticipanteXp: +document.getElementById('r-gs-participante-xp').value || 0,
+            gsParticipanteMoney: +document.getElementById('r-gs-participante-money').value || 0,
+            atualizadoEm: Date.now()
+        };
+        try {
+            await set(ref(db, 'configRecompensas'), data);
+            RECOMPENSAS_CONFIG = { ...data };
+            toast('✅ Recompensas salvas!', true);
+        } catch(e) { toast('❌ Erro: ' + e.message); }
+    };
+    
+    // ═══ CUSTOS & LIMITES ═══
+    async function carregarCustos() {
+        const snap = await get(ref(db, 'configCustos'));
+        if (snap.exists()) {
+            const d = snap.val();
+            document.getElementById('c-publico').value = d.publico ?? 5;
+            document.getElementById('c-prata').value = d.prata ?? 10;
+            document.getElementById('c-ouro').value = d.ouro ?? 20;
+            document.getElementById('c-diamante').value = d.diamante ?? 50;
+            document.getElementById('c-exclusivo').value = d.exclusivo ?? 0;
+            document.getElementById('c-publico-premium').value = d.publicoPremium ?? 3;
+            document.getElementById('c-prata-premium').value = d.prataPremium ?? 7;
+            document.getElementById('c-ouro-premium').value = d.ouroPremium ?? 14;
+            document.getElementById('c-diamante-premium').value = d.diamantePremium ?? 35;
+            document.getElementById('c-exclusivo-premium').value = d.exclusivoPremium ?? 0;
+            document.getElementById('l-publico-min').value = d.limitePublicoMin ?? 2;
+            document.getElementById('l-publico-max').value = d.limitePublicoMax ?? 50;
+            document.getElementById('l-prata-min').value = d.limitePrataMin ?? 10;
+            document.getElementById('l-prata-max').value = d.limitePrataMax ?? 80;
+            document.getElementById('l-ouro-min').value = d.limiteOuroMin ?? 20;
+            document.getElementById('l-ouro-max').value = d.limiteOuroMax ?? 150;
+            document.getElementById('l-diamante-min').value = d.limiteDiamanteMin ?? 30;
+            document.getElementById('l-diamante-max').value = d.limiteDiamanteMax ?? 300;
+            document.getElementById('l-exclusivo-min').value = d.limiteExclusivoMin ?? 2;
+            document.getElementById('l-exclusivo-max').value = d.limiteExclusivoMax ?? 500;
+            document.getElementById('l-bronze-dia').value = d.limiteBronzeDia ?? 1;
+            document.getElementById('l-prata-dia').value = d.limitePrataDia ?? 2;
+            document.getElementById('l-ouro-dia').value = d.limiteOuroDia ?? 3;
+            document.getElementById('l-diamante-dia').value = d.limiteDiamanteDia ?? 5;
+            document.getElementById('l-exclusivo-dia').value = d.limiteExclusivoDia ?? 10;
+        }
+    }
+    
+    window.salvarCustos = async function() {
+        const data = {
+            publico: +document.getElementById('c-publico').value || 0,
+            prata: +document.getElementById('c-prata').value || 0,
+            ouro: +document.getElementById('c-ouro').value || 0,
+            diamante: +document.getElementById('c-diamante').value || 0,
+            exclusivo: +document.getElementById('c-exclusivo').value || 0,
+            publicoPremium: +document.getElementById('c-publico-premium').value || 0,
+            prataPremium: +document.getElementById('c-prata-premium').value || 0,
+            ouroPremium: +document.getElementById('c-ouro-premium').value || 0,
+            diamantePremium: +document.getElementById('c-diamante-premium').value || 0,
+            exclusivoPremium: +document.getElementById('c-exclusivo-premium').value || 0,
+            limitePublicoMin: +document.getElementById('l-publico-min').value || 2,
+            limitePublicoMax: +document.getElementById('l-publico-max').value || 50,
+            limitePrataMin: +document.getElementById('l-prata-min').value || 10,
+            limitePrataMax: +document.getElementById('l-prata-max').value || 80,
+            limiteOuroMin: +document.getElementById('l-ouro-min').value || 20,
+            limiteOuroMax: +document.getElementById('l-ouro-max').value || 150,
+            limiteDiamanteMin: +document.getElementById('l-diamante-min').value || 30,
+            limiteDiamanteMax: +document.getElementById('l-diamante-max').value || 300,
+            limiteExclusivoMin: +document.getElementById('l-exclusivo-min').value || 2,
+            limiteExclusivoMax: +document.getElementById('l-exclusivo-max').value || 500,
+            limiteBronzeDia: +document.getElementById('l-bronze-dia').value || 1,
+            limitePrataDia: +document.getElementById('l-prata-dia').value || 2,
+            limiteOuroDia: +document.getElementById('l-ouro-dia').value || 3,
+            limiteDiamanteDia: +document.getElementById('l-diamante-dia').value || 5,
+            limiteExclusivoDia: +document.getElementById('l-exclusivo-dia').value || 10,
+            atualizadoEm: Date.now()
+        };
+        try {
+            await set(ref(db, 'configCustos'), data);
+            toast('✅ Custos salvos!', true);
+        } catch(e) { toast('❌ Erro: ' + e.message); }
+    };
+    </script>
+</body>
+</html>

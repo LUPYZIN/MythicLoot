@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Admin Mensagens Globais</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14; --bg-card: #151a26; --text: #f3f4f6; --text-2: #9ca3af;
+            --primary: #6366f1; --green: #10b981; --red: #ef4444; --gold: #fbbf24;
+            --orange: #f59e0b; --pink: #ec4899; --purple: #a855f7; --diamond: #38bdf8;
+            --border: rgba(255,255,255,0.06); --input-bg: #1a1f2e; --input-border: #2a2f3e;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+        body { background:var(--bg); color:var(--text); min-height:100vh; }
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-track { background:var(--bg); }
+        ::-webkit-scrollbar-thumb { background:#2a2f3e; border-radius:3px; }
+        
+        header { background:rgba(11,14,20,0.95); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; backdrop-filter:blur(16px); padding:.9rem 2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; }
+        .logo { font-family:'Space Grotesk',sans-serif; font-size:1.3rem; font-weight:700; color:var(--text); text-decoration:none; }
+        .logo em { color:var(--pink); font-style:normal; }
+        .btn-header { background:transparent; border:1px solid var(--border); color:var(--text-2); padding:.4rem .8rem; border-radius:6px; font-size:.8rem; cursor:pointer; transition:.3s; text-decoration:none; display:inline-flex; align-items:center; gap:.3rem; }
+        .btn-header:hover { border-color:var(--pink); color:var(--pink); }
+        
+        .main-layout { max-width:1600px; margin:0 auto; padding:1.5rem 2rem; display:grid; grid-template-columns:220px 1fr; gap:1.5rem; }
+        .sidebar { background:var(--bg-card); border-radius:14px; border:1px solid var(--border); padding:1rem; position:sticky; top:80px; height:fit-content; max-height:85vh; overflow-y:auto; }
+        .sidebar-btn { background:transparent; border:none; color:var(--text-2); padding:.7rem 1rem; border-radius:8px; font-size:.82rem; cursor:pointer; transition:.3s; text-align:left; display:flex; align-items:center; gap:.5rem; width:100%; text-decoration:none; }
+        .sidebar-btn:hover { background:rgba(255,255,255,.04); color:var(--text); }
+        .sidebar-btn.active { background:rgba(99,102,241,.12); color:var(--primary); font-weight:600; }
+        
+        .panel { background:var(--bg-card); border-radius:14px; border:1px solid var(--border); padding:1.5rem; margin-bottom:1.5rem; }
+        .panel-title { font-family:'Space Grotesk',sans-serif; font-size:1.15rem; font-weight:700; margin-bottom:1.2rem; display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
+        
+        .form-group { margin-bottom:1rem; }
+        .form-group label { display:block; font-size:.75rem; color:var(--text-2); margin-bottom:.4rem; font-weight:500; text-transform:uppercase; letter-spacing:.05em; }
+        .form-group input, .form-group select, .form-group textarea { width:100%; background:var(--input-bg); border:1px solid var(--input-border); color:var(--text); padding:.65rem .9rem; border-radius:8px; font-size:.85rem; transition:.3s; outline:none; font-family:'Inter',sans-serif; }
+        .form-group select { cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:2rem; }
+        .form-group select option { background:var(--bg-card); color:var(--text); }
+        .form-group textarea { resize:vertical; min-height:80px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--pink); background:#1e2333; }
+        .form-hint { font-size:.7rem; color:#6b7280; margin-top:.25rem; }
+        
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+        .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
+        
+        .btn { padding:.65rem 1.3rem; border-radius:8px; font-weight:600; cursor:pointer; border:none; transition:all .25s; font-size:.82rem; display:inline-flex; align-items:center; gap:.4rem; }
+        .btn:hover { opacity:.9; transform:translateY(-1px); box-shadow:0 4px 15px rgba(0,0,0,0.3); }
+        .btn.pink { background:var(--pink); color:#fff; }
+        .btn.green { background:var(--green); color:#fff; }
+        .btn.red { background:var(--red); color:#fff; }
+        .btn.gold { background:var(--gold); color:#000; }
+        .btn.purple { background:var(--purple); color:#fff; }
+        .btn.primary { background:var(--primary); color:#fff; }
+        
+        /* Grid de templates */
+        .templates-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(280px,1fr)); gap:1rem; margin-bottom:1.5rem; }
+        .template-card {
+            background:var(--input-bg); border:2px solid var(--input-border);
+            border-radius:14px; padding:1.2rem; cursor:pointer; transition:.3s;
+            text-align:center; position:relative;
+        }
+        .template-card:hover { border-color:var(--pink); transform:translateY(-2px); }
+        .template-card.selected { border-color:var(--pink); background:rgba(236,72,153,0.08); }
+        .template-card .t-icon { font-size:2.5rem; margin-bottom:.5rem; }
+        .template-card .t-name { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:.9rem; }
+        .template-card .t-desc { font-size:.7rem; color:var(--text-2); margin-top:.2rem; }
+        .template-card .t-check { position:absolute; top:.5rem; right:.5rem; color:var(--pink); font-size:1.2rem; display:none; }
+        .template-card.selected .t-check { display:block; }
+        
+        /* Preview do popup */
+        .popup-preview-container { display:flex; justify-content:center; margin:1.5rem 0; }
+        
+        /* Template 1: Padrão */
+        .popup-t1 {
+            background:linear-gradient(135deg,#1a1d2e,#0f1220);
+            border:2px solid var(--gold); border-radius:20px;
+            padding:2.5rem; text-align:center; max-width:420px; width:100%;
+            box-shadow:0 20px 60px rgba(0,0,0,0.6); position:relative;
+        }
+        .popup-t1 .popup-close { position:absolute; top:.8rem; right:.8rem; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.1); border:none; color:var(--text-2); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+        .popup-t1 .popup-icon { font-size:3.5rem; display:block; }
+        .popup-t1 .popup-title { font-family:'Space Grotesk',sans-serif; font-size:1.4rem; font-weight:700; margin:.5rem 0; }
+        .popup-t1 .popup-text { font-size:.85rem; color:var(--text-2); margin-bottom:1rem; line-height:1.5; }
+        .popup-t1 .popup-btn { padding:.8rem 2.5rem; border-radius:50px; font-size:.9rem; font-weight:700; cursor:pointer; font-family:'Space Grotesk',sans-serif; border:none; color:#fff; }
+        
+        /* Template 2: Neon */
+        .popup-t2 {
+            background:#0a0a0f; border:2px solid var(--diamond); border-radius:20px;
+            padding:2.5rem; text-align:center; max-width:420px; width:100%;
+            box-shadow:0 0 40px rgba(56,189,248,0.3),0 20px 60px rgba(0,0,0,0.6); position:relative;
+        }
+        .popup-t2 .popup-close { position:absolute; top:.8rem; right:.8rem; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.1); border:none; color:var(--text-2); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+        .popup-t2 .popup-icon { font-size:3.5rem; display:block; text-shadow:0 0 20px currentColor; }
+        .popup-t2 .popup-title { font-family:'Space Grotesk',sans-serif; font-size:1.4rem; font-weight:700; margin:.5rem 0; text-shadow:0 0 15px currentColor; }
+        .popup-t2 .popup-text { font-size:.85rem; color:var(--text-2); margin-bottom:1rem; line-height:1.5; }
+        .popup-t2 .popup-btn { padding:.8rem 2.5rem; border-radius:50px; font-size:.9rem; font-weight:700; cursor:pointer; font-family:'Space Grotesk',sans-serif; border:none; color:#fff; box-shadow:0 0 20px rgba(56,189,248,0.4); }
+        
+        /* Template 3: Gamer */
+        .popup-t3 {
+            background:linear-gradient(135deg,#1a0a0a,#0a0a1a); border:2px solid var(--red); border-radius:20px;
+            padding:2.5rem; text-align:center; max-width:420px; width:100%;
+            box-shadow:0 20px 60px rgba(0,0,0,0.6); position:relative;
+        }
+        .popup-t3 .popup-close { position:absolute; top:.8rem; right:.8rem; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.1); border:none; color:var(--text-2); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+        .popup-t3 .popup-icon { font-size:3.5rem; display:block; }
+        .popup-t3 .popup-title { font-family:'Space Grotesk',sans-serif; font-size:1.4rem; font-weight:700; margin:.5rem 0; }
+        .popup-t3 .popup-text { font-size:.85rem; color:var(--text-2); margin-bottom:1rem; line-height:1.5; }
+        .popup-t3 .popup-btn { padding:.8rem 2.5rem; border-radius:8px; font-size:.9rem; font-weight:700; cursor:pointer; font-family:'Space Grotesk',sans-serif; border:none; color:#fff; clip-path:polygon(8% 0,100% 0,100% 70%,92% 100%,0 100%,0 30%); }
+        
+        /* Template 4: Premium */
+        .popup-t4 {
+            background:linear-gradient(135deg,#1a1a0a,#1a0a1a); border:3px solid var(--gold); border-radius:24px;
+            padding:2.5rem; text-align:center; max-width:420px; width:100%;
+            box-shadow:0 0 50px rgba(251,191,36,0.2),0 20px 60px rgba(0,0,0,0.6); position:relative;
+        }
+        .popup-t4 .popup-close { position:absolute; top:.8rem; right:.8rem; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.1); border:none; color:var(--text-2); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+        .popup-t4 .popup-crown { font-size:2rem; display:block; margin-bottom:.3rem; }
+        .popup-t4 .popup-icon { font-size:3rem; display:block; }
+        .popup-t4 .popup-title { font-family:'Space Grotesk',sans-serif; font-size:1.4rem; font-weight:700; margin:.5rem 0; color:var(--gold); }
+        .popup-t4 .popup-text { font-size:.85rem; color:var(--text-2); margin-bottom:1rem; line-height:1.5; }
+        .popup-t4 .popup-btn { padding:.8rem 2.5rem; border-radius:50px; font-size:.9rem; font-weight:700; cursor:pointer; font-family:'Space Grotesk',sans-serif; border:none; color:#000; background:linear-gradient(135deg,var(--gold),#d97706); }
+        
+        /* Template 5: Alerta */
+        .popup-t5 {
+            background:linear-gradient(135deg,#1a0a0a,#1a0a0f); border:2px solid var(--red); border-radius:16px;
+            padding:2rem; text-align:center; max-width:400px; width:100%;
+            box-shadow:0 0 30px rgba(239,68,68,0.3),0 20px 60px rgba(0,0,0,0.6); position:relative;
+        }
+        .popup-t5 .popup-close { position:absolute; top:.8rem; right:.8rem; width:28px; height:28px; border-radius:50%; background:rgba(255,255,255,0.1); border:none; color:var(--text-2); cursor:pointer; font-size:1rem; display:flex; align-items:center; justify-content:center; }
+        .popup-t5 .popup-alert-icon { font-size:3rem; display:block; animation:pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100%{transform:scale(1)} 50%{transform:scale(1.1)} }
+        .popup-t5 .popup-title { font-family:'Space Grotesk',sans-serif; font-size:1.3rem; font-weight:700; margin:.5rem 0; color:var(--red); }
+        .popup-t5 .popup-text { font-size:.85rem; color:var(--text-2); margin-bottom:1rem; line-height:1.5; }
+        .popup-t5 .popup-btn { padding:.8rem 2.5rem; border-radius:8px; font-size:.9rem; font-weight:700; cursor:pointer; font-family:'Space Grotesk',sans-serif; border:none; color:#fff; background:var(--red); }
+        
+        /* Mensagens ativas */
+        .msg-card {
+            background:rgba(255,255,255,0.02); border:1px solid var(--border);
+            border-radius:12px; padding:1rem; margin-bottom:.6rem;
+            display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:.5rem;
+        }
+        .msg-card .msg-info { flex:1; min-width:0; }
+        .msg-card .msg-title { font-weight:600; font-size:.85rem; }
+        .msg-card .msg-template { font-size:.7rem; color:var(--text-2); }
+        .msg-card .msg-actions { display:flex; gap:.3rem; }
+        
+        .toast { position:fixed; top:1.5rem; right:1.5rem; z-index:400; background:var(--bg-card); border:1px solid var(--red); padding:.8rem 1.2rem; border-radius:12px; font-size:.83rem; transform:translateX(140%); transition:all .3s; max-width:380px; }
+        .toast.show { transform:translateX(0); }
+        .toast.ok { border-color:var(--green); }
+        
+        @media (max-width:768px) {
+            .main-layout { grid-template-columns:1fr; padding:.8rem; }
+            .sidebar { display:flex; flex-wrap:wrap; gap:.3rem; position:static; max-height:none; }
+            .sidebar-btn { width:auto; font-size:.7rem; padding:.4rem .6rem; }
+            .grid-2, .grid-3 { grid-template-columns:1fr; }
+            .templates-grid { grid-template-columns:1fr 1fr; }
+        }
+    </style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<header>
+    <a href="admin.html" class="logo"><em>📢</em> Looto Admin | Mensagens Globais</a>
+    <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+        <a href="looto.html" class="btn-header" target="_blank">🌐 Ver Site</a>
+        <a href="admin.html" class="btn-header">📊 Dashboard</a>
+        <button class="btn-header" onclick="logout()">🚪 Sair</button>
+    </div>
+</header>
+
+<div class="main-layout">
+    <aside class="sidebar">
+        <a href="admin.html" class="sidebar-btn">📊 Dashboard</a>
+        <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+        <a href="abots.html" class="sidebar-btn">🤖 Bots</a>
+        <a href="asorteios.html" class="sidebar-btn">🎁 Sorteios</a>
+        <a href="alogsorteios.html" class="sidebar-btn">📋 Log Sorteios</a>
+        <a href="achat.html" class="sidebar-btn">💬 Chat</a>
+        <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+        <a href="aloja.html" class="sidebar-btn">🛒 Loja</a>
+        <a href="admins.html" class="sidebar-btn">🔑 Admins</a>
+        <a href="ainfluencer.html" class="sidebar-btn">🌟 Influencers</a>
+        <a href="arecompensas.html" class="sidebar-btn">🎯 Recompensas</a>
+        <a href="aglobalmsg.html" class="sidebar-btn active">📢 Mensagens Globais</a>
+        <a href="aferramentas.html" class="sidebar-btn">🔧 Ferramentas</a>
+    </aside>
+    
+    <div>
+        <!-- CRIAR MENSAGEM -->
+        <div class="panel">
+            <div class="panel-title">📢 Criar Mensagem Global</div>
+            <p style="color:var(--text-2);font-size:.78rem;margin-bottom:1rem;">
+                A mensagem aparece como popup para todos os usuários no site. Some após ser fechada.
+            </p>
+            
+            <!-- Seleção de template -->
+            <div class="form-group">
+                <label>🎨 Escolha o Template</label>
+                <div class="templates-grid" id="templates-grid">
+                    <div class="template-card selected" data-template="1" onclick="selectTemplate('1')">
+                        <span class="t-check">✅</span>
+                        <div class="t-icon">🎁</div>
+                        <div class="t-name">Padrão</div>
+                        <div class="t-desc">Clássico e elegante</div>
+                    </div>
+                    <div class="template-card" data-template="2" onclick="selectTemplate('2')">
+                        <span class="t-check">✅</span>
+                        <div class="t-icon">💎</div>
+                        <div class="t-name">Neon</div>
+                        <div class="t-desc">Efeito glow azul</div>
+                    </div>
+                    <div class="template-card" data-template="3" onclick="selectTemplate('3')">
+                        <span class="t-check">✅</span>
+                        <div class="t-icon">🎮</div>
+                        <div class="t-name">Gamer</div>
+                        <div class="t-desc">Estilo gamer radical</div>
+                    </div>
+                    <div class="template-card" data-template="4" onclick="selectTemplate('4')">
+                        <span class="t-check">✅</span>
+                        <div class="t-icon">👑</div>
+                        <div class="t-name">Premium</div>
+                        <div class="t-desc">Dourado luxuoso</div>
+                    </div>
+                    <div class="template-card" data-template="5" onclick="selectTemplate('5')">
+                        <span class="t-check">✅</span>
+                        <div class="t-icon">⚠️</div>
+                        <div class="t-name">Alerta</div>
+                        <div class="t-desc">Aviso urgente</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>🏷️ Título</label><input type="text" id="msg-titulo" placeholder="Ex: Grande Sorteio Aberto!" oninput="atualizarPreview()"></div>
+                    <div class="form-group"><label>📝 Mensagem</label><textarea id="msg-texto" placeholder="Escreva sua mensagem aqui..." oninput="atualizarPreview()"></textarea></div>
+                </div>
+                <div>
+                    <div class="form-group"><label>🖼️ Ícone/Emoji</label><input type="text" id="msg-icone" value="📢" maxlength="10" oninput="atualizarPreview()"></div>
+                    <div class="form-group"><label>🔘 Texto do Botão</label><input type="text" id="msg-btn-texto" value="OK, Entendi!" oninput="atualizarPreview()"></div>
+                    <div class="form-group"><label>🎨 Cor do Tema</label><select id="msg-cor" onchange="atualizarPreview()">
+                        <option value="gold">🟡 Dourado</option>
+                        <option value="primary">🔵 Azul</option>
+                        <option value="green">🟢 Verde</option>
+                        <option value="pink">🩷 Rosa</option>
+                        <option value="diamond">💎 Diamante</option>
+                        <option value="red">🔴 Vermelho</option>
+                    </select></div>
+                </div>
+            </div>
+            
+            <!-- Preview -->
+            <div class="form-group">
+                <label>👁️ Preview</label>
+                <div class="popup-preview-container" id="preview-container">
+                    <!-- Preenchido via JS -->
+                </div>
+            </div>
+            
+            <button class="btn pink" onclick="enviarMensagem()" style="width:100%;">📢 Enviar Mensagem Global</button>
+        </div>
+        
+        <!-- MENSAGENS ATIVAS -->
+        <div class="panel">
+            <div class="panel-title" style="justify-content:space-between;">
+                📋 Mensagens Ativas <span id="count-msgs" style="font-size:.7rem;color:var(--text-2);">0</span>
+            </div>
+            <div id="mensagens-ativas"></div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { getDatabase, ref, get, set, push, remove, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+    authDomain: "looto-f46e5.firebaseapp.com",
+    databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+    projectId: "looto-f46e5",
+    storageBucket: "looto-f46e5.firebasestorage.app",
+    messagingSenderId: "295066400995",
+    appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let templateSelecionado = '1';
+let todasMensagens = [];
+
+const CORES = { gold:'#fbbf24', primary:'#6366f1', green:'#10b981', pink:'#ec4899', diamond:'#38bdf8', red:'#ef4444' };
+
+function toast(msg, ok=false) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (ok?' ok':'');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+
+async function checkAdmin(user) {
+    if(!user) return false;
+    if(user.email === 'startubez.com@gmail.com') return true;
+    const snap = await get(ref(db, 'admins'));
+    if(!snap.exists()) return false;
+    for(let key of Object.keys(snap.val())){ if(snap.val()[key].uid===user.uid||snap.val()[key].email===user.email) return true; }
+    return false;
+}
+
+window.selectTemplate = function(id) {
+    templateSelecionado = id;
+    document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+    document.querySelector(`[data-template="${id}"]`).classList.add('selected');
+    atualizarPreview();
+};
+
+window.atualizarPreview = function() {
+    const container = document.getElementById('preview-container');
+    const titulo = document.getElementById('msg-titulo').value || 'Título da Mensagem';
+    const texto = document.getElementById('msg-texto').value || 'Escreva sua mensagem aqui...';
+    const icone = document.getElementById('msg-icone').value || '📢';
+    const btnTexto = document.getElementById('msg-btn-texto').value || 'OK, Entendi!';
+    const cor = CORES[document.getElementById('msg-cor').value] || '#fbbf24';
+    
+    const templates = {
+        '1': `
+            <div class="popup-t1" style="border-color:${cor};">
+                <button class="popup-close">✕</button>
+                <span class="popup-icon">${icone}</span>
+                <div class="popup-title" style="color:${cor};">${titulo}</div>
+                <div class="popup-text">${texto}</div>
+                <button class="popup-btn" style="background:${cor};">${btnTexto}</button>
+            </div>`,
+        '2': `
+            <div class="popup-t2" style="border-color:${cor};box-shadow:0 0 40px ${cor}30,0 20px 60px rgba(0,0,0,0.6);">
+                <button class="popup-close">✕</button>
+                <span class="popup-icon" style="color:${cor};">${icone}</span>
+                <div class="popup-title" style="color:${cor};">${titulo}</div>
+                <div class="popup-text">${texto}</div>
+                <button class="popup-btn" style="background:${cor};box-shadow:0 0 20px ${cor}40;">${btnTexto}</button>
+            </div>`,
+        '3': `
+            <div class="popup-t3" style="border-color:${cor};">
+                <button class="popup-close">✕</button>
+                <span class="popup-icon">${icone}</span>
+                <div class="popup-title" style="color:${cor};">${titulo}</div>
+                <div class="popup-text">${texto}</div>
+                <button class="popup-btn" style="background:${cor};">${btnTexto}</button>
+            </div>`,
+        '4': `
+            <div class="popup-t4" style="border-color:${cor};">
+                <button class="popup-close">✕</button>
+                <span class="popup-crown">👑</span>
+                <span class="popup-icon">${icone}</span>
+                <div class="popup-title" style="color:${cor};">${titulo}</div>
+                <div class="popup-text">${texto}</div>
+                <button class="popup-btn" style="background:linear-gradient(135deg,${cor},#d97706);">${btnTexto}</button>
+            </div>`,
+        '5': `
+            <div class="popup-t5" style="border-color:${cor};">
+                <button class="popup-close">✕</button>
+                <span class="popup-alert-icon">${icone}</span>
+                <div class="popup-title" style="color:${cor};">${titulo}</div>
+                <div class="popup-text">${texto}</div>
+                <button class="popup-btn" style="background:${cor};">${btnTexto}</button>
+            </div>`
+    };
+    
+    container.innerHTML = templates[templateSelecionado] || templates['1'];
+};
+
+window.enviarMensagem = async function() {
+    const titulo = document.getElementById('msg-titulo').value.trim();
+    const texto = document.getElementById('msg-texto').value.trim();
+    if(!titulo || !texto) return toast('❌ Preencha título e mensagem!');
+    
+    try {
+        const msgRef = push(ref(db, 'mensagensGlobais'));
+        await set(msgRef, {
+            titulo, texto,
+            icone: document.getElementById('msg-icone').value || '📢',
+            btnTexto: document.getElementById('msg-btn-texto').value || 'OK',
+            cor: document.getElementById('msg-cor').value,
+            template: templateSelecionado,
+            ativo: true,
+            criadoEm: Date.now()
+        });
+        
+        document.getElementById('msg-titulo').value = '';
+        document.getElementById('msg-texto').value = '';
+        document.getElementById('msg-icone').value = '📢';
+        document.getElementById('msg-btn-texto').value = 'OK, Entendi!';
+        document.getElementById('msg-cor').value = 'gold';
+        templateSelecionado = '1';
+        document.querySelectorAll('.template-card').forEach(c => c.classList.remove('selected'));
+        document.querySelector('[data-template="1"]').classList.add('selected');
+        atualizarPreview();
+        
+        toast('📢 Mensagem enviada! Aparecerá para todos os usuários.', true);
+    } catch(e) { toast('❌ Erro: ' + e.message); }
+};
+
+// ═══ CARREGAR MENSAGENS (com onValue para tempo real) ═══
+function carregarMensagens() {
+    onValue(ref(db, 'mensagensGlobais'), (snap) => {
+        todasMensagens = [];
+        if(snap.exists()) {
+            snap.forEach(child => {
+                todasMensagens.push({ id: child.key, ...child.val() });
+            });
+        }
+        todasMensagens.sort((a,b) => (b.criadoEm||0) - (a.criadoEm||0));
+        document.getElementById('count-msgs').textContent = todasMensagens.filter(m => m.ativo).length + ' ativas';
+        renderizarMensagens();
+    });
+}
+
+function renderizarMensagens() {
+    const container = document.getElementById('mensagens-ativas');
+    if(todasMensagens.length === 0) {
+        container.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-2);">📭 Nenhuma mensagem</div>';
+        return;
+    }
+    
+    const tNames = { '1':'Padrão', '2':'Neon', '3':'Gamer', '4':'Premium', '5':'Alerta' };
+    
+    container.innerHTML = todasMensagens.map(m => `
+        <div class="msg-card" style="opacity:${m.ativo?'1':'0.5'}">
+            <div class="msg-info">
+                <div class="msg-title">${m.icone||'📢'} ${m.titulo||'Sem título'}</div>
+                <div class="msg-template">Template: ${tNames[m.template]||'Padrão'} · ${m.ativo?'🟢 Ativo':'🔴 Inativo'} · ${new Date(m.criadoEm).toLocaleString('pt-BR')}</div>
+            </div>
+            <div class="msg-actions">
+                <button class="btn green" onclick="toggleMensagem('${m.id}', ${!m.ativo})" style="padding:.4rem .7rem;font-size:.7rem;">${m.ativo?'⏸️ Desativar':'▶️ Ativar'}</button>
+                <button class="btn red" onclick="deletarMensagem('${m.id}')" style="padding:.4rem .7rem;font-size:.7rem;">🗑️</button>
+            </div>
+        </div>
+    `).join('');
+}
+
+window.toggleMensagem = async function(id, ativo) {
+    await set(ref(db, 'mensagensGlobais/' + id + '/ativo'), ativo);
+    toast(ativo ? '✅ Mensagem ativada!' : '⏸️ Mensagem desativada', true);
+};
+
+window.deletarMensagem = async function(id) {
+    if(!confirm('🗑️ Deletar esta mensagem?')) return;
+    await remove(ref(db, 'mensagensGlobais/' + id));
+    toast('🗑️ Deletada!', true);
+};
+
+onAuthStateChanged(auth, async (user) => {
+    if(!user) { window.location.href = 'login.html'; return; }
+    if(!(await checkAdmin(user))) {
+        document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;"><h1 style="color:#ef4444;">🚫 Acesso Negado</h1></div>';
+        return;
+    }
+    document.getElementById('admin-info').textContent = '👑 ' + user.email;
+    carregarMensagens();
+    atualizarPreview();
+});
+
+atualizarPreview();
+</script>
+</body>
+</html>

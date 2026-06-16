@@ -1,0 +1,860 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Admin Influencers</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14; --bg-card: #151a26; --text: #f3f4f6; --text-2: #9ca3af;
+            --primary: #6366f1; --green: #10b981; --red: #ef4444; --gold: #fbbf24;
+            --orange: #f59e0b; --pink: #ec4899; --purple: #a855f7;
+            --border: rgba(255,255,255,0.08); --input-bg: #1a1f2e; --input-border: #2a2f3e;
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+        body { background:var(--bg); color:var(--text); min-height:100vh; }
+        ::-webkit-scrollbar { width:6px; }
+        ::-webkit-scrollbar-track { background:var(--bg); }
+        ::-webkit-scrollbar-thumb { background:#2a2f3e; border-radius:3px; }
+        
+        header { background:rgba(11,14,20,0.95); border-bottom:1px solid var(--border); position:sticky; top:0; z-index:100; backdrop-filter:blur(16px); padding:.9rem 2rem; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:.5rem; }
+        .logo { font-family:'Space Grotesk',sans-serif; font-size:1.3rem; font-weight:700; color:var(--text); text-decoration:none; }
+        .logo em { color:var(--pink); font-style:normal; }
+        .btn-header { background:transparent; border:1px solid var(--border); color:var(--text-2); padding:.4rem .8rem; border-radius:6px; font-size:.8rem; cursor:pointer; transition:.3s; text-decoration:none; display:inline-flex; align-items:center; gap:.3rem; }
+        .btn-header:hover { border-color:var(--pink); color:var(--pink); }
+        
+        .main-layout { max-width:1600px; margin:0 auto; padding:1.5rem 2rem; display:grid; grid-template-columns:220px 1fr; gap:1.5rem; }
+        .sidebar { background:var(--bg-card); border-radius:14px; border:1px solid var(--border); padding:1rem; position:sticky; top:80px; height:fit-content; max-height:85vh; overflow-y:auto; }
+        .sidebar-btn { background:transparent; border:none; color:var(--text-2); padding:.7rem 1rem; border-radius:8px; font-size:.82rem; cursor:pointer; transition:.3s; text-align:left; display:flex; align-items:center; gap:.5rem; width:100%; text-decoration:none; }
+        .sidebar-btn:hover { background:rgba(255,255,255,.04); color:var(--text); }
+        .sidebar-btn.active { background:rgba(236,72,153,.12); color:var(--pink); font-weight:600; }
+        
+        .panel { background:var(--bg-card); border-radius:14px; border:1px solid var(--border); padding:1.5rem; margin-bottom:1.5rem; }
+        .panel-title { font-family:'Space Grotesk',sans-serif; font-size:1.15rem; font-weight:700; margin-bottom:1.2rem; display:flex; align-items:center; gap:.6rem; flex-wrap:wrap; }
+        .badge { font-size:.65rem; padding:.25rem .7rem; border-radius:99px; font-weight:600; }
+        .badge.on { background:rgba(16,185,129,.15); color:var(--green); }
+        .badge.off { background:rgba(239,68,68,.15); color:var(--red); }
+        
+        .form-group { margin-bottom:1rem; }
+        .form-group label { display:block; font-size:.75rem; color:var(--text-2); margin-bottom:.4rem; font-weight:500; text-transform:uppercase; letter-spacing:.05em; }
+        .form-group input, .form-group select, .form-group textarea { width:100%; background:var(--input-bg); border:1px solid var(--input-border); color:var(--text); padding:.65rem .9rem; border-radius:8px; font-size:.85rem; transition:.3s; outline:none; font-family:'Inter',sans-serif; }
+        .form-group select { cursor:pointer; appearance:none; background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%239ca3af' d='M6 8L1 3h10z'/%3E%3C/svg%3E"); background-repeat:no-repeat; background-position:right 12px center; padding-right:2rem; }
+        .form-group select option { background:var(--bg-card); color:var(--text); }
+        .form-group textarea { resize:vertical; min-height:70px; }
+        .form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color:var(--pink); background:#1e2333; }
+        .form-hint { font-size:.7rem; color:#6b7280; margin-top:.25rem; }
+        
+        .grid-2 { display:grid; grid-template-columns:1fr 1fr; gap:1rem; }
+        .grid-3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:1rem; }
+        .grid-5 { display:grid; grid-template-columns:2fr 1.5fr 1.5fr 2fr 0.8fr; gap:.6rem; align-items:end; }
+        
+        .btn { padding:.65rem 1.3rem; border-radius:8px; font-weight:600; cursor:pointer; border:none; transition:all .25s; font-size:.82rem; display:inline-flex; align-items:center; gap:.4rem; }
+        .btn:hover { opacity:.9; transform:translateY(-1px); box-shadow:0 4px 15px rgba(0,0,0,0.3); }
+        .btn.pink { background:var(--pink); color:#fff; }
+        .btn.green { background:var(--green); color:#fff; }
+        .btn.red { background:var(--red); color:#fff; }
+        .btn.gold { background:var(--gold); color:#000; }
+        .btn.orange { background:var(--orange); color:#000; }
+        .btn.purple { background:var(--purple); color:#fff; }
+        
+        .card-mini { background:rgba(255,255,255,0.02); border:1px solid var(--border); border-radius:10px; padding:1rem; }
+        .card-mini h4 { font-family:'Space Grotesk',sans-serif; font-size:.82rem; margin-bottom:.5rem; }
+        .card-mini input, .card-mini select { width:100%; background:var(--input-bg); border:1px solid var(--input-border); color:var(--text); padding:.5rem; border-radius:6px; font-size:.85rem; }
+        
+        .recompensa-option { background:var(--input-bg); border:1px solid var(--input-border); border-radius:10px; padding:.8rem 1rem; cursor:pointer; transition:.3s; }
+        .recompensa-option:hover { border-color:var(--pink); }
+        .recompensa-option.selected { border-color:var(--pink); background:rgba(236,72,153,.08); }
+        .recompensa-option input[type="checkbox"] { accent-color:var(--pink); margin-right:.5rem; }
+        
+        .platform-icons { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:.8rem; }
+        .platform-icon { padding:.45rem .9rem; border-radius:8px; border:1px solid var(--input-border); cursor:pointer; transition:.3s; font-size:.8rem; display:flex; align-items:center; gap:.4rem; background:var(--input-bg); color:var(--text-2); }
+        .platform-icon:hover { border-color:var(--pink); color:var(--text); }
+        .platform-icon.selected { border-color:var(--pink); background:rgba(236,72,153,.1); color:var(--pink); }
+        
+        .inscricao-card { background:rgba(255,255,255,0.015); border:1px solid var(--border); border-radius:12px; padding:1.1rem; margin-bottom:.7rem; }
+        .inscricao-card .status { display:inline-block; padding:.2rem .7rem; border-radius:99px; font-size:.68rem; font-weight:600; }
+        .status.pendente { background:rgba(245,158,11,.15); color:var(--orange); }
+        .status.aprovado { background:rgba(16,185,129,.15); color:var(--green); }
+        .status.recusado { background:rgba(239,68,68,.15); color:var(--red); }
+        .status.sorteio { background:rgba(99,102,241,.15); color:var(--primary); }
+        .inscricao-card .row { display:flex; gap:.5rem; align-items:center; flex-wrap:wrap; margin:.25rem 0; font-size:.78rem; }
+        .inscricao-card .row strong { color:var(--text-2); min-width:65px; font-size:.7rem; }
+        .inscricao-card .actions { margin-top:.7rem; display:flex; gap:.35rem; flex-wrap:wrap; }
+        
+        .key-card {
+            background:rgba(255,255,255,0.02); border:1px solid var(--border);
+            border-radius:12px; overflow:hidden; margin-bottom:.6rem;
+            display:flex; gap:0;
+        }
+        .key-card.usada { opacity:.5; }
+        .key-card .key-wallpaper {
+            width:120px; min-height:80px; flex-shrink:0;
+            background-size:cover; background-position:center;
+            background-color:#1a1f2e; position:relative;
+        }
+        .key-card .key-wallpaper .key-plat-badge {
+            position:absolute; top:.4rem; left:.4rem;
+            background:rgba(0,0,0,.7); padding:.15rem .5rem;
+            border-radius:4px; font-size:.6rem; font-weight:600;
+        }
+        .key-card .key-info { flex:1; padding:.8rem 1rem; }
+        .key-card .key-game { font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:.9rem; }
+        .key-card .key-code { font-family:'Courier New',monospace; font-size:.7rem; color:var(--gold); }
+        .key-card .key-meta { font-size:.65rem; color:var(--text-2); }
+        .key-card .key-actions { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.3rem; padding:.8rem; }
+        .key-card .key-status { font-size:.62rem; padding:.2rem .5rem; border-radius:99px; font-weight:600; }
+        .key-card .key-status.disponivel { background:rgba(16,185,129,.15); color:var(--green); }
+        .key-card .key-status.entregue { background:rgba(239,68,68,.15); color:var(--red); }
+        
+        .key-select-grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(250px,1fr)); gap:.5rem; max-height:300px; overflow-y:auto; }
+        .key-select-item {
+            background:rgba(255,255,255,0.02); border:1px solid var(--border);
+            border-radius:10px; padding:.7rem; display:flex; align-items:center;
+            gap:.6rem; cursor:pointer; transition:.3s;
+        }
+        .key-select-item:hover { border-color:var(--pink); }
+        .key-select-item.selected { border-color:var(--purple); background:rgba(168,85,247,0.08); }
+        .key-select-item .ks-img { width:45px; height:45px; border-radius:6px; background-size:cover; background-position:center; flex-shrink:0; background-color:#1a1f2e; }
+        .key-select-item .ks-info { flex:1; min-width:0; }
+        .key-select-item .ks-nome { font-size:.8rem; font-weight:600; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .key-select-item .ks-plat { font-size:.65rem; color:var(--text-2); }
+        .key-select-item input[type="checkbox"] { accent-color:var(--purple); flex-shrink:0; }
+        
+        .toast { position:fixed; top:1.5rem; right:1.5rem; z-index:400; background:var(--bg-card); border:1px solid var(--red); padding:.8rem 1.2rem; border-radius:12px; font-size:.83rem; transform:translateX(140%); transition:all .3s; max-width:380px; }
+        .toast.show { transform:translateX(0); }
+        .toast.ok { border-color:var(--green); }
+        
+        @media (max-width:768px) {
+            .main-layout { grid-template-columns:1fr; padding:.8rem; }
+            .sidebar { display:flex; flex-wrap:wrap; gap:.3rem; position:static; }
+            .sidebar-btn { width:auto; font-size:.7rem; padding:.4rem .6rem; }
+            .grid-2, .grid-3, .grid-5 { grid-template-columns:1fr; }
+            .key-card { flex-direction:column; }
+            .key-card .key-wallpaper { width:100%; height:100px; }
+        }
+    </style>
+</head>
+<body>
+<div id="toast" class="toast"></div>
+
+<header>
+    <a href="admin.html" class="logo"><em>🌟</em> Looto Admin | Influencers</a>
+    <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+    <div style="display:flex;gap:.4rem;flex-wrap:wrap;">
+        <a href="influencer.html" class="btn-header" target="_blank">🌐 Ver Página</a>
+        <a href="admin.html" class="btn-header">📊 Dashboard</a>
+        <button class="btn-header" onclick="logout()">🚪 Sair</button>
+    </div>
+</header>
+
+<div class="main-layout">
+    <aside class="sidebar">
+        <a href="admin.html" class="sidebar-btn">📊 Dashboard</a>
+        <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+        <a href="abots.html" class="sidebar-btn">🤖 Bots</a>
+        <a href="asorteios.html" class="sidebar-btn">🎁 Sorteios</a>
+        <a href="alogsorteios.html" class="sidebar-btn">📋 Log Sorteios</a>
+        <a href="achat.html" class="sidebar-btn">💬 Chat</a>
+        <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+        <a href="aloja.html" class="sidebar-btn">🛒 Loja</a>
+        <a href="admins.html" class="sidebar-btn">🔑 Admins</a>
+        <a href="ainfluencer.html" class="sidebar-btn active">🌟 Influencers</a>
+        <a href="arecompensas.html" class="sidebar-btn">🎯 Recompensas</a>
+        <a href="aferramentas.html" class="sidebar-btn">🔧 Ferramentas</a>
+    </aside>
+    
+    <div>
+        <!-- CONFIGURAÇÕES -->
+        <div class="panel">
+            <div class="panel-title">⚙️ Configurações <span class="badge on" id="status-badge" style="display:none;">ATIVO</span><span class="badge off" id="status-badge-off">INATIVO</span></div>
+            <div class="grid-2">
+                <div>
+                    <div class="form-group"><label>📛 Nome</label><input type="text" id="cfg-titulo"></div>
+                    <div class="form-group"><label>📝 Descrição</label><textarea id="cfg-descricao"></textarea></div>
+                    <div class="grid-2">
+                        <div class="form-group"><label>👥 Vagas (0=∞)</label><input type="number" id="cfg-maxvagas" value="0"></div>
+                        <div class="form-group"><label>🔒 Nível Mínimo</label><select id="cfg-nivelmin"><option value="publico">🌍 Público</option><option value="bronze">🟤 Bronze+</option><option value="platina">🪙 Platina+</option><option value="ouro">🥇 Ouro+</option><option value="diamante">💎 Diamante</option></select></div>
+                    </div>
+                </div>
+                <div>
+                    <div class="form-group"><label>📧 Email</label><input type="text" id="cfg-email"></div>
+                    <div class="form-group"><label>💬 Discord</label><input type="text" id="cfg-discord"></div>
+                    <div class="form-group"><label>📱 Contato</label><input type="text" id="cfg-contato"></div>
+                    <div class="form-group"><label>🖼️ Wallpaper</label><input type="text" id="cfg-wallpaper"></div>
+                    <div class="form-group"><label>⏱️ Expira</label><input type="datetime-local" id="cfg-expira"></div>
+                </div>
+            </div>
+            <button class="btn pink" onclick="salvarConfig()">💾 Salvar</button>
+            <button class="btn green" id="btn-toggle" onclick="togglePrograma()">▶️ Ativar</button>
+            <button class="btn red" onclick="limparDadosAntigos()">🧹 Limpar &gt;24h</button>
+        </div>
+        
+        <!-- REGRAS -->
+        <div class="panel">
+            <div class="panel-title">📋 Regras</div>
+            <div class="platform-icons" id="platform-tabs">
+                <span class="platform-icon selected" data-plat="youtube">▶️ YouTube</span>
+                <span class="platform-icon" data-plat="tiktok">🎵 TikTok</span>
+                <span class="platform-icon" data-plat="instagram">📷 Instagram</span>
+                <span class="platform-icon" data-plat="twitch">🎮 Twitch</span>
+                <span class="platform-icon" data-plat="kick">🥊 Kick</span>
+            </div>
+            <div class="grid-3">
+                <div class="form-group"><label>👁️ Views</label><input type="number" id="plat-views" value="0"></div>
+                <div class="form-group"><label>👥 Seguidores</label><input type="number" id="plat-followers" value="0"></div>
+                <div class="form-group"><label>❤️ Likes</label><input type="number" id="plat-likes" value="0"></div>
+            </div>
+            <div class="form-group"><label>📝 Instruções</label><textarea id="plat-instrucoes"></textarea></div>
+            <button class="btn pink" onclick="salvarRegras()">💾 Salvar</button>
+        </div>
+        
+        <!-- RECOMPENSAS FIXAS -->
+        <div class="panel">
+            <div class="panel-title">🎁 Recompensas Fixas (aprovação)</div>
+            <div class="grid-2" style="margin-bottom:1rem;">
+                <label class="recompensa-option selected" id="rec-opt-lootmoney"><input type="checkbox" checked onchange="toggleRec(this)"> 💰 LootMoney</label>
+                <label class="recompensa-option selected" id="rec-opt-xp"><input type="checkbox" checked onchange="toggleRec(this)"> ⭐ XP</label>
+                <label class="recompensa-option" id="rec-opt-nivel"><input type="checkbox" onchange="toggleRec(this)"> 📈 Nível</label>
+                <label class="recompensa-option" id="rec-opt-key"><input type="checkbox" onchange="toggleRec(this)"> 🔑 Key</label>
+            </div>
+            <div class="grid-3">
+                <div class="card-mini" id="rec-cfg-lootmoney"><h4>💰 LootMoney</h4><input type="number" id="rec-lootmoney" value="100"></div>
+                <div class="card-mini" id="rec-cfg-xp"><h4>⭐ XP</h4><input type="number" id="rec-xp" value="500"></div>
+                <div class="card-mini" id="rec-cfg-nivel" style="display:none;"><h4>📈 Nível</h4><select id="rec-nivel"><option value="0">Bronze</option><option value="1">Platina</option><option value="2">Ouro</option><option value="3">Diamante</option></select></div>
+            </div>
+            <button class="btn pink" onclick="salvarRecompensas()">💾 Salvar</button>
+        </div>
+        
+        <!-- SORTEIO EXCLUSIVO COM SELEÇÃO DE KEYS -->
+        <div class="panel">
+            <div class="panel-title">🎰 Sorteio Exclusivo <span style="font-size:.7rem;color:var(--text-2);">(apenas aprovados)</span></div>
+            <label class="recompensa-option" style="margin-bottom:1rem;">
+                <input type="checkbox" id="sorteio-ativo" onchange="toggleSorteio()"> ✅ Ativar Sorteio
+            </label>
+            <div id="sorteio-config" style="display:none;">
+                <div class="grid-3">
+                    <div class="form-group"><label>🎁 Nome</label><input type="text" id="sorteio-nome" placeholder="Sorteio Exclusivo"></div>
+                    <div class="form-group"><label>👥 Máx (0=∞)</label><input type="number" id="sorteio-max" value="0"></div>
+                    <div class="form-group"><label>🏆 Ganhadores</label><input type="number" id="sorteio-ganhadores" value="1"></div>
+                </div>
+                <div class="form-group"><label>⏱️ Expira</label><input type="datetime-local" id="sorteio-expira"></div>
+                <div class="form-group"><label>📝 Descrição</label><textarea id="sorteio-descricao"></textarea></div>
+                
+                <!-- GANHADOR -->
+                <h4 style="font-family:'Space Grotesk',sans-serif;margin:1rem 0 .5rem;color:var(--gold);">🏆 Recompensa do Ganhador</h4>
+                <div class="grid-2">
+                    <div class="form-group"><label>💰 LootMoney</label><input type="number" id="sort-win-lootmoney" value="500"></div>
+                    <div class="form-group"><label>⭐ XP</label><input type="number" id="sort-win-xp" value="1000"></div>
+                    <div class="form-group"><label>📈 Setar Nível</label><select id="sort-win-nivel"><option value="-1">Não alterar</option><option value="0">Bronze</option><option value="1">Platina</option><option value="2">Ouro</option><option value="3">Diamante</option></select></div>
+                </div>
+                <div class="form-group">
+                    <label>🔑 Keys para o GANHADOR (marque quais podem ser sorteadas)</label>
+                    <div class="key-select-grid" id="keys-ganhador-grid"><div style="color:var(--text-2);padding:1rem;">Carregando keys...</div></div>
+                </div>
+                
+                <!-- PERDEDORES -->
+                <h4 style="font-family:'Space Grotesk',sans-serif;margin:1rem 0 .5rem;color:var(--text-2);">😢 Consolação para Perdedores</h4>
+                <div class="grid-3">
+                    <div class="form-group"><label>💰 LootMoney</label><input type="number" id="sort-lose-lootmoney" value="0"></div>
+                    <div class="form-group"><label>⭐ XP</label><input type="number" id="sort-lose-xp" value="0"></div>
+                </div>
+                <div class="form-group">
+                    <label>🔑 Keys para PERDEDORES (marque quais podem ser sorteadas)</label>
+                    <div class="key-select-grid" id="keys-perdedores-grid"><div style="color:var(--text-2);padding:1rem;">Carregando keys...</div></div>
+                </div>
+                
+                <button class="btn purple" onclick="realizarSorteio()" style="margin-top:.8rem;">🎲 Realizar Sorteio Agora</button>
+            </div>
+            <button class="btn pink" onclick="salvarSorteio()" style="margin-top:.8rem;">💾 Salvar Sorteio</button>
+        </div>
+        
+        <!-- BANCO DE KEYS -->
+        <div class="panel">
+            <div class="panel-title">🏦 Banco de Keys <span id="total-keys-banco" style="font-size:.7rem;color:var(--text-2);">0</span></div>
+            <div class="grid-5" style="margin-bottom:1rem;">
+                <div class="form-group"><label>🎮 Nome</label><input type="text" id="key-nome"></div>
+                <div class="form-group"><label>🖥️ Plataforma</label><select id="key-plataforma"><option value="Steam">Steam</option><option value="Epic">Epic</option><option value="Xbox">Xbox</option><option value="PSN">PSN</option><option value="GOG">GOG</option></select></div>
+                <div class="form-group"><label>🔑 Código</label><input type="text" id="key-codigo"></div>
+                <div class="form-group"><label>🖼️ Wallpaper</label><input type="text" id="key-wallpaper"></div>
+                <div><button class="btn gold" onclick="adicionarKey()" style="width:100%;">➕</button></div>
+            </div>
+            <div id="banco-keys-list" style="max-height:400px;overflow-y:auto;"></div>
+        </div>
+        
+        <!-- INSCRIÇÕES -->
+        <div class="panel">
+            <div class="panel-title">📨 Inscrições <span id="total-inscricoes" style="font-size:.7rem;color:var(--text-2);"></span></div>
+            <div style="margin-bottom:.8rem;display:flex;gap:.5rem;">
+                <select id="filtro-status" onchange="carregarInscricoes()" style="background:var(--input-bg);border:1px solid var(--input-border);color:var(--text);padding:.5rem .8rem;border-radius:6px;font-size:.8rem;"><option value="todas">📋 Todas</option><option value="pendente">🟡 Pendentes</option><option value="aprovado">🟢 Aprovadas</option><option value="recusado">🔴 Recusadas</option><option value="sorteio">🎰 Sorteio</option></select>
+                <input type="text" id="filtro-busca" placeholder="🔍 Buscar..." oninput="carregarInscricoes()" style="background:var(--input-bg);border:1px solid var(--input-border);color:var(--text);padding:.5rem .8rem;border-radius:6px;flex:1;">
+                <button class="btn red" onclick="removerTodasRecusadas()">🗑️</button>
+            </div>
+            <div id="inscricoes-list" style="max-height:60vh;overflow-y:auto;"></div>
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { getDatabase, ref, get, set, update, remove, push, onValue, query, orderByChild, limitToLast } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+    authDomain: "looto-f46e5.firebaseapp.com",
+    databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+    projectId: "looto-f46e5",
+    storageBucket: "looto-f46e5.firebasestorage.app",
+    messagingSenderId: "295066400995",
+    appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+let plataformaSelecionada = 'youtube';
+let todasInscricoes = [];
+let dadosPrograma = {};
+let bancoKeys = [];
+let keysSorteioSelecionadas = { ganhador: [], perdedores: [] };
+const LIMITE_HORAS = 24;
+const LIMITE_CONSULTAS = 200; // limite para queries de limpeza
+
+function toast(msg, ok=false) {
+    const el = document.getElementById('toast');
+    el.textContent = msg;
+    el.className = 'toast show' + (ok?' ok':'');
+    clearTimeout(toast._t);
+    toast._t = setTimeout(() => el.classList.remove('show'), 3500);
+}
+
+window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+
+async function checkAdmin(user) {
+    if(!user) return false;
+    if(user.email === 'startubez.com@gmail.com') return true;
+    const snap = await get(ref(db, 'admins'));
+    if(!snap.exists()) return false;
+    for(let key of Object.keys(snap.val())){ if(snap.val()[key].uid===user.uid||snap.val()[key].email===user.email) return true; }
+    return false;
+}
+
+window.toggleRec = function(cb) {
+    document.getElementById(cb.parentElement.id).classList.toggle('selected', cb.checked);
+    document.getElementById('rec-cfg-lootmoney').style.display = document.querySelector('#rec-opt-lootmoney input').checked?'block':'none';
+    document.getElementById('rec-cfg-xp').style.display = document.querySelector('#rec-opt-xp input').checked?'block':'none';
+    document.getElementById('rec-cfg-nivel').style.display = document.querySelector('#rec-opt-nivel input').checked?'block':'none';
+};
+
+window.toggleSorteio = function() {
+    const ativo = document.getElementById('sorteio-ativo').checked;
+    document.getElementById('sorteio-config').style.display = ativo ? 'block' : 'none';
+    if(ativo) carregarKeysSorteio();
+};
+
+document.getElementById('platform-tabs').addEventListener('click', (e) => {
+    if(e.target.classList.contains('platform-icon')){
+        document.querySelectorAll('.platform-icon').forEach(el=>el.classList.remove('selected'));
+        e.target.classList.add('selected');
+        plataformaSelecionada = e.target.dataset.plat;
+        carregarRegrasPlataforma();
+    }
+});
+
+async function carregarDados() {
+    const snap = await get(ref(db, 'programaInfluencer'));
+    dadosPrograma = snap.exists() ? snap.val() : { ativo: false };
+    
+    document.getElementById('cfg-titulo').value = dadosPrograma.titulo || '';
+    document.getElementById('cfg-descricao').value = dadosPrograma.descricao || '';
+    document.getElementById('cfg-maxvagas').value = dadosPrograma.maxVagas || 0;
+    document.getElementById('cfg-nivelmin').value = dadosPrograma.nivelMin || 'publico';
+    document.getElementById('cfg-email').value = dadosPrograma.emailSuporte || '';
+    document.getElementById('cfg-discord').value = dadosPrograma.discord || '';
+    document.getElementById('cfg-contato').value = dadosPrograma.contato || '';
+    document.getElementById('cfg-wallpaper').value = dadosPrograma.wallpaper || '';
+    document.getElementById('cfg-expira').value = dadosPrograma.expiraEm ? new Date(dadosPrograma.expiraEm).toISOString().slice(0,16) : '';
+    
+    document.getElementById('status-badge').style.display = dadosPrograma.ativo ? 'inline' : 'none';
+    document.getElementById('status-badge-off').style.display = dadosPrograma.ativo ? 'none' : 'inline';
+    document.getElementById('btn-toggle').textContent = dadosPrograma.ativo ? '⏸️ Desativar' : '▶️ Ativar';
+    document.getElementById('btn-toggle').className = 'btn ' + (dadosPrograma.ativo ? 'red' : 'green');
+    
+    const rec = dadosPrograma.recompensa || {};
+    document.querySelector('#rec-opt-lootmoney input').checked = !!rec.lootmoney;
+    document.querySelector('#rec-opt-xp input').checked = !!rec.xp;
+    document.querySelector('#rec-opt-nivel input').checked = rec.nivel !== undefined && rec.nivel >= 0;
+    document.querySelector('#rec-opt-key input').checked = !!rec.usarKeys;
+    document.getElementById('rec-lootmoney').value = rec.lootmoney || 0;
+    document.getElementById('rec-xp').value = rec.xp || 0;
+    document.getElementById('rec-nivel').value = rec.nivel !== undefined ? rec.nivel : 0;
+    ['rec-opt-lootmoney','rec-opt-xp','rec-opt-nivel','rec-opt-key'].forEach(id => document.getElementById(id).classList.toggle('selected', document.querySelector('#'+id+' input').checked));
+    document.getElementById('rec-cfg-lootmoney').style.display = document.querySelector('#rec-opt-lootmoney input').checked?'block':'none';
+    document.getElementById('rec-cfg-xp').style.display = document.querySelector('#rec-opt-xp input').checked?'block':'none';
+    document.getElementById('rec-cfg-nivel').style.display = document.querySelector('#rec-opt-nivel input').checked?'block':'none';
+    
+    const sort = dadosPrograma.sorteio || {};
+    document.getElementById('sorteio-ativo').checked = !!sort.ativo;
+    document.getElementById('sorteio-config').style.display = sort.ativo ? 'block' : 'none';
+    document.getElementById('sorteio-nome').value = sort.nome || '';
+    document.getElementById('sorteio-max').value = sort.max || 0;
+    document.getElementById('sorteio-ganhadores').value = sort.ganhadores || 1;
+    document.getElementById('sorteio-expira').value = sort.expiraEm ? new Date(sort.expiraEm).toISOString().slice(0,16) : '';
+    document.getElementById('sorteio-descricao').value = sort.descricao || '';
+    
+    const win = sort.ganhador || {};
+    document.getElementById('sort-win-lootmoney').value = win.lootmoney || 0;
+    document.getElementById('sort-win-xp').value = win.xp || 0;
+    document.getElementById('sort-win-nivel').value = win.nivel !== undefined ? win.nivel : -1;
+    keysSorteioSelecionadas.ganhador = win.keysIds || [];
+    
+    const lose = sort.perdedor || {};
+    document.getElementById('sort-lose-lootmoney').value = lose.lootmoney || 0;
+    document.getElementById('sort-lose-xp').value = lose.xp || 0;
+    keysSorteioSelecionadas.perdedores = lose.keysIds || [];
+    
+    carregarBancoKeys();
+    carregarRegrasPlataforma();
+    carregarInscricoes();
+    if(sort.ativo) carregarKeysSorteio();
+}
+
+function carregarRegrasPlataforma(){
+    const regras = dadosPrograma.regras || {};
+    const r = regras[plataformaSelecionada] || {};
+    document.getElementById('plat-views').value = r.viewsMin || 0;
+    document.getElementById('plat-followers').value = r.seguidoresMin || 0;
+    document.getElementById('plat-likes').value = r.likesMin || 0;
+    document.getElementById('plat-instrucoes').value = r.instrucoes || '';
+}
+
+async function carregarBancoKeys() {
+    const snap = await get(ref(db, 'programaInfluencer/bancoKeys'));
+    bancoKeys = [];
+    if(snap.exists()) for(let key of Object.keys(snap.val())) bancoKeys.push({ id: key, ...snap.val()[key] });
+    renderizarBancoKeys();
+}
+
+function renderizarBancoKeys() {
+    const d = bancoKeys.filter(k => !k.usada).length;
+    document.getElementById('total-keys-banco').textContent = d + ' disponíveis';
+    const list = document.getElementById('banco-keys-list');
+    if(!bancoKeys.length) { list.innerHTML = '<div style="text-align:center;padding:2rem;color:var(--text-2);">🏦 Vazio</div>'; return; }
+    list.innerHTML = bancoKeys.sort((a,b)=>(b.adicionadaEm||0)-(a.adicionadaEm||0)).map(k => `
+        <div class="key-card ${k.usada?'usada':''}">
+            <div class="key-wallpaper" style="background-image:url('${k.wallpaperUrl||''}');"><span class="key-plat-badge">${k.plataforma}</span></div>
+            <div class="key-info"><div class="key-game">🎮 ${k.nome}</div><div class="key-code">🔑 ${k.codigo}</div>${k.usada?`<div class="key-meta">Entregue: ${k.entreguePara||'N/D'}</div>`:''}</div>
+            <div class="key-actions"><span class="key-status ${k.usada?'entregue':'disponivel'}">${k.usada?'Entregue':'Disponível'}</span><button class="btn red" onclick="removerKey('${k.id}')" style="padding:.25rem .5rem;font-size:.65rem;">🗑️</button></div>
+        </div>`).join('');
+}
+
+function carregarKeysSorteio() {
+    const keysDisponiveis = bancoKeys.filter(k => !k.usada);
+    
+    const gridGanhador = document.getElementById('keys-ganhador-grid');
+    if(keysDisponiveis.length === 0) {
+        gridGanhador.innerHTML = '<div style="color:var(--text-2);padding:1rem;">Nenhuma key disponível no banco</div>';
+    } else {
+        gridGanhador.innerHTML = keysDisponiveis.map(k => `
+            <label class="key-select-item ${keysSorteioSelecionadas.ganhador.includes(k.id) ? 'selected' : ''}">
+                <div class="ks-img" style="background-image:url('${k.wallpaperUrl||''}');"></div>
+                <div class="ks-info"><div class="ks-nome">🎮 ${k.nome}</div><div class="ks-plat">${k.plataforma}</div></div>
+                <input type="checkbox" value="${k.id}" ${keysSorteioSelecionadas.ganhador.includes(k.id) ? 'checked' : ''} onchange="toggleKeySorteio(this, 'ganhador')">
+            </label>`).join('');
+    }
+    
+    const gridPerdedores = document.getElementById('keys-perdedores-grid');
+    if(keysDisponiveis.length === 0) {
+        gridPerdedores.innerHTML = '<div style="color:var(--text-2);padding:1rem;">Nenhuma key disponível no banco</div>';
+    } else {
+        gridPerdedores.innerHTML = keysDisponiveis.map(k => `
+            <label class="key-select-item ${keysSorteioSelecionadas.perdedores.includes(k.id) ? 'selected' : ''}">
+                <div class="ks-img" style="background-image:url('${k.wallpaperUrl||''}');"></div>
+                <div class="ks-info"><div class="ks-nome">🎮 ${k.nome}</div><div class="ks-plat">${k.plataforma}</div></div>
+                <input type="checkbox" value="${k.id}" ${keysSorteioSelecionadas.perdedores.includes(k.id) ? 'checked' : ''} onchange="toggleKeySorteio(this, 'perdedores')">
+            </label>`).join('');
+    }
+}
+
+window.toggleKeySorteio = function(cb, tipo) {
+    const keyId = cb.value;
+    const label = cb.closest('.key-select-item');
+    if(cb.checked) {
+        if(!keysSorteioSelecionadas[tipo].includes(keyId)) keysSorteioSelecionadas[tipo].push(keyId);
+        label.classList.add('selected');
+    } else {
+        keysSorteioSelecionadas[tipo] = keysSorteioSelecionadas[tipo].filter(id => id !== keyId);
+        label.classList.remove('selected');
+    }
+};
+
+window.adicionarKey = async function() {
+    const n = document.getElementById('key-nome').value.trim();
+    const c = document.getElementById('key-codigo').value.trim();
+    if(!n||!c) return toast('❌ Preencha!');
+    await push(ref(db, 'programaInfluencer/bancoKeys'), {
+        nome: n, plataforma: document.getElementById('key-plataforma').value,
+        codigo: c, wallpaperUrl: document.getElementById('key-wallpaper').value.trim(),
+        usada: false, adicionadaEm: Date.now()
+    });
+    document.getElementById('key-nome').value = '';
+    document.getElementById('key-codigo').value = '';
+    document.getElementById('key-wallpaper').value = '';
+    toast('🔑 Adicionada!', true);
+    carregarBancoKeys();
+};
+
+window.removerKey = async function(id) { if(!confirm('Remover?')) return; await remove(ref(db, 'programaInfluencer/bancoKeys/'+id)); carregarBancoKeys(); };
+
+function consumirKeyEspecifica(keyId, uid, nome) {
+    const key = bancoKeys.find(k => k.id === keyId && !k.usada);
+    if(!key) return null;
+    update(ref(db, 'programaInfluencer/bancoKeys/'+key.id), { usada: true, entreguePara: nome||'N/D', entregueUid: uid||'N/D', entregueEm: Date.now() });
+    return key;
+}
+
+function consumirKeyAleatoria(uid, nome) {
+    const key = bancoKeys.find(k => !k.usada);
+    if(!key) return null;
+    update(ref(db, 'programaInfluencer/bancoKeys/'+key.id), { usada: true, entreguePara: nome||'N/D', entregueUid: uid||'N/D', entregueEm: Date.now() });
+    return key;
+}
+
+function sortearKeyDaLista(keysIds) {
+    const disponiveis = keysIds.map(id => bancoKeys.find(k => k.id === id && !k.usada)).filter(k => k);
+    if(!disponiveis.length) return null;
+    return disponiveis[Math.floor(Math.random() * disponiveis.length)];
+}
+
+async function enviarKeyChat(uid, key) {
+    if(!key) return;
+    await push(ref(db, 'chat'), { uid, nome:'LootoBot 🤖', texto:'🎁 Key do programa!', ts:Date.now(), type:'treasure', keyGame:key.nome, keyPlatform:key.plataforma, keyCode:key.codigo, keyImage:key.wallpaperUrl||'', opened:false });
+}
+
+async function enviarNotificacao(uid, nome, tipo, titulo, texto, rewards) {
+    await push(ref(db, 'chat'), { uid:'bot', nome:'LootoBot 🤖', texto, ts:Date.now(), type:'notification', notifType:tipo, notifTitle:titulo, targetUid:uid, rewards:rewards||{} });
+}
+
+window.salvarConfig = async function() {
+    const e = document.getElementById('cfg-expira').value;
+    await set(ref(db, 'programaInfluencer'), {
+        titulo: document.getElementById('cfg-titulo').value.trim()||'Programa',
+        descricao: document.getElementById('cfg-descricao').value.trim()||'',
+        maxVagas: parseInt(document.getElementById('cfg-maxvagas').value)||0,
+        nivelMin: document.getElementById('cfg-nivelmin').value,
+        emailSuporte: document.getElementById('cfg-email').value.trim()||'',
+        discord: document.getElementById('cfg-discord').value.trim()||'',
+        contato: document.getElementById('cfg-contato').value.trim()||'',
+        wallpaper: document.getElementById('cfg-wallpaper').value.trim()||'',
+        expiraEm: e?new Date(e).getTime():null,
+        ativo: dadosPrograma.ativo||false
+    });
+    toast('⚙️ Salvo!', true);
+};
+
+window.salvarRegras = async function() {
+    const r = dadosPrograma.regras || {};
+    r[plataformaSelecionada] = {
+        viewsMin: parseInt(document.getElementById('plat-views').value)||0,
+        seguidoresMin: parseInt(document.getElementById('plat-followers').value)||0,
+        likesMin: parseInt(document.getElementById('plat-likes').value)||0,
+        instrucoes: document.getElementById('plat-instrucoes').value.trim()||''
+    };
+    await set(ref(db, 'programaInfluencer/regras'), r);
+    toast('📋 Salvo!', true);
+};
+
+window.salvarRecompensas = async function() {
+    const rec = {};
+    if(document.querySelector('#rec-opt-lootmoney input').checked) rec.lootmoney = parseInt(document.getElementById('rec-lootmoney').value)||0;
+    if(document.querySelector('#rec-opt-xp input').checked) rec.xp = parseInt(document.getElementById('rec-xp').value)||0;
+    if(document.querySelector('#rec-opt-nivel input').checked) rec.nivel = parseInt(document.getElementById('rec-nivel').value)||0;
+    rec.usarKeys = document.querySelector('#rec-opt-key input').checked;
+    await set(ref(db, 'programaInfluencer/recompensa'), rec);
+    toast('🎁 Salvo!', true);
+};
+
+window.salvarSorteio = async function() {
+    const sort = {
+        ativo: document.getElementById('sorteio-ativo').checked,
+        nome: document.getElementById('sorteio-nome').value.trim()||'Sorteio',
+        max: parseInt(document.getElementById('sorteio-max').value)||0,
+        ganhadores: parseInt(document.getElementById('sorteio-ganhadores').value)||1,
+        expiraEm: document.getElementById('sorteio-expira').value?new Date(document.getElementById('sorteio-expira').value).getTime():null,
+        descricao: document.getElementById('sorteio-descricao').value.trim()||'',
+        ganhador: {
+            lootmoney: parseInt(document.getElementById('sort-win-lootmoney').value)||0,
+            xp: parseInt(document.getElementById('sort-win-xp').value)||0,
+            nivel: parseInt(document.getElementById('sort-win-nivel').value),
+            keysIds: keysSorteioSelecionadas.ganhador
+        },
+        perdedor: {
+            lootmoney: parseInt(document.getElementById('sort-lose-lootmoney').value)||0,
+            xp: parseInt(document.getElementById('sort-lose-xp').value)||0,
+            keysIds: keysSorteioSelecionadas.perdedores
+        },
+        participantes: (dadosPrograma.sorteio||{}).participantes||{}
+    };
+    await set(ref(db, 'programaInfluencer/sorteio'), sort);
+    dadosPrograma.sorteio = sort;
+    toast('🎰 Sorteio salvo!', true);
+};
+
+window.togglePrograma = async function() {
+    const n = !dadosPrograma.ativo;
+    await set(ref(db, 'programaInfluencer/ativo'), n);
+    dadosPrograma.ativo = n;
+    document.getElementById('status-badge').style.display = n?'inline':'none';
+    document.getElementById('status-badge-off').style.display = n?'none':'inline';
+    document.getElementById('btn-toggle').textContent = n?'⏸️ Desativar':'▶️ Ativar';
+    document.getElementById('btn-toggle').className = 'btn '+(n?'red':'green');
+    toast(n?'🌟 ATIVADO!':'⏸️ Desativado', true);
+};
+
+// ═══ REALIZAR SORTEIO (OTIMIZADO - busca usuários em lote) ═══
+window.realizarSorteio = async function() {
+    const sort = dadosPrograma.sorteio;
+    if(!sort||!sort.ativo) return toast('⚠️ Inativo!');
+    const parts = Object.values(sort.participantes||{});
+    if(!parts.length) return toast('⚠️ Sem participantes!');
+    
+    const nGanhadores = Math.min(sort.ganhadores||1, parts.length);
+    const pool = [...parts];
+    const ganhadores = [];
+    for(let i=0;i<nGanhadores;i++) { const idx=Math.floor(Math.random()*pool.length); ganhadores.push(pool.splice(idx,1)[0]); }
+    const perdedores = pool;
+    
+    const win = sort.ganhador||{};
+    const lose = sort.perdedor||{};
+    
+    // ═══ BUSCAR TODOS OS USUÁRIOS EM LOTE (evita N+1 queries) ═══
+    const todosIds = [...new Set([...ganhadores.map(g=>g.uid), ...perdedores.map(p=>p.uid)])];
+    const userSnaps = await Promise.all(todosIds.map(uid => get(ref(db, 'usuarios/' + uid))));
+    const userDataMap = {};
+    todosIds.forEach((uid, i) => { userDataMap[uid] = userSnaps[i].val() || {}; });
+    
+    const updates = [];
+    const notificacoes = [];
+    const keysParaEntregar = [];
+    
+    // Processar ganhadores
+    for(const g of ganhadores) {
+        const uData = userDataMap[g.uid] || {};
+        if(win.lootmoney > 0) updates.push(update(ref(db, 'usuarios/'+g.uid), { dinheiro: (uData.dinheiro||0) + win.lootmoney }));
+        if(win.xp > 0) updates.push(update(ref(db, 'usuarios/'+g.uid), { pontos: (uData.pontos||0) + win.xp }));
+        if(win.nivel !== undefined && win.nivel >= 0) updates.push(update(ref(db, 'usuarios/'+g.uid), { nivelConta: win.nivel }));
+        
+        if(win.keysIds && win.keysIds.length > 0) {
+            const key = sortearKeyDaLista(win.keysIds);
+            if(key) {
+                consumirKeyEspecifica(key.id, g.uid, g.nome);
+                keysParaEntregar.push({ uid: g.uid, key });
+            }
+        }
+        
+        let txt = '🏆 <strong>'+(g.nome||'Usuário')+'</strong>, você GANHOU: <strong>'+(sort.nome||'Sorteio')+'</strong>! 🎉';
+        if(win.lootmoney) txt += '\n💰 +'+win.lootmoney+' LootMoney';
+        if(win.xp) txt += '\n⭐ +'+win.xp+' XP';
+        if(win.nivel !== undefined && win.nivel >= 0) txt += '\n📈 Nível '+['Bronze','Platina','Ouro','Diamante'][win.nivel];
+        notificacoes.push({ uid: g.uid, nome: g.nome, tipo: 'win', titulo: '🏆 '+sort.nome, texto: txt, rewards: { lootmoney: win.lootmoney||0, xp: win.xp||0 } });
+    }
+    
+    // Processar perdedores
+    for(const p of perdedores) {
+        const uData = userDataMap[p.uid] || {};
+        if(lose.lootmoney > 0) updates.push(update(ref(db, 'usuarios/'+p.uid), { dinheiro: (uData.dinheiro||0) + lose.lootmoney }));
+        if(lose.xp > 0) updates.push(update(ref(db, 'usuarios/'+p.uid), { pontos: (uData.pontos||0) + lose.xp }));
+        
+        if(lose.keysIds && lose.keysIds.length > 0) {
+            const key = sortearKeyDaLista(lose.keysIds);
+            if(key) {
+                consumirKeyEspecifica(key.id, p.uid, p.nome);
+                keysParaEntregar.push({ uid: p.uid, key });
+            }
+        }
+        
+        let txt = '😢 <strong>'+(p.nome||'Usuário')+'</strong>, não foi dessa vez no sorteio <strong>'+(sort.nome||'Sorteio')+'</strong>.\n🎁 Mas você ganhou uma recompensa de consolação:';
+        if(lose.lootmoney) txt += '\n💰 +'+lose.lootmoney+' LootMoney';
+        if(lose.xp) txt += '\n⭐ +'+lose.xp+' XP';
+        if(lose.keysIds && lose.keysIds.length > 0) txt += '\n🔑 Uma key aleatória!';
+        if(!lose.lootmoney && !lose.xp && (!lose.keysIds || !lose.keysIds.length)) txt += '\n😅 Continue participando!';
+        notificacoes.push({ uid: p.uid, nome: p.nome, tipo: 'lose', titulo: '😢 '+sort.nome, texto: txt, rewards: { lootmoney: lose.lootmoney||0, xp: lose.xp||0 } });
+    }
+    
+    // Executar todas as operações em paralelo
+    const todasPromises = [
+        ...updates,
+        ...keysParaEntregar.map(k => enviarKeyChat(k.uid, k.key)),
+        ...notificacoes.map(n => enviarNotificacao(n.uid, n.nome, n.tipo, n.titulo, n.texto, n.rewards)),
+        set(ref(db, 'programaInfluencer/sorteio/participantes'), {}),
+        set(ref(db, 'programaInfluencer/sorteio/ativo'), false)
+    ];
+    await Promise.all(todasPromises);
+    
+    dadosPrograma.sorteio = {...sort, ativo: false, participantes: {}};
+    carregarBancoKeys();
+    toast('🎉 Sorteio finalizado! '+ganhadores.length+' 🏆 | '+perdedores.length+' 😢', true);
+    carregarDados();
+};
+
+// ═══ LIMPEZA (OTIMIZADA COM LIMITTOLAST) ═══
+window.limparDadosAntigos = async function() {
+    if(!confirm('🧹 Limpar dados >'+LIMITE_HORAS+'h?')) return;
+    const limite = Date.now()-(LIMITE_HORAS*3600000);
+    let r = 0;
+    
+    // Usar limitToLast nas queries
+    const [is, cs] = await Promise.all([
+        get(query(ref(db, 'inscricoesInfluencer'), orderByChild('dataInscricao'), limitToLast(LIMITE_CONSULTAS))),
+        get(query(ref(db, 'chat'), orderByChild('ts'), limitToLast(LIMITE_CONSULTAS)))
+    ]);
+    
+    const promises = [];
+    if(is.exists()) {
+        is.forEach(c => {
+            const v = c.val();
+            if(v.status === 'recusado' && (v.recusadoEm || v.dataInscricao || 0) < limite) {
+                promises.push(remove(ref(db, 'inscricoesInfluencer/' + c.key))); r++;
+            }
+        });
+    }
+    if(cs.exists()) {
+        cs.forEach(c => {
+            const v = c.val();
+            if((v.type === 'notification' || v.type === 'treasure') && (v.ts || 0) < limite) {
+                promises.push(remove(ref(db, 'chat/' + c.key))); r++;
+            }
+        });
+    }
+    if(promises.length > 0) await Promise.all(promises);
+    toast('🧹 '+r+' itens removidos', true);
+    carregarInscricoes();
+};
+
+// Limpeza automática otimizada
+setInterval(async () => {
+    const limite = Date.now() - (LIMITE_HORAS * 3600000);
+    try {
+        const [is, cs] = await Promise.all([
+            get(query(ref(db, 'inscricoesInfluencer'), orderByChild('dataInscricao'), limitToLast(LIMITE_CONSULTAS))),
+            get(query(ref(db, 'chat'), orderByChild('ts'), limitToLast(LIMITE_CONSULTAS)))
+        ]);
+        const promises = [];
+        if(is.exists()) is.forEach(c => { const v = c.val(); if(v.status === 'recusado' && (v.recusadoEm || v.dataInscricao || 0) < limite) promises.push(remove(ref(db, 'inscricoesInfluencer/' + c.key))); });
+        if(cs.exists()) cs.forEach(c => { const v = c.val(); if((v.type === 'notification' || v.type === 'treasure') && (v.ts || 0) < limite) promises.push(remove(ref(db, 'chat/' + c.key))); });
+        if(promises.length > 0) await Promise.all(promises);
+    } catch(e) {}
+}, 3600000);
+
+async function carregarInscricoes(){
+    const snap = await get(ref(db, 'inscricoesInfluencer'));
+    todasInscricoes = [];
+    if(snap.exists()) for(let k of Object.keys(snap.val())) todasInscricoes.push({id:k, ...snap.val()[k]});
+    todasInscricoes.sort((a,b)=>(b.dataInscricao||0)-(a.dataInscricao||0));
+    renderizarInscricoes();
+}
+
+function renderizarInscricoes(){
+    const f = document.getElementById('filtro-status').value;
+    const b = document.getElementById('filtro-busca').value.toLowerCase();
+    let l = todasInscricoes;
+    if(f !== 'todas') l = l.filter(i => i.status === f);
+    if(b) l = l.filter(i => (i.nome||'').toLowerCase().includes(b) || (i.email||'').toLowerCase().includes(b) || (i.uid||'').toLowerCase().includes(b));
+    document.getElementById('total-inscricoes').textContent = l.length+' | '+todasInscricoes.filter(i=>i.status==='pendente').length+' pendentes';
+    if(!l.length){ document.getElementById('inscricoes-list').innerHTML = '<div style="text-align:center;padding:3rem;color:var(--text-2);">📭 Nenhuma</div>'; return; }
+    const sl = {pendente:'🟡 Pendente', aprovado:'🟢 Aprovado', recusado:'🔴 Recusado', sorteio:'🎰 Sorteio'};
+    document.getElementById('inscricoes-list').innerHTML = l.map(i=>`
+        <div class="inscricao-card">
+            <div style="display:flex;justify-content:space-between;"><strong>${i.nome||'Anônimo'}</strong><span class="status ${i.status||'pendente'}">${sl[i.status]||'Pendente'}</span></div>
+            <div class="row"><strong>UUID:</strong><code>${i.uid}</code></div>
+            <div class="row"><strong>Email:</strong>${i.email} | <strong>Plataforma:</strong>${i.plataforma} | <a href="${i.link}" target="_blank">Ver</a></div>
+            ${i.recompensaDada?`<div class="row"><strong>🎁:</strong>${i.recompensaDada}</div>`:''}
+            <div class="actions">
+                ${i.status==='pendente'?`<button class="btn green" onclick="aprovar('${i.id}')">✅</button><button class="btn red" onclick="recusar('${i.id}')">❌</button><button class="btn gold" onclick="darKey('${i.id}')">🔑</button>`:''}
+                ${i.status==='aprovado'&&dadosPrograma.sorteio?.ativo?`<button class="btn purple" onclick="addSorteio('${i.id}')">🎰</button>`:''}
+                ${i.status==='sorteio'?`<button class="btn gold" onclick="remSorteio('${i.id}')">🔓</button>`:''}
+                <button class="btn orange" onclick="msg('${i.uid}','${i.nome}')">💬</button>
+                <button class="btn red" onclick="remover('${i.id}')">🗑️</button>
+            </div>
+        </div>`).join('');
+}
+
+window.aprovar = async function(id){
+    const i = todasInscricoes.find(x=>x.id===id); if(!i) return;
+    const rec = dadosPrograma.recompensa||{}; let d = [];
+    try{
+        const ur = ref(db, 'usuarios/'+i.uid); const us = await get(ur); const ud = us.val()||{};
+        if(rec.lootmoney){ await update(ur, {dinheiro:(ud.dinheiro||0)+rec.lootmoney}); d.push('💰 +'+rec.lootmoney); }
+        if(rec.xp){ await update(ur, {pontos:(ud.pontos||0)+rec.xp}); d.push('⭐ +'+rec.xp); }
+        if(rec.nivel!==undefined&&rec.nivel>=0){ await update(ur, {nivelConta:rec.nivel}); d.push('📈 '+['Bronze','Platina','Ouro','Diamante'][rec.nivel]); }
+        if(rec.usarKeys){ const k = consumirKeyAleatoria(i.uid,i.nome); if(k){ await enviarKeyChat(i.uid,k); d.push('🔑 '+k.nome); carregarBancoKeys(); } }
+    }catch(e){}
+    await update(ref(db, 'inscricoesInfluencer/'+id), {status:'aprovado', recompensaDada:d.join(', ')||'Aprovado', aprovadoEm:Date.now()});
+    await enviarNotificacao(i.uid, i.nome, 'win', 'Programa Influencer', '🎉 <strong>'+i.nome+'</strong>, APROVADO!\n🎁 '+d.join(', '), {lootmoney:rec.lootmoney||0, xp:rec.xp||0});
+    toast('✅ Aprovado!', true); carregarInscricoes();
+};
+
+window.recusar = async function(id){
+    const m = prompt('Motivo:')||'Não especificado';
+    const i = todasInscricoes.find(x=>x.id===id);
+    await update(ref(db, 'inscricoesInfluencer/'+id), {status:'recusado', motivoRecusa:m, recusadoEm:Date.now()});
+    if(i) await enviarNotificacao(i.uid, i.nome, 'lose', 'Programa Influencer', '❌ <strong>'+i.nome+'</strong>, RECUSADO.\n📝 '+m);
+    toast('❌ Recusado', true); carregarInscricoes();
+};
+
+window.darKey = async function(id){
+    const i = todasInscricoes.find(x=>x.id===id); if(!i) return;
+    const k = consumirKeyAleatoria(i.uid, i.nome); if(!k) return toast('❌ Sem keys!');
+    await update(ref(db, 'inscricoesInfluencer/'+id), {status:'aprovado', recompensaDada:'🔑 '+k.nome, aprovadoEm:Date.now()});
+    await enviarKeyChat(i.uid, k); carregarBancoKeys();
+    toast('🔑 Entregue!', true); carregarInscricoes();
+};
+
+window.addSorteio = async function(id){
+    const i = todasInscricoes.find(x=>x.id===id); if(!i) return;
+    const s = dadosPrograma.sorteio; if(!s?.ativo) return toast('⚠️');
+    const p = s.participantes||{};
+    if(s.max>0&&Object.keys(p).length>=s.max) return toast('🔴 Lotado');
+    p[i.uid] = {uid:i.uid, nome:i.nome, email:i.email, entradoEm:Date.now()};
+    await set(ref(db, 'programaInfluencer/sorteio/participantes'), p);
+    await update(ref(db, 'inscricoesInfluencer/'+id), {status:'sorteio'});
+    toast('🎰 Add!', true); carregarInscricoes();
+};
+
+window.remSorteio = async function(id){
+    const i = todasInscricoes.find(x=>x.id===id); if(!i) return;
+    const p = dadosPrograma.sorteio?.participantes||{};
+    delete p[i.uid];
+    await set(ref(db, 'programaInfluencer/sorteio/participantes'), p);
+    await update(ref(db, 'inscricoesInfluencer/'+id), {status:'aprovado'});
+    toast('🔓 Removido', true); carregarInscricoes();
+};
+
+window.msg = async function(uid, nome){
+    const t = prompt('Mensagem para '+nome+':'); if(!t) return;
+    await push(ref(db, 'chat'), {uid:'admin', nome:'🛡️ Admin', texto:t, ts:Date.now(), type:'user'});
+    toast('💬 Enviada!', true);
+};
+
+window.remover = async function(id){ if(!confirm('🗑️?')) return; await remove(ref(db, 'inscricoesInfluencer/'+id)); carregarInscricoes(); };
+window.removerTodasRecusadas = async function(){
+    const r = todasInscricoes.filter(i=>i.status==='recusado');
+    if(!r.length) return toast('Nenhuma');
+    if(!confirm('Remover '+r.length+'?')) return;
+    for(let i of r) await remove(ref(db, 'inscricoesInfluencer/'+i.id));
+    carregarInscricoes();
+};
+
+onValue(ref(db, 'inscricoesInfluencer'), () => carregarInscricoes());
+onValue(ref(db, 'programaInfluencer'), snap => { if(snap.exists()) dadosPrograma = snap.val(); else dadosPrograma = {ativo:false}; carregarDados(); });
+onAuthStateChanged(auth, async user => {
+    if(!user){ window.location.href = 'login.html'; return; }
+    if(!(await checkAdmin(user))){ document.body.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;"><h1 style="color:#ef4444;">🚫 Acesso Negado</h1></div>'; return; }
+    document.getElementById('admin-info').textContent = '👑 ' + user.email;
+    carregarDados();
+});
+</script>
+</body>
+</html>

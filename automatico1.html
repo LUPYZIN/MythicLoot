@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | Automação</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;600;700&family=Inter:wght@400;500&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14; --bg-card: #151a26; --text: #f3f4f6; --text-2: #9ca3af;
+            --primary: #6366f1; --green: #10b981; --red: #ef4444; --gold: #fbbf24;
+            --orange: #f59e0b; --pink: #ec4899; --border: rgba(255,255,255,0.06);
+        }
+        * { margin:0; padding:0; box-sizing:border-box; font-family:'Inter',sans-serif; }
+        body { background:var(--bg); color:var(--text); min-height:100vh; display:flex; flex-direction:column; }
+        
+        header { background:rgba(11,14,20,0.95); border-bottom:1px solid var(--border); padding:.9rem 2rem; display:flex; align-items:center; justify-content:space-between; }
+        .logo { font-family:'Space Grotesk',sans-serif; font-size:1.2rem; font-weight:700; color:var(--text); text-decoration:none; display:flex; align-items:center; gap:.5rem; }
+        .logo .dot { width:8px; height:8px; background:var(--green); border-radius:50%; animation:pulse 1.5s infinite; }
+        @keyframes pulse { 0%,100%{opacity:.5} 50%{opacity:1} }
+        
+        .container { max-width:900px; margin:0 auto; padding:2rem; width:100%; flex:1; }
+        .status-card { background:var(--bg-card); border:1px solid var(--border); border-radius:16px; padding:1.5rem; margin-bottom:1rem; }
+        .status-title { font-family:'Space Grotesk',sans-serif; font-size:1rem; font-weight:700; margin-bottom:1rem; display:flex; align-items:center; gap:.5rem; }
+        
+        .stats-row { display:grid; grid-template-columns:repeat(4,1fr); gap:1rem; margin-bottom:1rem; }
+        .stat-mini { background:rgba(255,255,255,.02); border:1px solid var(--border); border-radius:10px; padding:.8rem; text-align:center; }
+        .stat-mini .val { font-family:'Space Grotesk',sans-serif; font-size:1.5rem; font-weight:700; }
+        .stat-mini .lbl { font-size:.65rem; color:var(--text-2); margin-top:.2rem; }
+        
+        .console-log { background:#000; color:#0f0; font-family:'Courier New',monospace; font-size:.7rem; padding:1rem; border-radius:10px; max-height:400px; overflow-y:auto; white-space:pre-wrap; line-height:1.5; }
+        .console-log::-webkit-scrollbar { width:3px; }
+        .console-log::-webkit-scrollbar-thumb { background:rgba(0,255,0,.2); border-radius:99px; }
+        
+        .badge { padding:.15rem .5rem; border-radius:99px; font-size:.65rem; font-weight:600; }
+        .badge-green { background:rgba(16,185,129,.15); color:var(--green); }
+        .badge-gold { background:rgba(251,191,36,.15); color:var(--gold); }
+        .badge-blue { background:rgba(99,102,241,.15); color:var(--primary); }
+        
+        .btn { padding:.5rem 1rem; border-radius:6px; font-size:.75rem; font-weight:600; cursor:pointer; border:none; transition:.3s; }
+        .btn.primary { background:var(--primary); color:#fff; }
+        .btn.red { background:var(--red); color:#fff; }
+        .btn.green { background:var(--green); color:#fff; }
+        .btn.gold { background:var(--gold); color:#000; }
+        
+        .actions-row { display:flex; gap:.5rem; flex-wrap:wrap; margin-bottom:1rem; }
+        
+        @media (max-width:768px) { .stats-row { grid-template-columns:1fr 1fr; } .container { padding:1rem; } }
+    </style>
+</head>
+<body>
+
+<header>
+    <a href="admin.html" class="logo"><span class="dot"></span> Looto Automação</a>
+    <div style="display:flex;gap:.5rem;align-items:center;">
+        <span class="badge badge-green" id="status-badge">🟢 Rodando</span>
+        <span style="font-size:.7rem;color:var(--text-2);" id="clock">00:00:00</span>
+    </div>
+</header>
+
+<div class="container" id="main-content">
+    <div class="status-card">
+        <div class="status-title">📊 Estatísticas em Tempo Real</div>
+        <div class="stats-row" id="stats-row">
+            <div class="stat-mini"><div class="val" id="stat-sorteios" style="color:#6366f1;">0</div><div class="lbl">Sorteios Ativos</div></div>
+            <div class="stat-mini"><div class="val" id="stat-entregues" style="color:#10b981;">0</div><div class="lbl">Keys Entregues</div></div>
+            <div class="stat-mini"><div class="val" id="stat-chat" style="color:#ec4899;">0</div><div class="lbl">Chat Limpo</div></div>
+            <div class="stat-mini"><div class="val" id="stat-baus" style="color:#fbbf24;">0</div><div class="lbl">Baús Expirados</div></div>
+        </div>
+    </div>
+    
+    <div class="status-card">
+        <div class="status-title">⚡ Ações Manuais</div>
+        <div class="actions-row">
+            <button class="btn primary" onclick="keyDelivery()">🔑 Forçar Key Delivery</button>
+            <button class="btn gold" onclick="limpezaChat()">🗑️ Forçar Limpeza</button>
+            <button class="btn green" onclick="avisoBot()">📢 Enviar Aviso</button>
+            <button class="btn red" onclick="reiniciarSistema()">🔄 Reiniciar</button>
+        </div>
+    </div>
+    
+    <div class="status-card">
+        <div class="status-title">📋 Log de Atividades</div>
+        <div class="console-log" id="console-log">
+            [SISTEMA] Aguardando autenticação...
+        </div>
+    </div>
+</div>
+
+<script type="module">
+import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+import { getAuth, signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+import { getDatabase, ref, get, update, remove, push, query, orderByChild, limitToLast, equalTo } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+const firebaseConfig = {
+    apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+    authDomain: "looto-f46e5.firebaseapp.com",
+    databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+    projectId: "looto-f46e5",
+    storageBucket: "looto-f46e5.firebasestorage.app",
+    messagingSenderId: "295066400995",
+    appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+};
+
+const app = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getDatabase(app);
+
+const CHAT_LIMITE = 10 * 60 * 1000;
+const TREASURE_OPENED_LIMITE = 10 * 60 * 1000;
+const TREASURE_UNOPENED_LIMITE = 24 * 60 * 60 * 1000;
+const BOT_AVISO_LIMITE = 1 * 60 * 1000;
+const SORTEIO_LIMITE = 50; // Máximo de sorteios por ciclo
+const CHAT_LIMITE_CICLO = 200; // Máximo de mensagens por ciclo de limpeza
+
+let stats = { sorteios: 0, entregues: 0, chatLimpo: 0, bausExpirados: 0 };
+const consoleLines = [];
+const MAX_LINES = 50;
+let sistemaIniciado = false;
+let currentUser = null;
+let intervals = [];
+
+// Cache de recompensas e custos (renovado a cada 5 minutos)
+let cacheRecompensas = null;
+let cacheCustos = null;
+let cacheTimestamp = 0;
+const CACHE_TTL = 5 * 60 * 1000;
+
+function addLog(msg, tipo = 'info') {
+    const time = new Date().toLocaleTimeString('pt-BR');
+    const prefix = tipo === 'success' ? '✅' : tipo === 'error' ? '❌' : tipo === 'key' ? '🔑' : tipo === 'clean' ? '🗑️' : '📋';
+    consoleLines.push(`[${time}] ${prefix} ${msg}`);
+    if (consoleLines.length > MAX_LINES) consoleLines.shift();
+    const logEl = document.getElementById('console-log');
+    if (logEl) { logEl.innerHTML = consoleLines.join('\n'); logEl.scrollTop = logEl.scrollHeight; }
+}
+
+function updateClock() { const el = document.getElementById('clock'); if (el) el.textContent = new Date().toLocaleTimeString('pt-BR'); }
+
+function updateStats() {
+    document.getElementById('stat-sorteios').textContent = stats.sorteios;
+    document.getElementById('stat-entregues').textContent = stats.entregues;
+    document.getElementById('stat-chat').textContent = stats.chatLimpo;
+    document.getElementById('stat-baus').textContent = stats.bausExpirados;
+}
+
+async function carregarConfigs() {
+    const now = Date.now();
+    if (cacheRecompensas && cacheCustos && (now - cacheTimestamp) < CACHE_TTL) {
+        return { recompensas: cacheRecompensas, custos: cacheCustos };
+    }
+    try {
+        const [recSnap, custoSnap] = await Promise.all([
+            get(ref(db, 'configRecompensas')),
+            get(ref(db, 'configCustos'))
+        ]);
+        cacheRecompensas = recSnap.exists() ? recSnap.val() : { vencedorXp:500, vencedorMoney:100, participanteXp:50, participanteMoney:10, criadorXp:200, criadorMoney:50, criadorPote:10 };
+        cacheCustos = custoSnap.exists() ? custoSnap.val() : { publico:5, platina:5, ouro:10, diamante:15 };
+        cacheTimestamp = now;
+        return { recompensas: cacheRecompensas, custos: cacheCustos };
+    } catch(e) {
+        return { recompensas: { vencedorXp:500, vencedorMoney:100, participanteXp:50, participanteMoney:10, criadorXp:200, criadorMoney:50, criadorPote:10 }, custos: { publico:5, platina:5, ouro:10, diamante:15 } };
+    }
+}
+
+// ═══ KEY DELIVERY OTIMIZADO ═══
+window.keyDelivery = async function() {
+    try {
+        const { recompensas, custos } = await carregarConfigs();
+        let totalAtivos = 0;
+        const now = Date.now();
+        
+        // ═══ SORTEIOS (OTIMIZADO COM LIMITETOLAST) ═══
+        const sorteiosSnap = await get(query(ref(db, 'sorteios'), orderByChild('expiraEm'), limitToLast(SORTEIO_LIMITE)));
+        
+        if (sorteiosSnap.exists()) {
+            const sorteios = sorteiosSnap.val();
+            
+            for (const [sorteioId, sData] of Object.entries(sorteios)) {
+                if (!sData.ativo) continue;
+                if (sData.expiraEm && sData.expiraEm >= now) { totalAtivos++; continue; }
+                if (sData.keyEntregue) continue;
+                
+                totalAtivos++;
+                const participantes = sData.participantes || {};
+                const pIds = Object.keys(participantes);
+                
+                if (pIds.length > 0 && sData.key) {
+                    const vencedorId = pIds[Math.floor(Math.random() * pIds.length)];
+                    const vencedor = participantes[vencedorId];
+                    const custo = custos[sData.tipo] || 5;
+                    const totalArrecadado = pIds.length * custo;
+                    
+                    // Batch: entrega key + notificação + sistema
+                    const batchOps = [];
+                    
+                    // Key no chat
+                    batchOps.push(push(ref(db, 'chat'), {
+                        uid: vencedorId, nome: vencedor.nome || 'Vencedor', texto: '',
+                        ts: now, type: 'treasure',
+                        keyCode: sData.key, keyGame: sData.nomeJogo || sData.titulo,
+                        keyPlatform: sData.plataforma || 'Steam',
+                        sorteioId: sorteioId, opened: false
+                    }));
+                    
+                    // Mensagem sistema
+                    batchOps.push(push(ref(db, 'chat'), {
+                        uid: 'bot', nome: 'LootoBot 🤖',
+                        texto: `🎉 <strong>${vencedor.nome || 'Alguém'}</strong> ganhou <strong>${sData.nomeJogo || sData.titulo}</strong>! 🎁`,
+                        ts: now, type: 'system'
+                    }));
+                    
+                    // Buscar dados dos participantes em lote (N+1 → 1 consulta)
+                    const userIds = [...new Set([vencedorId, ...pIds.filter(id => id !== vencedorId), sData.criadoPor].filter(Boolean))];
+                    const userSnaps = await Promise.all(userIds.map(uid => get(ref(db, 'usuarios/' + uid))));
+                    const userDataMap = {};
+                    userIds.forEach((uid, i) => { userDataMap[uid] = userSnaps[i].val() || {}; });
+                    
+                    // Vencedor
+                    const vData = userDataMap[vencedorId] || {};
+                    batchOps.push(update(ref(db, 'usuarios/' + vencedorId), {
+                        pontos: (vData.pontos||0) + (recompensas.vencedorXp||500),
+                        dinheiro: (vData.dinheiro||0) + (recompensas.vencedorMoney||100)
+                    }));
+                    
+                    // Notificação vencedor
+                    batchOps.push(push(ref(db, 'chat'), {
+                        uid: vencedorId, nome: vencedor.nome || 'Vencedor',
+                        texto: `🎉 Você ganhou o sorteio de <strong>${sData.nomeJogo}</strong>! Verifique suas keys!`,
+                        ts: now, type: 'notification', notifType: 'win',
+                        notifTitle: '🏆 Você venceu!',
+                        rewards: { xp: recompensas.vencedorXp||500, money: recompensas.vencedorMoney||100 }
+                    }));
+                    
+                    // Perdedores
+                    for (const perdedorId of pIds) {
+                        if (perdedorId === vencedorId) continue;
+                        const pData = userDataMap[perdedorId] || {};
+                        batchOps.push(update(ref(db, 'usuarios/' + perdedorId), {
+                            pontos: (pData.pontos||0) + (recompensas.participanteXp||50),
+                            dinheiro: (pData.dinheiro||0) + (recompensas.participanteMoney||10)
+                        }));
+                        batchOps.push(push(ref(db, 'chat'), {
+                            uid: perdedorId, nome: participantes[perdedorId]?.nome || 'Participante',
+                            texto: `😢 O sorteio de <strong>${sData.nomeJogo}</strong> terminou. Mas você ganhou pontos!`,
+                            ts: now, type: 'notification', notifType: 'lose',
+                            notifTitle: '😢 Não foi dessa vez',
+                            rewards: { xp: recompensas.participanteXp||50, money: recompensas.participanteMoney||10 }
+                        }));
+                    }
+                    
+                    // Criador
+                    if (sData.criadoPor) {
+                        const cData = userDataMap[sData.criadoPor] || {};
+                        batchOps.push(update(ref(db, 'usuarios/' + sData.criadoPor), {
+                            pontos: (cData.pontos||0) + (recompensas.criadorXp||200),
+                            dinheiro: (cData.dinheiro||0) + (recompensas.criadorMoney||50) + Math.floor(totalArrecadado * (recompensas.criadorPote||10) / 100)
+                        }));
+                    }
+                    
+                    // Log
+                    batchOps.push(push(ref(db, 'logSorteios'), {
+                        data: now, jogo: sData.nomeJogo || sData.titulo || 'Jogo',
+                        key: sData.key || 'XXXXX', criador: sData.criadoPorNome || 'Anônimo',
+                        criadorId: sData.criadoPor || '', vencedor: vencedor.nome || 'Desconhecido',
+                        vencedorId, plataforma: sData.plataforma || 'Steam',
+                        totalParticipantes: pIds.length, totalArrecadado, status: 'Entregue'
+                    }));
+                    
+                    // Atualizar sorteio
+                    batchOps.push(update(ref(db, 'sorteios/' + sorteioId), {
+                        keyEntregue: true, vencedorId, vencedorNome: vencedor.nome,
+                        dataEntrega: now, ativo: false
+                    }));
+                    
+                    await Promise.all(batchOps);
+                    stats.entregues++;
+                    addLog(`Key: ${sData.nomeJogo} → ${vencedor.nome} (${pIds.length}p)`, 'key');
+                } else {
+                    await update(ref(db, 'sorteios/' + sorteioId), { keyEntregue: true, ativo: false, semParticipantes: true });
+                    addLog(`Sem part.: ${sData.nomeJogo}`, 'info');
+                }
+            }
+        }
+        
+        // ═══ GRANDE SORTEIO ═══
+        const gsSnap = await get(ref(db, 'grandesorteio'));
+        if (gsSnap.exists()) {
+            const gs = gsSnap.val();
+            if (gs.ativo && gs.expiraEm && gs.expiraEm < now && !gs.keyEntregue) {
+                const participantes = gs.participantes || {};
+                const pIds = Object.keys(participantes);
+                if (pIds.length > 0 && gs.keys && gs.keys.length > 0) {
+                    const vencedorId = pIds[Math.floor(Math.random() * pIds.length)];
+                    const vencedor = participantes[vencedorId];
+                    const batchOps = [];
+                    
+                    for (const keyData of gs.keys) {
+                        batchOps.push(push(ref(db, 'chat'), {
+                            uid: vencedorId, nome: vencedor.nome || 'Vencedor', texto: '',
+                            ts: now, type: 'treasure',
+                            keyCode: keyData.key, keyGame: keyData.nome || 'Grande Sorteio',
+                            keyPlatform: keyData.plataforma || 'Steam',
+                            sorteioId: 'grande-sorteio', opened: false
+                        }));
+                    }
+                    
+                    batchOps.push(push(ref(db, 'chat'), {
+                        uid: 'bot', nome: 'LootoBot 🤖',
+                        texto: `🏆 <strong>${vencedor.nome || 'Alguém'}</strong> venceu o <strong>Grande Sorteio</strong>! 🎉`,
+                        ts: now, type: 'system'
+                    }));
+                    
+                    const userIds = [...new Set([vencedorId, ...pIds.filter(id => id !== vencedorId)].filter(Boolean))];
+                    const userSnaps = await Promise.all(userIds.map(uid => get(ref(db, 'usuarios/' + uid))));
+                    const userDataMap = {};
+                    userIds.forEach((uid, i) => { userDataMap[uid] = userSnaps[i].val() || {}; });
+                    
+                    const vData = userDataMap[vencedorId] || {};
+                    batchOps.push(update(ref(db, 'usuarios/' + vencedorId), {
+                        pontos: (vData.pontos||0) + (recompensas.gsVencedorXp||1000),
+                        dinheiro: (vData.dinheiro||0) + (recompensas.gsVencedorMoney||0)
+                    }));
+                    
+                    for (const pid of pIds) {
+                        if (pid === vencedorId) continue;
+                        const pData = userDataMap[pid] || {};
+                        batchOps.push(update(ref(db, 'usuarios/' + pid), {
+                            pontos: (pData.pontos||0) + (recompensas.gsParticipanteXp||1000),
+                            dinheiro: (pData.dinheiro||0) + (recompensas.gsParticipanteMoney||0)
+                        }));
+                    }
+                    
+                    batchOps.push(push(ref(db, 'logSorteios'), {
+                        data: now, jogo: 'Grande Sorteio: ' + gs.keys.map(k => k.nome).join(', '),
+                        key: gs.keys.map(k => k.key).join(' | '),
+                        criador: 'Admin', criadorId: 'admin',
+                        vencedor: vencedor.nome || 'Desconhecido', vencedorId,
+                        plataforma: gs.keys[0]?.plataforma || 'Várias',
+                        totalParticipantes: pIds.length, status: 'Entregue'
+                    }));
+                    
+                    batchOps.push(update(ref(db, 'grandesorteio'), {
+                        ativo: false, emBreve: true, keyEntregue: true,
+                        vencedorId, vencedorNome: vencedor.nome, dataEntrega: now
+                    }));
+                    
+                    await Promise.all(batchOps);
+                    stats.entregues++;
+                    addLog(`🏆 Grande Sorteio: ${vencedor.nome} (${pIds.length}p)`, 'key');
+                }
+            }
+        }
+        
+        stats.sorteios = totalAtivos;
+        updateStats();
+    } catch(e) {
+        addLog(`Erro KeyDelivery: ${e.message}`, 'error');
+    }
+};
+
+// ═══ LIMPEZA OTIMIZADA ═══
+window.limpezaChat = async function() {
+    try {
+        const snap = await get(query(ref(db, 'chat'), orderByChild('ts'), limitToLast(CHAT_LIMITE_CICLO)));
+        if (!snap.exists()) return;
+        const now = Date.now();
+        let limpos = 0;
+        const removes = [];
+        
+        snap.forEach(child => {
+            const msg = child.val();
+            const id = child.key;
+            if (msg.type === 'treasure') {
+                if (msg.opened && msg.openedAt && (now - msg.openedAt > TREASURE_OPENED_LIMITE)) removes.push(remove(ref(db, 'chat/' + id)));
+                else if (!msg.opened && msg.ts && (now - msg.ts > TREASURE_UNOPENED_LIMITE)) removes.push(remove(ref(db, 'chat/' + id)));
+            } else if (msg.type === 'global_bot' && (now - (msg.ts || 0) > BOT_AVISO_LIMITE)) {
+                removes.push(remove(ref(db, 'chat/' + id)));
+            } else if (msg.type === 'notification' && (now - (msg.ts || 0) > 86400000)) {
+                removes.push(remove(ref(db, 'chat/' + id)));
+            } else if (msg.type !== 'system' && (now - (msg.ts || 0) > CHAT_LIMITE)) {
+                removes.push(remove(ref(db, 'chat/' + id)));
+            } else if (msg.type === 'system' && (now - (msg.ts || 0) > CHAT_LIMITE)) {
+                removes.push(remove(ref(db, 'chat/' + id)));
+            }
+        });
+        
+        if (removes.length > 0) {
+            await Promise.all(removes);
+            limpos = removes.length;
+        }
+        
+        stats.chatLimpo = limpos;
+        if (limpos > 0) addLog(`Chat limpo: ${limpos} msgs`, 'clean');
+        updateStats();
+    } catch(e) {
+        addLog(`Erro limpeza: ${e.message}`, 'error');
+    }
+};
+
+window.avisoBot = async function() {
+    try {
+        await push(ref(db, 'chat'), {
+            uid: 'bot', nome: 'LootoBot 🤖',
+            texto: '⏰ <strong>Lembrete:</strong> Mensagens somem em <strong>10 minutos</strong>. Baús expiram em <strong>10 minutos</strong> após abertos! ⚠️',
+            ts: Date.now(), type: 'global_bot'
+        });
+        addLog('📢 Aviso enviado', 'info');
+    } catch(e) { addLog(`Erro aviso: ${e.message}`, 'error'); }
+};
+
+window.reiniciarSistema = function() {
+    intervals.forEach(clearInterval);
+    intervals = [];
+    sistemaIniciado = false;
+    stats = { sorteios: 0, entregues: 0, chatLimpo: 0, bausExpirados: 0 };
+    consoleLines.length = 0;
+    addLog('🔄 Sistema reiniciado!');
+    iniciarSistemas();
+};
+
+function iniciarSistemas() {
+    if (sistemaIniciado) return;
+    sistemaIniciado = true;
+    
+    addLog('🚀 Sistemas iniciados!');
+    addLog('   🔑 Key Delivery: 60s (limitado a ' + SORTEIO_LIMITE + ' sorteios/ciclo)');
+    addLog('   🗑️ Limpeza Chat: 30s (limitado a ' + CHAT_LIMITE_CICLO + ' msgs/ciclo)');
+    addLog('   📢 Aviso Bot: 600s (10min)');
+    
+    keyDelivery();
+    limpezaChat();
+    setTimeout(avisoBot, 10000);
+    
+    intervals.push(setInterval(keyDelivery, 60000));
+    intervals.push(setInterval(limpezaChat, 30000));
+    intervals.push(setInterval(avisoBot, 600000));
+    intervals.push(setInterval(updateClock, 1000));
+    intervals.push(setInterval(updateStats, 30000));
+    updateStats();
+}
+
+// ═══ AUTH (SEM ANÔNIMO) ═══
+onAuthStateChanged(auth, async (user) => {
+    if (user) {
+        currentUser = user;
+        const adminSnap = await get(ref(db, 'admins'));
+        let isAdmin = false;
+        if (adminSnap.exists()) {
+            const admins = adminSnap.val();
+            for (let key of Object.keys(admins)) {
+                if (admins[key].uid === user.uid) { isAdmin = true; break; }
+            }
+        }
+        if (user.uid === 'u1BGSDSXdJSXnpUESiSbgYLXNkv1') isAdmin = true;
+        
+        if (!isAdmin) {
+            document.getElementById('main-content').innerHTML = `
+                <div style="display:flex;align-items:center;justify-content:center;min-height:60vh;text-align:center;flex-direction:column;gap:1rem;">
+                    <h1 style="font-family:'Space Grotesk',sans-serif;font-size:3rem;color:#ef4444;">🚫 Acesso Negado</h1>
+                    <p style="color:var(--text-2);">Apenas administradores podem acessar esta página.</p>
+                    <a href="admin.html" style="background:#6366f1;color:#fff;padding:.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;">Voltar ao Admin</a>
+                </div>`;
+            return;
+        }
+        
+        addLog(`✅ Admin autenticado: ${user.uid.slice(0,10)}...`, 'success');
+        document.getElementById('status-badge').textContent = '🟢 Admin';
+        if (!sistemaIniciado) iniciarSistemas();
+    } else {
+        // Redireciona para login em vez de criar anônimo
+        window.location.href = 'login.html';
+    }
+});
+
+updateClock();
+</script>
+</body>
+</html>
