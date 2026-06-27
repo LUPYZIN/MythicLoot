@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Looto | E‑mails Admin</title>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #0b0e14; --bg-card: #151a26; --text: #f3f4f6; --text-2: #9ca3af;
+            --primary: #6366f1; --green: #10b981; --red: #ef4444; --gold: #fbbf24;
+            --orange: #f59e0b; --pink: #ec4899; --border: rgba(255, 255, 255, 0.06);
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        body { background: var(--bg); color: var(--text); min-height: 100vh; }
+        
+        header {
+            background: rgba(11, 14, 20, 0.95); border-bottom: 1px solid var(--border);
+            position: sticky; top: 0; z-index: 100; backdrop-filter: blur(16px);
+            padding: .9rem 2rem; display: flex; align-items: center; justify-content: space-between;
+            flex-wrap: wrap; gap: .5rem;
+        }
+        .logo { font-family: 'Space Grotesk', sans-serif; font-size: 1.3rem; font-weight: 700; color: var(--text); text-decoration: none; }
+        .logo em { color: var(--red); font-style: normal; }
+        .btn-header { background: transparent; border: 1px solid var(--border); color: var(--text-2); padding: .4rem .8rem; border-radius: 6px; font-size: .8rem; cursor: pointer; transition: .3s; text-decoration: none; }
+        .btn-header:hover { border-color: var(--red); color: var(--red); }
+        
+        .main-layout { max-width: 1600px; margin: 0 auto; padding: 1.5rem 2rem; display: grid; grid-template-columns: 220px 1fr; gap: 1.5rem; }
+        .sidebar { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1rem; position: sticky; top: 80px; height: fit-content; }
+        .sidebar-btn { background: transparent; border: none; color: var(--text-2); padding: .7rem 1rem; border-radius: 8px; font-size: .85rem; cursor: pointer; transition: .3s; text-align: left; display: flex; align-items: center; gap: .5rem; width: 100%; text-decoration: none; }
+        .sidebar-btn:hover { background: rgba(255, 255, 255, .03); color: var(--text); }
+        .sidebar-btn.active { background: rgba(99, 102, 241, .12); color: var(--primary); font-weight: 600; }
+        
+        .panel { background: var(--bg-card); border-radius: 14px; border: 1px solid var(--border); padding: 1.5rem; margin-bottom: 1.5rem; }
+        .panel-title { font-family: 'Space Grotesk', sans-serif; font-size: 1.2rem; font-weight: 700; margin-bottom: 1rem; display: flex; align-items: center; gap: .5rem; }
+        
+        input, select, textarea { background: rgba(11, 14, 20, .6); border: 1px solid var(--border); padding: .5rem .7rem; border-radius: 6px; color: var(--text); font-size: .82rem; outline: none; width: 100%; }
+        input:focus, select:focus, textarea:focus { border-color: var(--primary); }
+        
+        .btn { padding: .5rem 1rem; border-radius: 6px; font-size: .8rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .15rem; }
+        .btn.primary { background: var(--primary); color: #fff; }
+        .btn.green { background: var(--green); color: #fff; }
+        .btn.red { background: var(--red); color: #fff; }
+        .btn.gold { background: var(--gold); color: #000; }
+        .btn.orange { background: var(--orange); color: #000; }
+        .btn.pink { background: var(--pink); color: #fff; }
+        
+        .btn-sm { padding: .3rem .6rem; border-radius: 4px; font-size: .7rem; font-weight: 600; cursor: pointer; border: none; transition: .3s; margin: .1rem; }
+        .btn-sm.red { background: var(--red); color: #fff; }
+        
+        .field { margin-bottom: .8rem; }
+        .field label { font-size: .75rem; color: var(--text-2); display: block; margin-bottom: .2rem; }
+        .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: .75rem; }
+        .field-row-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: .75rem; }
+        
+        .card-config { background: rgba(255,255,255,.02); border: 1px solid var(--border); border-radius: 10px; padding: 1rem; margin-bottom: .8rem; }
+        .card-config h5 { font-family: 'Space Grotesk', sans-serif; font-size: .85rem; margin-bottom: .5rem; display: flex; align-items: center; gap: .4rem; }
+        
+        .social-links { display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1rem; }
+        .social-link { display: inline-flex; align-items: center; gap: .5rem; padding: .6rem 1.2rem; border-radius: 12px; font-size: .85rem; font-weight: 600; text-decoration: none; transition: all .3s; color: #fff; }
+        .social-link:hover { transform: translateY(-2px); box-shadow: 0 8px 20px rgba(0,0,0,.4); }
+        .social-link.instagram { background: linear-gradient(135deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888); }
+        .social-link.youtube { background: #FF0000; }
+        .social-link.tiktok { background: #000; border: 1px solid rgba(255,255,255,.2); }
+        .social-link.tiktok:hover { border-color: #ff0050; }
+        .social-link.discord { background: #5865F2; }
+        .social-link svg { width: 18px; height: 18px; flex-shrink: 0; }
+        
+        .table-container { border: 1px solid var(--border); border-radius: 8px; margin-top: .5rem; }
+        .table-wrapper { max-height: 400px; overflow-y: auto; }
+        .table-wrapper::-webkit-scrollbar { width: 4px; }
+        .table-wrapper::-webkit-scrollbar-thumb { background: rgba(255,255,255,.1); border-radius: 99px; }
+        table { width: 100%; border-collapse: collapse; font-size: .8rem; }
+        th { text-align: left; padding: .6rem; color: var(--text-2); font-size: .7rem; text-transform: uppercase; border-bottom: 1px solid var(--border); background: var(--bg-card); position: sticky; top: 0; z-index: 1; }
+        td { padding: .55rem .6rem; border-bottom: 1px solid rgba(255, 255, 255, .04); }
+        
+        .badge { padding: .15rem .5rem; border-radius: 99px; font-size: .7rem; font-weight: 600; display: inline-block; }
+        .badge-green { background: rgba(16,185,129,.15); color: var(--green); }
+        .badge-red { background: rgba(239,68,68,.15); color: var(--red); }
+        .badge-gold { background: rgba(251,191,36,.15); color: var(--gold); }
+        
+        .toast { position: fixed; top: 1.5rem; right: 1.5rem; background: var(--bg-card); border: 1px solid var(--red); padding: .8rem 1.2rem; border-radius: 12px; font-size: .85rem; z-index: 999; transform: translateX(140%); transition: .3s; max-width: 320px; }
+        .toast.show { transform: translateX(0); }
+        .toast.ok { border-color: var(--green); }
+        
+        .inline-flex { display: flex; gap: .5rem; flex-wrap: wrap; align-items: center; }
+        
+        @media (max-width: 768px) {
+            .main-layout { grid-template-columns: 1fr; padding: 1rem; }
+            .sidebar { display: flex; flex-wrap: wrap; gap: .3rem; position: static; }
+            .sidebar-btn { width: auto; font-size: .7rem; padding: .4rem .6rem; }
+            .field-row, .field-row-3 { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div id="toast" class="toast"></div>
+    
+    <header>
+        <a href="looto.html" class="logo"><em>🛡️</em> Looto Admin</a>
+        <span id="admin-info" style="font-size:.8rem;color:var(--text-2);"></span>
+        <div>
+            <a href="looto.html" class="btn-header">🏠 Site</a>
+            <button class="btn-header" onclick="logout()" style="margin-left:.5rem;">🚪 Sair</button>
+        </div>
+    </header>
+    
+    <div class="main-layout">
+        <aside class="sidebar">
+            <a href="admin.html" class="sidebar-btn">📊 Dashboard</a>
+            <a href="auser.html" class="sidebar-btn">👥 Usuários</a>
+            <a href="abots.html" class="sidebar-btn">🤖 Bots</a>
+            <a href="asorteios.html" class="sidebar-btn">🎁 Sorteios</a>
+            <a href="alogsorteios.html" class="sidebar-btn">📋 Log Sorteios</a>
+            <a href="achat.html" class="sidebar-btn">💬 Chat</a>
+            <a href="agrandesorteio.html" class="sidebar-btn">🏆 Grande Sorteio</a>
+            <a href="aloja.html" class="sidebar-btn">🛒 Loja</a>
+            <a href="admins.html" class="sidebar-btn">🔑 Admins</a>
+            <a href="aassinantes.html" class="sidebar-btn">⭐ Assinantes</a>
+            <a href="aemail.html" class="sidebar-btn active">📧 E‑mails</a>
+            <a href="aferramentas.html" class="sidebar-btn">🔧 Ferramentas</a>
+        </aside>
+        
+        <div>
+            <!-- Configurações EmailJS -->
+            <div class="panel">
+                <div class="panel-title">📧 Configuração do EmailJS</div>
+                <div class="card-config">
+                    <h5>🔑 Credenciais</h5>
+                    <div class="field-row">
+                        <div class="field"><label>Service ID</label><input type="text" id="email-service-id" value="service_daay298"></div>
+                        <div class="field"><label>Public Key</label><input type="text" id="email-public-key" value="-Ww4WXJlTypeWnMse"></div>
+                    </div>
+                    <div class="field-row-3">
+                        <div class="field"><label>Template ID (Vitória)</label><input type="text" id="email-template-vitoria" value="template_egysgq9"></div>
+                        <div class="field"><label>Template ID (Derrota)</label><input type="text" id="email-template-derrota" value="template_ptvwfhh"></div>
+                        <div class="field"><label>E‑mail do Remetente</label><input type="email" id="email-from" placeholder="seu@email.com"></div>
+                    </div>
+                    <div class="inline-flex">
+                        <button class="btn primary" onclick="salvarConfig()" style="flex:1;">💾 Salvar Configurações</button>
+                        <button class="btn orange" onclick="testarConexao()" style="flex:1;">🧪 Testar Conexão</button>
+                        <button class="btn green" onclick="testarEmail()" style="flex:1;">📤 Testar Envio</button>
+                    </div>
+                </div>
+                
+                <div class="card-config">
+                    <h5>📱 Redes Sociais (aparecem nos e‑mails)</h5>
+                    <div class="social-links">
+                        <a href="https://www.instagram.com/looto01" target="_blank" class="social-link instagram">
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="2" width="20" height="20" rx="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
+                            Instagram
+                        </a>
+                        <a href="https://www.youtube.com/@Looto-01" target="_blank" class="social-link youtube">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M23.5 6.19a3.02 3.02 0 0 0-2.12-2.14C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.38.55A3.02 3.02 0 0 0 .5 6.19 31.6 31.6 0 0 0 0 12a31.6 31.6 0 0 0 .5 5.81 3.02 3.02 0 0 0 2.12 2.14c1.88.55 9.38.55 9.38.55s7.5 0 9.38-.55a3.02 3.02 0 0 0 2.12-2.14A31.6 31.6 0 0 0 24 12a31.6 31.6 0 0 0-.5-5.81z"/><polygon points="9.5,7.5 9.5,16.5 16.5,12" fill="#0b0e14"/></svg>
+                            YouTube
+                        </a>
+                        <a href="https://www.tiktok.com/@looto01" target="_blank" class="social-link tiktok">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/></svg>
+                            TikTok
+                        </a>
+                        <a href="https://discord.com/invite/3VyAdmrFT" target="_blank" class="social-link discord">
+                            <svg viewBox="0 0 24 24" fill="currentColor"><path d="M20.32 4.37a19.8 19.8 0 0 0-4.89-1.51.07.07 0 0 0-.08.04 13.6 13.6 0 0 0-.6 1.22 18.3 18.3 0 0 0-5.5 0 12.7 12.7 0 0 0-.6-1.22.07.07 0 0 0-.08-.04 19.8 19.8 0 0 0-4.89 1.51.06.06 0 0 0-.03.02C1.58 8.66.65 12.82.96 16.92a.08.08 0 0 0 .03.05 20 20 0 0 0 6.02 3.03.08.08 0 0 0 .08-.02 14.4 14.4 0 0 0 1.24-2.01.07.07 0 0 0-.04-.1 13.2 13.2 0 0 1-1.89-.89.07.07 0 0 1-.01-.11 9.6 9.6 0 0 0 .15-.12.07.07 0 0 1 .08 0 14.2 14.2 0 0 0 12.76 0 .07.07 0 0 1 .08 0l.15.12c.03.03.04.08.01.11a13.2 13.2 0 0 1-1.89.89.07.07 0 0 0-.04.1c.39.7.8 1.37 1.24 2.01a.08.08 0 0 0 .08.02 20 20 0 0 0 6.02-3.03.08.08 0 0 0 .03-.05c.38-4.73-.63-8.84-2.68-12.53a.06.06 0 0 0-.03-.02zM8.02 14.33c-.88 0-1.62-.8-1.62-1.78s.71-1.79 1.62-1.79 1.64.81 1.62 1.79c-.01.98-.74 1.78-1.62 1.78zm7.96 0c-.88 0-1.62-.8-1.62-1.78s.71-1.79 1.62-1.79 1.64.81 1.62 1.79c-.01.98-.74 1.78-1.62 1.78z"/></svg>
+                            Discord
+                        </a>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Enviar para pessoa específica -->
+            <div class="panel">
+                <div class="panel-title">📤 Enviar E‑mail Manual</div>
+                <div class="card-config">
+                    <h5>🔍 Buscar Destinatário</h5>
+                    <div class="inline-flex">
+                        <input type="text" id="send-uid" placeholder="UID do usuário" style="flex:1;">
+                        <input type="email" id="send-email" placeholder="ou e‑mail direto" style="flex:1;">
+                        <button class="btn primary" onclick="buscarUsuario()">🔍 Buscar</button>
+                    </div>
+                    <div id="user-info" style="margin-top:.5rem;font-size:.85rem;"></div>
+                </div>
+                <div class="card-config" id="send-section" style="display:none;">
+                    <h5>✉️ Enviar E‑mail</h5>
+                    <div class="field-row">
+                        <div class="field"><label>Nome do Jogo</label><input type="text" id="send-game" placeholder="Ex: Hollow Knight"></div>
+                        <div class="field"><label>Key (opcional)</label><input type="text" id="send-key" placeholder="XXXXX-XXXXX-XXXXX"></div>
+                    </div>
+                    <div class="field">
+                        <label>Tipo</label>
+                        <select id="send-type">
+                            <option value="vitoria">🏆 Vitória</option>
+                            <option value="derrota">😢 Derrota</option>
+                        </select>
+                    </div>
+                    <button class="btn green" onclick="enviarEmailManual()">📤 Enviar E‑mail</button>
+                </div>
+            </div>
+            
+            <!-- Histórico de envios -->
+            <div class="panel">
+                <div class="panel-title">📋 Histórico de Envios</div>
+                <div class="table-container">
+                    <div class="table-wrapper">
+                        <table>
+                            <thead><tr><th>Para</th><th>Jogo</th><th>Tipo</th><th>Data</th><th>Status</th><th>Ações</th></tr></thead>
+                            <tbody id="table-logs"></tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="inline-flex" style="margin-top:.5rem;">
+                    <button class="btn red" onclick="limparHistorico()">🗑️ Limpar Histórico</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+    import { getAuth, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+    import { getDatabase, ref, get, set, push, remove, query, orderByChild, limitToLast, onValue } from "https://www.gstatic.com/firebasejs/12.13.0/firebase-database.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyDUBFZkXFtIGzE-Mp4WLVWA77HzlaG9pMI",
+        authDomain: "looto-f46e5.firebaseapp.com",
+        databaseURL: "https://looto-f46e5-default-rtdb.firebaseio.com",
+        projectId: "looto-f46e5",
+        storageBucket: "looto-f46e5.firebasestorage.app",
+        messagingSenderId: "295066400995",
+        appId: "1:295066400995:web:cdaa28a808f71e7e6eadd6"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getDatabase(app);
+
+    let currentUser = null;
+    let destinatarioEncontrado = null;
+
+    function toast(msg, ok = false) {
+        const el = document.getElementById('toast');
+        el.textContent = msg;
+        el.className = 'toast show' + (ok ? ' ok' : '');
+        clearTimeout(toast._t);
+        toast._t = setTimeout(() => el.classList.remove('show'), 5000);
+    }
+
+    window.logout = async () => { await signOut(auth); window.location.href = 'login.html'; };
+
+    async function checkAdmin(user) {
+        if (!user) return false;
+        if (user.email === 'startubez.com@gmail.com') return true;
+        const snap = await get(ref(db, 'admins'));
+        if (!snap.exists()) return false;
+        const admins = snap.val();
+        for (let key of Object.keys(admins)) { const a = admins[key]; if (a.uid === user.uid || a.email === user.email) return true; }
+        return false;
+    }
+
+    async function carregarConfig() {
+        const snap = await get(ref(db, 'configEmail'));
+        if (snap.exists()) {
+            const d = snap.val();
+            if (d.serviceId) document.getElementById('email-service-id').value = d.serviceId;
+            if (d.publicKey) document.getElementById('email-public-key').value = d.publicKey;
+            document.getElementById('email-template-vitoria').value = d.templateVitoria || 'template_egysgq9';
+            document.getElementById('email-template-derrota').value = d.templateDerrota || 'template_ptvwfhh';
+            if (d.emailFrom) document.getElementById('email-from').value = d.emailFrom;
+        }
+    }
+
+    onAuthStateChanged(auth, async (user) => {
+        if (!user) { window.location.href = 'login.html'; return; }
+        const isAdmin = await checkAdmin(user);
+        if (!isAdmin) {
+            document.body.innerHTML = `<div style="display:flex;align-items:center;justify-content:center;min-height:100vh;text-align:center;flex-direction:column;gap:1rem;padding:2rem;"><h1 style="font-family:'Space Grotesk',sans-serif;font-size:3rem;color:#ef4444;">🚫 Acesso Negado</h1><p style="color:#9ca3af;">Você não tem permissão.</p><a href="looto.html" style="background:#6366f1;color:#fff;padding:.8rem 2rem;border-radius:8px;text-decoration:none;font-weight:600;">Ir para o Site</a></div>`;
+            setTimeout(() => window.location.href = 'looto.html', 3000);
+            return;
+        }
+        currentUser = user;
+        document.getElementById('admin-info').textContent = `👑 ${user.email}`;
+        carregarConfig();
+        carregarHistorico();
+    });
+
+    window.salvarConfig = async function() {
+        const data = {
+            serviceId: document.getElementById('email-service-id').value.trim(),
+            publicKey: document.getElementById('email-public-key').value.trim(),
+            templateVitoria: document.getElementById('email-template-vitoria').value.trim(),
+            templateDerrota: document.getElementById('email-template-derrota').value.trim(),
+            emailFrom: document.getElementById('email-from').value.trim(),
+            atualizadoEm: Date.now()
+        };
+        try {
+            await set(ref(db, 'configEmail'), data);
+            toast('✅ Configurações salvas!', true);
+        } catch(e) { toast('❌ Erro: ' + e.message); }
+    };
+
+    // ═══════════ TESTE DE CONEXÃO (só inicializa o EmailJS) ═══════════
+    window.testarConexao = async function() {
+        const publicKey = document.getElementById('email-public-key').value.trim();
+        if (!publicKey) { toast('⚠️ Preencha a Public Key!'); return; }
+        if (!window.emailjs) {
+            await new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js";
+                script.onload = resolve;
+                script.onerror = resolve;
+                document.head.appendChild(script);
+            });
+            if (!window.emailjs) { toast('❌ EmailJS não carregou.'); return; }
+        }
+        try {
+            window.emailjs.init(publicKey);
+            toast('✅ Conexão OK – Public Key válida!', true);
+        } catch(e) {
+            console.error(e);
+            toast('❌ Public Key inválida: ' + e.message);
+        }
+    };
+
+    // ═══════════ ENVIO DE E‑MAIL (COM DEPURAÇÃO) ═══════════
+    async function enviarEmail(destinatario, nome, jogo, key, tipo) {
+        const snap = await get(ref(db, 'configEmail'));
+        if (!snap.exists()) { toast('⚠️ Configure o EmailJS primeiro!'); return false; }
+        const config = snap.val();
+        if (!config.publicKey || !config.serviceId) {
+            toast('⚠️ Service ID e Public Key são obrigatórios!'); return false;
+        }
+        const templateId = tipo === 'vitoria' ? config.templateVitoria : config.templateDerrota;
+        if (!templateId) { toast('⚠️ Template ID não configurado!'); return false; }
+
+        if (!window.emailjs) {
+            await new Promise((resolve) => {
+                const script = document.createElement('script');
+                script.src = "https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js";
+                script.onload = resolve;
+                script.onerror = resolve;
+                document.head.appendChild(script);
+            });
+            if (!window.emailjs) { toast('❌ EmailJS não carregou.'); return false; }
+        }
+        window.emailjs.init(config.publicKey);
+
+        try {
+            const response = await window.emailjs.send(config.serviceId, templateId, {
+                to_email: destinatario,
+                to_name: nome || "Jogador",
+                game: jogo || "Sorteio",
+                key: key || "",
+                result: tipo
+            });
+            console.log('✅ Email enviado:', response);
+            await push(ref(db, 'emailLogs'), {
+                para: destinatario, nome, jogo, tipo, enviadoEm: Date.now(),
+                enviadoPor: currentUser.email, status: 'sucesso'
+            });
+            return true;
+        } catch(e) {
+            console.error('❌ Erro EmailJS:', e);
+            // Exibe o erro detalhado
+            let msg = e.message || 'Falha no envio';
+            if (e.status === 412) msg = 'Domínio não autorizado. Adicione este domínio em Account → Security no EmailJS.';
+            else if (e.status === 403) msg = 'Acesso negado. Verifique a Public Key e o Service ID.';
+            toast('❌ ' + msg);
+            await push(ref(db, 'emailLogs'), {
+                para: destinatario, nome, jogo, tipo, enviadoEm: Date.now(),
+                enviadoPor: currentUser.email, status: 'falha', erro: e.message
+            });
+            return false;
+        }
+    }
+
+    window.testarEmail = async function() {
+        if (!currentUser) return;
+        const userSnap = await get(ref(db, 'usuarios/' + currentUser.uid));
+        const userData = userSnap.val() || {};
+        const email = userData.email || prompt('Digite o e‑mail para teste:');
+        if (!email) return toast('⚠️ E‑mail não informado.');
+        toast('⏳ Enviando e‑mail de teste...');
+        const ok = await enviarEmail(email, userData.username || 'Admin', 'Jogo de Teste', 'TESTE-XXXXX', 'vitoria');
+        if (ok) toast('✅ E‑mail de teste enviado!', true);
+    };
+
+    window.buscarUsuario = async function() {
+        const uid = document.getElementById('send-uid').value.trim();
+        const email = document.getElementById('send-email').value.trim();
+        if (!uid && !email) { toast('⚠️ Digite um UID ou e‑mail!'); return; }
+        let foundEmail = email;
+        let foundNome = 'Jogador';
+        if (uid) {
+            const snap = await get(ref(db, 'usuarios/' + uid));
+            if (snap.exists()) {
+                const data = snap.val();
+                foundEmail = foundEmail || data.email;
+                foundNome = data.username || foundNome;
+            } else { toast('⚠️ Usuário não encontrado!'); return; }
+        }
+        if (!foundEmail) { toast('⚠️ E‑mail não encontrado!'); return; }
+        destinatarioEncontrado = { email: foundEmail, nome: foundNome };
+        document.getElementById('user-info').innerHTML = `<div style="background:rgba(16,185,129,.08);border:1px solid rgba(16,185,129,.2);border-radius:8px;padding:.7rem;">✅ <strong>${foundNome}</strong> — ${foundEmail}</div>`;
+        document.getElementById('send-section').style.display = 'block';
+    };
+
+    window.enviarEmailManual = async function() {
+        if (!destinatarioEncontrado) { toast('⚠️ Busque um destinatário primeiro!'); return; }
+        const jogo = document.getElementById('send-game').value.trim();
+        const key = document.getElementById('send-key').value.trim();
+        const tipo = document.getElementById('send-type').value;
+        if (!jogo) { toast('⚠️ Digite o nome do jogo!'); return; }
+        const btn = document.querySelector('#send-section .btn.green');
+        btn.disabled = true; btn.textContent = '⏳ Enviando...';
+        const ok = await enviarEmail(destinatarioEncontrado.email, destinatarioEncontrado.nome, jogo, key, tipo);
+        btn.disabled = false; btn.textContent = '📤 Enviar E‑mail';
+        if (ok) {
+            toast('✅ E‑mail enviado!', true);
+            document.getElementById('send-game').value = '';
+            document.getElementById('send-key').value = '';
+            destinatarioEncontrado = null;
+            document.getElementById('user-info').innerHTML = '';
+            document.getElementById('send-section').style.display = 'none';
+        }
+    };
+
+    function carregarHistorico() {
+        onValue(query(ref(db, 'emailLogs'), orderByChild('enviadoEm'), limitToLast(50)), (snap) => {
+            const tbody = document.getElementById('table-logs');
+            tbody.innerHTML = '';
+            if (!snap.exists()) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;padding:2rem;">Nenhum envio registrado</td></tr>';
+                return;
+            }
+            const logs = [];
+            snap.forEach(c => logs.push({ id: c.key, ...c.val() }));
+            logs.reverse();
+            tbody.innerHTML = logs.map(l => `
+                <tr>
+                    <td><strong>${l.nome||'—'}</strong><br><span style="font-size:.7rem;">${l.para}</span></td>
+                    <td>${l.jogo||'—'}</td>
+                    <td><span class="badge ${l.tipo==='vitoria'?'badge-gold':'badge-red'}">${l.tipo==='vitoria'?'🏆 Vitória':'😢 Derrota'}</span></td>
+                    <td style="font-size:.7rem;">${new Date(l.enviadoEm).toLocaleString('pt-BR')}</td>
+                    <td><span class="badge ${l.status==='sucesso'?'badge-green':'badge-red'}">${l.status==='sucesso'?'✅ OK':'❌ Falha'}</span></td>
+                    <td><button class="btn-sm red" onclick="deletarLog('${l.id}')">🗑️</button></td>
+                </tr>
+            `).join('');
+        });
+    }
+    window.deletarLog = async (id) => { await remove(ref(db, 'emailLogs/' + id)); toast('🗑️ Removido!', true); };
+    window.limparHistorico = async () => {
+        if (!confirm('Limpar todo o histórico?')) return;
+        await remove(ref(db, 'emailLogs'));
+        toast('🗑️ Histórico limpo!', true);
+    };
+    </script>
+</body>
+</html>
